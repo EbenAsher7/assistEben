@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
-import apiUser from "./routes/apiUser.js";
+import cookieParser from "cookie-parser";
+import api from "./routes/api.js";
+import user from "./routes/user.js";
 import authMiddleware from "./middleware/auth.js";
 
 const app = express();
@@ -12,11 +14,17 @@ app.use(cors());
 // Middleware para parsear JSON
 app.use(express.json());
 
+// Configurar cookie-parser
+app.use(cookieParser());
+
+// Ruta pública para el login
+app.use("/api", user);
+
 // Middleware de autenticación
 app.use(authMiddleware);
 
-// Usar rutas
-app.use("/user", apiUser);
+// Usar rutas protegidas
+app.use("/api", api);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

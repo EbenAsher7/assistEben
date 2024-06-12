@@ -141,4 +141,181 @@ router.get("/getStudentsByModule/:moduleId", async (req, res) => {
   }
 });
 
+// obtener sumatoria de asistencias por tipo dandole una fecha
+router.get("/getAttendanceByDate/:date", async (req, res) => {
+  try {
+    const date = req.params.date;
+
+    const result = await turso.execute({
+      sql: `
+        SELECT
+          Tutores.id AS TutorID,
+          Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
+          COUNT(Asistencias.id) AS TotalAsistencias,
+          SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
+          SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
+        FROM Tutores
+        JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
+        JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
+        WHERE DATE(Asistencias.fecha) = ?
+        GROUP BY Tutores.id, TutorNombres;
+      `,
+      args: [date],
+    });
+
+    const columns = result.columns;
+    const rows = result.rows;
+
+    const attendance = rows.map((row) => {
+      return {
+        TutorID: row[columns.indexOf("TutorID")],
+        TutorNombres: row[columns.indexOf("TutorNombres")],
+        AsistenciasPresenciales: row[columns.indexOf("AsistenciasPresenciales")],
+        AsistenciasVirtuales: row[columns.indexOf("AsistenciasVirtuales")],
+        TotalAsistencias: row[columns.indexOf("TotalAsistencias")],
+      };
+    });
+
+    res.status(200).json(attendance);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Convertir el mes y año en un rango de fechas
+function getDateRangeFromMonthYear(monthYear) {
+  const [month, year] = monthYear.split("-");
+  const startDate = `${year}-${month}-01`;
+  const endDate = new Date(year, month, 0); // último día del mes
+  return { startDate, endDate: endDate.toISOString().split("T")[0] };
+}
+
+// Obtener sumatoria de asistencias por tipo dado un mes y año
+router.get("/getAttendanceByMonth/:monthYear", async (req, res) => {
+  try {
+    const { monthYear } = req.params;
+    const { startDate, endDate } = getDateRangeFromMonthYear(monthYear);
+
+    const result = await turso.execute({
+      sql: `
+        SELECT
+          Tutores.id AS TutorID,
+          Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
+          DATE(Asistencias.fecha) AS Fecha,
+          COUNT(Asistencias.id) AS TotalAsistencias,
+          SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
+          SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
+        FROM Tutores
+        JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
+        JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
+        WHERE DATE(Asistencias.fecha) BETWEEN ? AND ?
+        GROUP BY Tutores.id, TutorNombres, Fecha;
+      `,
+      args: [startDate, endDate],
+    });
+
+    const columns = result.columns;
+    const rows = result.rows;
+
+    const attendanceByTutor = rows.reduce((acc, row) => {
+      const tutorId = row[columns.indexOf("TutorID")];
+      const tutorNombre = row[columns.indexOf("TutorNombres")];
+      const fecha = row[columns.indexOf("Fecha")];
+      const asistenciasPresenciales = row[columns.indexOf("AsistenciasPresenciales")];
+      const asistenciasVirtuales = row[columns.indexOf("AsistenciasVirtuales")];
+      const totalAsistencias = row[columns.indexOf("TotalAsistencias")];
+
+      if (!acc[tutorId]) {
+        acc[tutorId] = {
+          TutorID: tutorId,
+          TutorNombres: tutorNombre,
+          TotalAsistencias: 0,
+          fechas: [],
+        };
+      }
+
+      acc[tutorId].TotalAsistencias += totalAsistencias;
+      acc[tutorId].fechas.push({
+        fecha,
+        AsistenciasPresenciales: asistenciasPresenciales,
+        AsistenciasVirtuales: asistenciasVirtuales,
+        TotalAsistencias: totalAsistencias,
+      });
+
+      return acc;
+    }, {});
+
+    const attendanceArray = Object.values(attendanceByTutor);
+
+    res.status(200).json(attendanceArray);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Obtener sumatoria de asistencias por tipo dado un mes, año y tutor ID
+router.get("/getAttendanceByMonthAndTutor/:monthYear/:tutorId", async (req, res) => {
+  try {
+    const { monthYear, tutorId } = req.params;
+    const { startDate, endDate } = getDateRangeFromMonthYear(monthYear);
+
+    const result = await turso.execute({
+      sql: `
+        SELECT
+          Tutores.id AS TutorID,
+          Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
+          DATE(Asistencias.fecha) AS Fecha,
+          COUNT(Asistencias.id) AS TotalAsistencias,
+          SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
+          SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
+        FROM Tutores
+        JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
+        JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
+        WHERE DATE(Asistencias.fecha) BETWEEN ? AND ?
+          AND Tutores.id = ?
+        GROUP BY Tutores.id, TutorNombres, Fecha;
+      `,
+      args: [startDate, endDate, tutorId],
+    });
+
+    const columns = result.columns;
+    const rows = result.rows;
+
+    const attendanceByTutor = rows.reduce((acc, row) => {
+      const tutorId = row[columns.indexOf('TutorID')];
+      const tutorNombre = row[columns.indexOf('TutorNombres')];
+      const fecha = row[columns.indexOf('Fecha')];
+      const asistenciasPresenciales = row[columns.indexOf('AsistenciasPresenciales')];
+      const asistenciasVirtuales = row[columns.indexOf('AsistenciasVirtuales')];
+      const totalAsistencias = row[columns.indexOf('TotalAsistencias')];
+
+      if (!acc[tutorId]) {
+        acc[tutorId] = {
+          TutorID: tutorId,
+          TutorNombres: tutorNombre,
+          TotalAsistencias: 0,
+          fechas: [],
+        };
+      }
+
+      acc[tutorId].TotalAsistencias += totalAsistencias;
+      acc[tutorId].fechas.push({
+        fecha,
+        AsistenciasPresenciales: asistenciasPresenciales,
+        AsistenciasVirtuales: asistenciasVirtuales,
+        TotalAsistencias: totalAsistencias,
+      });
+
+      return acc;
+    }, {});
+
+    const attendanceArray = Object.values(attendanceByTutor);
+
+    res.status(200).json(attendanceArray);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 export default router;

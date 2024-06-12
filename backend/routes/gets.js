@@ -70,4 +70,75 @@ router.get("/getStudentsByTutor/:tutorId", async (req, res) => {
   }
 });
 
+//obtener tutores asignados a un modulo
+router.get("/getTutorsByModule/:moduleId", async (req, res) => {
+  try {
+    const moduleId = req.params.moduleId;
+    const result = await turso.execute({
+      sql: "SELECT Tutores.id AS TutorID, Tutores.nombres AS TutorNombres, Tutores.apellidos AS TutorApellidos, Tutores.telefono AS TutorTelefono, Tutores.direccion AS TutorDireccion, Tutores.activo AS TutorActivo, Tutores.observaciones AS TutorObservaciones FROM Tutores JOIN Modulos ON Tutores.modulo_id = Modulos.id WHERE Modulos.id = ?;",
+      args: [moduleId],
+    });
+
+    const columns = result.columns;
+    const rows = result.rows;
+
+    const tutors = rows.map((row) => {
+      let tutor = {};
+      columns.forEach((col, index) => {
+        tutor[col] = row[index];
+      });
+      return tutor;
+    });
+
+    res.status(200).json(tutors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// obtener todos los alumnos de un modulo y su tutor
+router.get("/getStudentsByModule/:moduleId", async (req, res) => {
+  try {
+    const moduleId = req.params.moduleId;
+    const result = await turso.execute({
+      sql: `
+        SELECT
+          Tutores.id AS TutorID,
+          Tutores.nombres AS TutorNombres,
+          Tutores.apellidos AS TutorApellidos,
+          Alumnos.id AS AlumnoID,
+          Alumnos.nombres AS AlumnoNombres,
+          Alumnos.apellidos AS AlumnoApellidos,
+          Alumnos.telefono AS AlumnoTelefono,
+          Alumnos.activo AS AlumnoActivo
+        FROM Tutores
+        JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
+        WHERE Tutores.modulo_id = ?;
+      `,
+      args: [moduleId],
+    });
+
+    const columns = result.columns;
+    const rows = result.rows;
+
+    const students = rows.map((row) => {
+      let student = {};
+      columns.forEach((col, index) => {
+        student[col] = row[index];
+      });
+      return {
+        alumno_id: student.AlumnoID,
+        alumno_nombres: student.AlumnoNombres + " " + student.AlumnoApellidos,
+        alumno_telefono: student.AlumnoTelefono,
+        tutor_nombre: student.TutorNombres + " " + student.TutorApellidos,
+        alumno_activo: student.AlumnoActivo,
+      };
+    });
+
+    res.status(200).json(students);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 export default router;

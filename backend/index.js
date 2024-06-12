@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import api from "./routes/api.js";
 import user from "./routes/user.js";
+import gets from "./routes/gets.js";
 import authMiddleware from "./middleware/auth.js";
 
 const app = express();
@@ -25,6 +26,7 @@ app.use(authMiddleware);
 
 // Usar rutas protegidas
 app.use("/api", api);
+app.use("/get", gets);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

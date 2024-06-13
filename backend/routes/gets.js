@@ -1,105 +1,105 @@
-import express from "express";
-import { turso } from "../database/connection.js";
+import express from 'express'
+import { turso } from '../database/connection.js'
 
-const router = express.Router();
+const router = express.Router()
 
-//obtener todos los alumnos de todos los tutores
-router.get("/getAllStudentsByTutor", async (req, res) => {
+// obtener todos los alumnos de todos los tutores
+router.get('/getAllStudentsByTutor', async (req, res) => {
   try {
     const result = await turso.execute(
       "SELECT Tutores.id AS tutor_id, Tutores.nombres || ' ' || Tutores.apellidos AS tutor_nombre, Alumnos.id AS alumno_id, Alumnos.nombres || ' ' || Alumnos.apellidos AS alumno_nombre FROM Tutores LEFT JOIN Alumnos ON Tutores.id = Alumnos.tutor_id ORDER BY Tutores.id, Alumnos.id"
-    );
-    const columns = result.columns;
-    const rows = result.rows;
+    )
+    const columns = result.columns
+    const rows = result.rows
 
     const students = rows.map((row) => {
-      let student = {};
+      const student = {}
       columns.forEach((col, index) => {
-        student[col] = row[index];
-      });
-      return student;
-    });
+        student[col] = row[index]
+      })
+      return student
+    })
 
     const groupedByTutor = students.reduce((acc, student) => {
-      const tutorId = student.tutor_id;
+      const tutorId = student.tutor_id
       if (!acc[tutorId]) {
         acc[tutorId] = {
           tutor_id: tutorId,
           tutor_nombre: student.tutor_nombre,
-          alumnos: [],
-        };
+          alumnos: []
+        }
       }
       acc[tutorId].alumnos.push({
         alumno_id: student.alumno_id,
-        alumno_nombre: student.alumno_nombre,
-      });
-      return acc;
-    }, {});
+        alumno_nombre: student.alumno_nombre
+      })
+      return acc
+    }, {})
 
-    const groupedByTutorArray = Object.values(groupedByTutor);
+    const groupedByTutorArray = Object.values(groupedByTutor)
 
-    res.status(200).json(groupedByTutorArray);
+    res.status(200).json(groupedByTutorArray)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message })
   }
-});
+})
 
-//obtener todos los alumnos de un tutor
-router.get("/getStudentsByTutor/:tutorId", async (req, res) => {
+// obtener todos los alumnos de un tutor
+router.get('/getStudentsByTutor/:tutorId', async (req, res) => {
   try {
-    const tutorId = req.params.tutorId;
+    const tutorId = req.params.tutorId
     const result = await turso.execute({
-      sql: "SELECT Alumnos.id AS AlumnoID, Alumnos.nombres AS AlumnoNombres, Alumnos.apellidos AS AlumnoApellidos, Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento, Alumnos.telefono AS AlumnoTelefono, Alumnos.direccion AS AlumnoDireccion, Alumnos.activo AS AlumnoActivo, Alumnos.observaciones AS AlumnoObservaciones FROM Alumnos JOIN Tutores ON Alumnos.tutor_id = Tutores.id WHERE Tutores.id = ?;",
-      args: [tutorId],
-    });
+      sql: 'SELECT Alumnos.id AS AlumnoID, Alumnos.nombres AS AlumnoNombres, Alumnos.apellidos AS AlumnoApellidos, Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento, Alumnos.telefono AS AlumnoTelefono, Alumnos.direccion AS AlumnoDireccion, Alumnos.activo AS AlumnoActivo, Alumnos.observaciones AS AlumnoObservaciones FROM Alumnos JOIN Tutores ON Alumnos.tutor_id = Tutores.id WHERE Tutores.id = ?;',
+      args: [tutorId]
+    })
 
-    const columns = result.columns;
-    const rows = result.rows;
+    const columns = result.columns
+    const rows = result.rows
 
     const students = rows.map((row) => {
-      let student = {};
+      const student = {}
       columns.forEach((col, index) => {
-        student[col] = row[index];
-      });
-      return student;
-    });
+        student[col] = row[index]
+      })
+      return student
+    })
 
-    res.status(200).json(students);
+    res.status(200).json(students)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message })
   }
-});
+})
 
-//obtener tutores asignados a un modulo
-router.get("/getTutorsByModule/:moduleId", async (req, res) => {
+// obtener tutores asignados a un modulo
+router.get('/getTutorsByModule/:moduleId', async (req, res) => {
   try {
-    const moduleId = req.params.moduleId;
+    const moduleId = req.params.moduleId
     const result = await turso.execute({
-      sql: "SELECT Tutores.id AS TutorID, Tutores.nombres AS TutorNombres, Tutores.apellidos AS TutorApellidos, Tutores.telefono AS TutorTelefono, Tutores.direccion AS TutorDireccion, Tutores.activo AS TutorActivo, Tutores.observaciones AS TutorObservaciones FROM Tutores JOIN Modulos ON Tutores.modulo_id = Modulos.id WHERE Modulos.id = ?;",
-      args: [moduleId],
-    });
+      sql: 'SELECT Tutores.id AS TutorID, Tutores.nombres AS TutorNombres, Tutores.apellidos AS TutorApellidos, Tutores.telefono AS TutorTelefono, Tutores.direccion AS TutorDireccion, Tutores.activo AS TutorActivo, Tutores.observaciones AS TutorObservaciones FROM Tutores JOIN Modulos ON Tutores.modulo_id = Modulos.id WHERE Modulos.id = ?;',
+      args: [moduleId]
+    })
 
-    const columns = result.columns;
-    const rows = result.rows;
+    const columns = result.columns
+    const rows = result.rows
 
     const tutors = rows.map((row) => {
-      let tutor = {};
+      const tutor = {}
       columns.forEach((col, index) => {
-        tutor[col] = row[index];
-      });
-      return tutor;
-    });
+        tutor[col] = row[index]
+      })
+      return tutor
+    })
 
-    res.status(200).json(tutors);
+    res.status(200).json(tutors)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message })
   }
-});
+})
 
 // obtener todos los alumnos de un modulo y su tutor
-router.get("/getStudentsByModule/:moduleId", async (req, res) => {
+router.get('/getStudentsByModule/:moduleId', async (req, res) => {
   try {
-    const moduleId = req.params.moduleId;
+    const moduleId = req.params.moduleId
     const result = await turso.execute({
       sql: `
         SELECT
@@ -115,36 +115,36 @@ router.get("/getStudentsByModule/:moduleId", async (req, res) => {
         JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
         WHERE Tutores.modulo_id = ?;
       `,
-      args: [moduleId],
-    });
+      args: [moduleId]
+    })
 
-    const columns = result.columns;
-    const rows = result.rows;
+    const columns = result.columns
+    const rows = result.rows
 
     const students = rows.map((row) => {
-      let student = {};
+      const student = {}
       columns.forEach((col, index) => {
-        student[col] = row[index];
-      });
+        student[col] = row[index]
+      })
       return {
         alumno_id: student.AlumnoID,
-        alumno_nombres: student.AlumnoNombres + " " + student.AlumnoApellidos,
+        alumno_nombres: student.AlumnoNombres + ' ' + student.AlumnoApellidos,
         alumno_telefono: student.AlumnoTelefono,
-        tutor_nombre: student.TutorNombres + " " + student.TutorApellidos,
-        alumno_activo: student.AlumnoActivo,
-      };
-    });
+        tutor_nombre: student.TutorNombres + ' ' + student.TutorApellidos,
+        alumno_activo: student.AlumnoActivo
+      }
+    })
 
-    res.status(200).json(students);
+    res.status(200).json(students)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message })
   }
-});
+})
 
 // obtener sumatoria de asistencias por tipo dandole una fecha
-router.get("/getAttendanceByDate/:date", async (req, res) => {
+router.get('/getAttendanceByDate/:date', async (req, res) => {
   try {
-    const date = req.params.date;
+    const date = req.params.date
 
     const result = await turso.execute({
       sql: `
@@ -160,41 +160,42 @@ router.get("/getAttendanceByDate/:date", async (req, res) => {
         WHERE DATE(Asistencias.fecha) = ?
         GROUP BY Tutores.id, TutorNombres;
       `,
-      args: [date],
-    });
+      args: [date]
+    })
 
-    const columns = result.columns;
-    const rows = result.rows;
+    const columns = result.columns
+    const rows = result.rows
 
     const attendance = rows.map((row) => {
       return {
-        TutorID: row[columns.indexOf("TutorID")],
-        TutorNombres: row[columns.indexOf("TutorNombres")],
-        AsistenciasPresenciales: row[columns.indexOf("AsistenciasPresenciales")],
-        AsistenciasVirtuales: row[columns.indexOf("AsistenciasVirtuales")],
-        TotalAsistencias: row[columns.indexOf("TotalAsistencias")],
-      };
-    });
+        TutorID: row[columns.indexOf('TutorID')],
+        TutorNombres: row[columns.indexOf('TutorNombres')],
+        AsistenciasPresenciales:
+          row[columns.indexOf('AsistenciasPresenciales')],
+        AsistenciasVirtuales: row[columns.indexOf('AsistenciasVirtuales')],
+        TotalAsistencias: row[columns.indexOf('TotalAsistencias')]
+      }
+    })
 
-    res.status(200).json(attendance);
+    res.status(200).json(attendance)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message })
   }
-});
+})
 
 // Convertir el mes y año en un rango de fechas
 function getDateRangeFromMonthYear(monthYear) {
-  const [month, year] = monthYear.split("-");
-  const startDate = `${year}-${month}-01`;
-  const endDate = new Date(year, month, 0); // último día del mes
-  return { startDate, endDate: endDate.toISOString().split("T")[0] };
+  const [month, year] = monthYear.split('-')
+  const startDate = `${year}-${month}-01`
+  const endDate = new Date(year, month, 0) // último día del mes
+  return { startDate, endDate: endDate.toISOString().split('T')[0] }
 }
 
 // Obtener sumatoria de asistencias por tipo dado un mes y año
-router.get("/getAttendanceByMonth/:monthYear", async (req, res) => {
+router.get('/getAttendanceByMonth/:monthYear', async (req, res) => {
   try {
-    const { monthYear } = req.params;
-    const { startDate, endDate } = getDateRangeFromMonthYear(monthYear);
+    const { monthYear } = req.params
+    const { startDate, endDate } = getDateRangeFromMonthYear(monthYear)
 
     const result = await turso.execute({
       sql: `
@@ -211,56 +212,59 @@ router.get("/getAttendanceByMonth/:monthYear", async (req, res) => {
         WHERE DATE(Asistencias.fecha) BETWEEN ? AND ?
         GROUP BY Tutores.id, TutorNombres, Fecha;
       `,
-      args: [startDate, endDate],
-    });
+      args: [startDate, endDate]
+    })
 
-    const columns = result.columns;
-    const rows = result.rows;
+    const columns = result.columns
+    const rows = result.rows
 
     const attendanceByTutor = rows.reduce((acc, row) => {
-      const tutorId = row[columns.indexOf("TutorID")];
-      const tutorNombre = row[columns.indexOf("TutorNombres")];
-      const fecha = row[columns.indexOf("Fecha")];
-      const asistenciasPresenciales = row[columns.indexOf("AsistenciasPresenciales")];
-      const asistenciasVirtuales = row[columns.indexOf("AsistenciasVirtuales")];
-      const totalAsistencias = row[columns.indexOf("TotalAsistencias")];
+      const tutorId = row[columns.indexOf('TutorID')]
+      const tutorNombre = row[columns.indexOf('TutorNombres')]
+      const fecha = row[columns.indexOf('Fecha')]
+      const asistenciasPresenciales =
+        row[columns.indexOf('AsistenciasPresenciales')]
+      const asistenciasVirtuales = row[columns.indexOf('AsistenciasVirtuales')]
+      const totalAsistencias = row[columns.indexOf('TotalAsistencias')]
 
       if (!acc[tutorId]) {
         acc[tutorId] = {
           TutorID: tutorId,
           TutorNombres: tutorNombre,
           TotalAsistencias: 0,
-          fechas: [],
-        };
+          fechas: []
+        }
       }
 
-      acc[tutorId].TotalAsistencias += totalAsistencias;
+      acc[tutorId].TotalAsistencias += totalAsistencias
       acc[tutorId].fechas.push({
         fecha,
         AsistenciasPresenciales: asistenciasPresenciales,
         AsistenciasVirtuales: asistenciasVirtuales,
-        TotalAsistencias: totalAsistencias,
-      });
+        TotalAsistencias: totalAsistencias
+      })
 
-      return acc;
-    }, {});
+      return acc
+    }, {})
 
-    const attendanceArray = Object.values(attendanceByTutor);
+    const attendanceArray = Object.values(attendanceByTutor)
 
-    res.status(200).json(attendanceArray);
+    res.status(200).json(attendanceArray)
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message })
   }
-});
+})
 
 // Obtener sumatoria de asistencias por tipo dado un mes, año y tutor ID
-router.get("/getAttendanceByMonthAndTutor/:monthYear/:tutorId", async (req, res) => {
-  try {
-    const { monthYear, tutorId } = req.params;
-    const { startDate, endDate } = getDateRangeFromMonthYear(monthYear);
+router.get(
+  '/getAttendanceByMonthAndTutor/:monthYear/:tutorId',
+  async (req, res) => {
+    try {
+      const { monthYear, tutorId } = req.params
+      const { startDate, endDate } = getDateRangeFromMonthYear(monthYear)
 
-    const result = await turso.execute({
-      sql: `
+      const result = await turso.execute({
+        sql: `
         SELECT
           Tutores.id AS TutorID,
           Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
@@ -275,47 +279,49 @@ router.get("/getAttendanceByMonthAndTutor/:monthYear/:tutorId", async (req, res)
           AND Tutores.id = ?
         GROUP BY Tutores.id, TutorNombres, Fecha;
       `,
-      args: [startDate, endDate, tutorId],
-    });
+        args: [startDate, endDate, tutorId]
+      })
 
-    const columns = result.columns;
-    const rows = result.rows;
+      const columns = result.columns
+      const rows = result.rows
 
-    const attendanceByTutor = rows.reduce((acc, row) => {
-      const tutorId = row[columns.indexOf('TutorID')];
-      const tutorNombre = row[columns.indexOf('TutorNombres')];
-      const fecha = row[columns.indexOf('Fecha')];
-      const asistenciasPresenciales = row[columns.indexOf('AsistenciasPresenciales')];
-      const asistenciasVirtuales = row[columns.indexOf('AsistenciasVirtuales')];
-      const totalAsistencias = row[columns.indexOf('TotalAsistencias')];
+      const attendanceByTutor = rows.reduce((acc, row) => {
+        const tutorId = row[columns.indexOf('TutorID')]
+        const tutorNombre = row[columns.indexOf('TutorNombres')]
+        const fecha = row[columns.indexOf('Fecha')]
+        const asistenciasPresenciales =
+          row[columns.indexOf('AsistenciasPresenciales')]
+        const asistenciasVirtuales =
+          row[columns.indexOf('AsistenciasVirtuales')]
+        const totalAsistencias = row[columns.indexOf('TotalAsistencias')]
 
-      if (!acc[tutorId]) {
-        acc[tutorId] = {
-          TutorID: tutorId,
-          TutorNombres: tutorNombre,
-          TotalAsistencias: 0,
-          fechas: [],
-        };
-      }
+        if (!acc[tutorId]) {
+          acc[tutorId] = {
+            TutorID: tutorId,
+            TutorNombres: tutorNombre,
+            TotalAsistencias: 0,
+            fechas: []
+          }
+        }
 
-      acc[tutorId].TotalAsistencias += totalAsistencias;
-      acc[tutorId].fechas.push({
-        fecha,
-        AsistenciasPresenciales: asistenciasPresenciales,
-        AsistenciasVirtuales: asistenciasVirtuales,
-        TotalAsistencias: totalAsistencias,
-      });
+        acc[tutorId].TotalAsistencias += totalAsistencias
+        acc[tutorId].fechas.push({
+          fecha,
+          AsistenciasPresenciales: asistenciasPresenciales,
+          AsistenciasVirtuales: asistenciasVirtuales,
+          TotalAsistencias: totalAsistencias
+        })
 
-      return acc;
-    }, {});
+        return acc
+      }, {})
 
-    const attendanceArray = Object.values(attendanceByTutor);
+      const attendanceArray = Object.values(attendanceByTutor)
 
-    res.status(200).json(attendanceArray);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.status(200).json(attendanceArray)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
   }
-});
+)
 
-
-export default router;
+export default router

@@ -34,8 +34,7 @@ router.post('/addTutor', async (req, res) => {
       !password ||
       !tipo
     ) {
-      res.status(400).json({ error: 'Faltan datos requeridos' })
-      throw new Error('Faltan datos requeridos')
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Verificar que no exista un tutor con el mismo username
@@ -79,8 +78,7 @@ router.post('/addTutor', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo agregar el tutor' })
-      throw new Error('No se pudo agregar el tutor')
+      return res.status(500).json({ error: 'No se pudo agregar el tutor' })
     }
 
     res.json({
@@ -138,8 +136,7 @@ router.post('/changePassword', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo cambiar la contraseña' })
-      throw new Error('No se pudo cambiar la contraseña')
+      return res.status(500).json({ error: 'No se pudo cambiar la contraseña' })
     }
 
     res.json({ Success: 'Contraseña cambiada correctamente' })
@@ -155,8 +152,7 @@ router.post('/disableTutor', async (req, res) => {
 
     // verificar que los datos requeridos estén presentes
     if (!username) {
-      res.status(400).json({ error: 'Faltan datos requeridos' })
-      throw new Error('Faltan datos requeridos')
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Verificar que el tutor exista
@@ -176,8 +172,7 @@ router.post('/disableTutor', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo desactivar el tutor' })
-      throw new Error('No se pudo desactivar el tutor')
+      return res.status(500).json({ error: 'No se pudo desactivar el tutor' })
     }
 
     res.json({ Success: 'Usuario desactivado correctamente' })
@@ -210,8 +205,7 @@ router.post('/addStudent', async (req, res) => {
       !modulo_id ||
       !activo
     ) {
-      res.status(400).json({ error: 'Faltan datos requeridos' })
-      throw new Error('Faltan datos requeridos')
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Verificar que el tutor exista
@@ -249,8 +243,7 @@ router.post('/addStudent', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo agregar el alumno' })
-      throw new Error('No se pudo agregar el alumno')
+      return res.status(500).json({ error: 'No se pudo agregar el alumno' })
     }
 
     res.status(200).json({ Success: 'Alumno agregado correctamente' })
@@ -266,8 +259,7 @@ router.post('/disableStudent', async (req, res) => {
 
     // verificar que los datos requeridos estén presentes
     if (!id) {
-      res.status(400).json({ error: 'Faltan datos requeridos' })
-      throw new Error('Faltan datos requeridos')
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Verificar que el alumno exista
@@ -287,8 +279,7 @@ router.post('/disableStudent', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo desactivar el alumno' })
-      throw new Error('No se pudo desactivar el alumno')
+      return res.status(500).json({ error: 'No se pudo desactivar el alumno' })
     }
 
     res.json({ Success: 'Alumno desactivado correctamente' })
@@ -304,8 +295,7 @@ router.post('/acceptStudent', async (req, res) => {
 
     // verificar que los datos requeridos estén presentes
     if (!id) {
-      res.status(400).json({ error: 'Faltan datos requeridos' })
-      throw new Error('Faltan datos requeridos')
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Verificar que el alumno exista
@@ -325,8 +315,7 @@ router.post('/acceptStudent', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo activar el alumno' })
-      throw new Error('No se pudo activar el alumno')
+      return res.status(500).json({ error: 'No se pudo activar el alumno' })
     }
 
     res.json({ Success: 'Alumno activado correctamente' })
@@ -352,8 +341,7 @@ router.post('/changeTutorData', async (req, res) => {
 
     // verificar que los datos requeridos estén presentes
     if (!id) {
-      res.status(400).json({ error: 'Faltan datos requeridos' })
-      throw new Error('Faltan datos requeridos')
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Verificar que el tutor exista
@@ -383,13 +371,144 @@ router.post('/changeTutorData', async (req, res) => {
     })
 
     if (resultado.affectedRows === 0) {
-      res.status(500).json({ error: 'No se pudo cambiar los datos del tutor' })
-      throw new Error('No se pudo cambiar los datos del tutor')
+      return res
+        .status(500)
+        .json({ error: 'No se pudo cambiar los datos del tutor' })
     }
 
     res.json({ Success: 'Datos del tutor cambiados correctamente' })
   } catch (error) {
     res.status(500).json({ error: error.message })
+  }
+})
+
+// cambiar datos de un alumno
+router.post('/changeStudentData', async (req, res) => {
+  try {
+    const {
+      id,
+      nombres,
+      apellidos,
+      fecha_nacimiento,
+      telefono,
+      direccion,
+      tutor_id,
+      modulo_id,
+      activo,
+      observaciones
+    } = req.body
+
+    // verificar que los datos requeridos estén presentes
+    if (!id) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
+    }
+
+    // Verificar que el alumno exista
+    const alumno = await turso.execute({
+      sql: 'SELECT * FROM Alumnos WHERE id = ? AND activo = "Activo"',
+      args: [id]
+    })
+
+    if (alumno.rows.length === 0) {
+      return res.status(400).json({ error: 'Alumno no existe' })
+    }
+
+    // Cambiar los datos del alumno
+    const resultado = await turso.execute({
+      sql: 'UPDATE Alumnos SET nombres = ?, apellidos = ?, fecha_nacimiento = ?, telefono = ?, direccion = ?, tutor_id = ?, modulo_id = ?, activo = ?, observaciones = ? WHERE id = ?',
+      args: [
+        nombres,
+        apellidos,
+        fecha_nacimiento,
+        telefono,
+        direccion,
+        tutor_id,
+        modulo_id,
+        activo,
+        observaciones,
+        id
+      ]
+    })
+
+    if (resultado.affectedRows === 0) {
+      return res
+        .status(500)
+        .json({ error: 'No se pudo cambiar los datos del alumno' })
+    }
+
+    res.json({ Success: 'Datos del alumno cambiados correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+router.post('/registerAttendance', async (req, res) => {
+  try {
+    const { alumno_id, fecha, pregunta, tipo } = req.body
+
+    // verificar que los datos requeridos estén presentes
+    if (!alumno_id || !fecha || !tipo) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
+    }
+
+    // Verificar que el alumno exista
+    const alumno = await turso.execute({
+      sql: 'SELECT * FROM Alumnos WHERE id = ? AND activo = "Activo"',
+      args: [alumno_id]
+    })
+
+    if (alumno.rows.length === 0) {
+      return res.status(400).json({ error: 'Alumno no existe' })
+    }
+
+    // Agregar la asistencia
+    const resultado = await turso.execute({
+      sql: 'INSERT INTO Asistencias (alumno_id, fecha, pregunta, tipo) VALUES (?, ?, ?, ?)',
+      args: [alumno_id, fecha, pregunta, tipo]
+    })
+
+    if (resultado.affectedRows === 0) {
+      return res
+        .status(500)
+        .json({ error: 'No se pudo registrar la asistencia' })
+    }
+
+    res.json({ Success: 'Asistencia registrada correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Buscar alumno por nombres y apellidos "LIKE"
+router.post('/searchStudent', async (req, res) => {
+  try {
+    const { search } = req.body
+
+    // verificar que los datos requeridos estén presentes
+    if (!search) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
+    }
+
+    // Buscar el alumno
+    const resultado = await turso.execute({
+      sql: 'SELECT id, nombres, apellidos, telefono FROM Alumnos WHERE nombres LIKE ? OR apellidos LIKE ?',
+      args: [`%${search}%`, `%${search}%`]
+    })
+
+    const columns = resultado.columns
+    const rows = resultado.rows
+
+    const students = rows.map((row) => {
+      const student = {}
+      columns.forEach((col, index) => {
+        student[col] = row[index]
+      })
+      return student
+    })
+
+    res.status(200).json(students)
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
   }
 })
 

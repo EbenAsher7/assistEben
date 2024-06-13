@@ -19,8 +19,7 @@ router.post('/user/login', async (req, res) => {
     })
 
     if (result.rows.length === 0) {
-      res.status(401).json({ error: 'Usuario no existe' })
-      return
+      return res.status(401).json({ error: 'Usuario no existe' })
     }
 
     // Verificar la contraseña
@@ -30,8 +29,7 @@ router.post('/user/login', async (req, res) => {
     const match = await bcrypt.compare(password, hashedPassword)
 
     if (!match) {
-      res.status(401).json({ error: 'Contraseña incorrecta' })
-      return
+      return res.status(401).json({ error: 'Contraseña incorrecta' })
     }
 
     const user = result.rows[0]

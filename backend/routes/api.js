@@ -40,6 +40,11 @@ router.get('/tutors', async (req, res) => {
       return tutor
     })
 
+    // return all data except password
+    tutors.forEach((tutor) => {
+      delete tutor.password
+    })
+
     res.status(200).json(tutors)
   } catch (error) {
     res.status(500).json({ error: error.message })

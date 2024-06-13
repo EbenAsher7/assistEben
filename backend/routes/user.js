@@ -2,7 +2,9 @@ import express from 'express'
 import { turso } from '../database/connection.js'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
+import bcrypt from 'bcrypt'
 dotenv.config()
+/* eslint-disable camelcase */
 
 const router = express.Router()
 
@@ -12,30 +14,51 @@ router.post('/user/login', async (req, res) => {
     const { username, password } = req.body
 
     const result = await turso.execute({
-      sql: 'SELECT * FROM tutores WHERE username = ? AND password = ?',
-      args: [username, password]
+      sql: 'SELECT * FROM tutores WHERE username = ?',
+      args: [username]
     })
 
     if (result.rows.length === 0) {
-      res.status(401).json({ error: 'Usuario o contraseña incorrectos' })
+      res.status(401).json({ error: 'Usuario no existe' })
       return
     }
+
+    // Verificar la contraseña
+    const userPass = result.rows[0]
+    const hashedPassword = userPass.password
+
+    const match = await bcrypt.compare(password, hashedPassword)
+
+    if (!match) {
+      res.status(401).json({ error: 'Contraseña incorrecta' })
+      return
+    }
+
     const user = result.rows[0]
 
     const {
       nombres,
       apellidos,
-      fechaNacimiento,
-      fotoUrl,
+      fech_nacimiento,
+      foto_url,
       telefono,
       direccion,
       tipo,
       observaciones,
-      modulo,
+      modulo_id,
       activo
     } = user
 
-    const token = jwt.sign(user, process.env.JWT_SECRET, { expiresIn: '6d' })
+    const datosUser = {
+      nombre: nombres + ' ' + apellidos,
+      tipo,
+      modulo_id,
+      activo
+    }
+
+    const token = jwt.sign(datosUser, process.env.JWT_SECRET, {
+      expiresIn: '6d'
+    })
 
     // return cookie
     res.cookie('token', token, {
@@ -48,16 +71,16 @@ router.post('/user/login', async (req, res) => {
     res.status(200).json({
       user: {
         nombres: nombres + ' ' + apellidos,
-        fechaNacimiento,
-        fotoUrl,
+        fech_nacimiento,
+        foto_url,
         telefono,
         direccion,
         tipo,
         observaciones,
-        modulo,
+        modulo_id,
         activo
-      }
-      //   token,
+      },
+      token
     })
   } catch (error) {
     res.status(500).json({ error: error.message })

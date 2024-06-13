@@ -324,4 +324,90 @@ router.get(
   }
 )
 
+// obtener alumnos pendientes por tutor y sin tutor
+// para todos los pendientes usar: /getPendingStudents
+// para los pendientes de un tutor usar: /getPendingStudents?tutorId=1
+router.get('/getPendingStudents', async (req, res) => {
+  try {
+    const tutorId = req.query.tutorId
+    let query
+    let args
+
+    if (tutorId) {
+      // Consulta cuando se pasa el id del tutor
+      query = `
+        SELECT
+          Alumnos.id AS idAlumno,
+          Alumnos.nombres || ' ' || Alumnos.apellidos AS nombreAlumno
+        FROM Alumnos
+        WHERE Alumnos.tutor_id = ? AND Alumnos.activo = 'Pendiente';
+      `
+      args = [tutorId]
+    } else {
+      // Consulta cuando no se pasa el id del tutor
+      query = `
+        SELECT
+          Tutores.id AS idTutor,
+          Tutores.nombres || ' ' || Tutores.apellidos AS NombreTutor,
+          Alumnos.id AS idAlumno,
+          Alumnos.nombres || ' ' || Alumnos.apellidos AS nombreAlumno
+        FROM Tutores
+        JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
+        WHERE Alumnos.activo = 'Pendiente';
+      `
+      args = []
+    }
+
+    const result = await turso.execute({
+      sql: query,
+      args
+    })
+
+    const columns = result.columns
+    const rows = result.rows
+
+    if (tutorId) {
+      // Formateo de la respuesta cuando se pasa el id del tutor
+      const students = rows.map((row) => {
+        const student = {}
+        columns.forEach((col, index) => {
+          student[col] = row[index]
+        })
+        return student
+      })
+
+      res.status(200).json(students)
+    } else {
+      // Formateo de la respuesta cuando no se pasa el id del tutor
+      const tutors = rows.reduce((acc, row) => {
+        const tutorIndex = acc.findIndex(
+          (t) => t.idTutor === row[columns.indexOf('idTutor')]
+        )
+        if (tutorIndex === -1) {
+          acc.push({
+            idTutor: row[columns.indexOf('idTutor')],
+            NombreTutor: row[columns.indexOf('NombreTutor')],
+            Alumnos: [
+              {
+                idAlumno: row[columns.indexOf('idAlumno')],
+                nombreAlumno: row[columns.indexOf('nombreAlumno')]
+              }
+            ]
+          })
+        } else {
+          acc[tutorIndex].Alumnos.push({
+            idAlumno: row[columns.indexOf('idAlumno')],
+            nombreAlumno: row[columns.indexOf('nombreAlumno')]
+          })
+        }
+        return acc
+      }, [])
+
+      res.status(200).json(tutors)
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

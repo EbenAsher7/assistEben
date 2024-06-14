@@ -2,7 +2,7 @@ import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import PropTypes from "prop-types";
 
@@ -24,7 +24,7 @@ export function DropdownAE({ data, title, setValueAE }) {
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder={`Buscar ${title.toLowerCase()}...`} />
+          {/* <CommandInput onC placeholder={`Buscar ${title.toLowerCase()}...`} /> */}
           <CommandList>
             <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
             <CommandGroup>

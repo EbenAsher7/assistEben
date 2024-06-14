@@ -21,25 +21,25 @@ const Attendance = () => {
       <div className="flex flex-col w-full px-4 my-3 justify-center">
         <hr className="mb-4" />
         <div className="flex justify-center w-full">
-          <Tabs defaultValue="listado" className="overflow-x-auto">
-            <TabsList>
-              <TabsTrigger value="listado">Listado</TabsTrigger>
-              <TabsTrigger value="AddStudent">Añadir Alumno</TabsTrigger>
-              <TabsTrigger value="asisDia">Asistencia por Día</TabsTrigger>
-              <TabsTrigger value="asisMes">Asistencia por Mes</TabsTrigger>
-              <TabsTrigger value="editarEstudiante">Editar Alumno</TabsTrigger>
-              <TabsTrigger value="graficas">Gráficas</TabsTrigger>
-              <TabsTrigger value="pendientes">Pendientes</TabsTrigger>
-            </TabsList>
-            <div className="fixed w-11/12 sm:w-[950px] sm:-ml-[100px]">
-              <ListStudents value="listado" />
-              <AddStudent value="AddStudent" />
-              <AttendanceByDay value="asisDia" />
-              <AttendanceByMonth value="asisMes" />
-              <EditStudents value="editarEstudiante" />
-              <Graphics value="graficas" />
-              <PendantStudents value="pendientes" />
+          <Tabs defaultValue="listado" className="w-full">
+            <div className="sticky top-0 left-0 right-0 z-10">
+              <TabsList className="flex overflow-x-auto whitespace-nowrap pl-96 sm:pl-0 ">
+                <TabsTrigger value="listado">Listado</TabsTrigger>
+                <TabsTrigger value="AddStudent">Añadir Alumno</TabsTrigger>
+                <TabsTrigger value="asisDia">Asistencia por Día</TabsTrigger>
+                <TabsTrigger value="asisMes">Asistencia por Mes</TabsTrigger>
+                <TabsTrigger value="editarEstudiante">Editar Alumno</TabsTrigger>
+                <TabsTrigger value="graficas">Gráficas</TabsTrigger>
+                <TabsTrigger value="pendientes">Pendientes</TabsTrigger>
+              </TabsList>
             </div>
+            <ListStudents value="listado" />
+            <AddStudent value="AddStudent" />
+            <AttendanceByDay value="asisDia" />
+            <AttendanceByMonth value="asisMes" />
+            <EditStudents value="editarEstudiante" />
+            <Graphics value="graficas" />
+            <PendantStudents value="pendientes" />
           </Tabs>
         </div>
       </div>

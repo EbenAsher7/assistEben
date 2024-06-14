@@ -96,6 +96,36 @@ router.get('/getTutorsByModule/:moduleId', async (req, res) => {
   }
 })
 
+// obtener todos los alumnos de un modulo y de un tutor
+router.get(
+  '/getStudentsByModuleAndTutor/:moduleId/:tutorId',
+  async (req, res) => {
+    try {
+      const moduleId = req.params.moduleId
+      const tutorId = req.params.tutorId
+      const result = await turso.execute({
+        sql: 'SELECT Alumnos.id AS AlumnoID, Alumnos.nombres AS AlumnoNombres, Alumnos.apellidos AS AlumnoApellidos, Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento, Alumnos.telefono AS AlumnoTelefono, Alumnos.direccion AS AlumnoDireccion, Alumnos.activo AS AlumnoActivo, Alumnos.observaciones AS AlumnoObservaciones FROM Alumnos JOIN Tutores ON Alumnos.tutor_id = Tutores.id WHERE Tutores.modulo_id = ? AND Tutores.id = ?;',
+        args: [moduleId, tutorId]
+      })
+
+      const columns = result.columns
+      const rows = result.rows
+
+      const students = rows.map((row) => {
+        const student = {}
+        columns.forEach((col, index) => {
+          student[col] = row[index]
+        })
+        return student
+      })
+
+      res.status(200).json(students)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  }
+)
+
 // obtener todos los alumnos de un modulo y su tutor
 router.get('/getStudentsByModule/:moduleId', async (req, res) => {
   try {

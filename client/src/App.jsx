@@ -9,7 +9,7 @@ import Attendance from "./pages/Attendance";
 
 const App = () => {
   return (
-    <div className="bg-neutral-100 dark:bg-neutral-900 w-full h-dvh overflow-y-auto text-black dark:text-white">
+    <div className="bg-neutral-100 dark:bg-neutral-900 w-full h-dvh overflow-y-auto pb-5 text-black dark:text-white">
       <Navbar />
       <div className="mt-[60px] sm:mt-[70px] "></div> {/* Navbar height */}
       <Toaster />

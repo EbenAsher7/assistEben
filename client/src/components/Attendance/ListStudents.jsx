@@ -19,37 +19,40 @@ import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import { DropdownAE } from "../DropdownAE";
+import { format } from "date-fns";
 
 const columns = [
   {
-    accessorKey: "Nombres",
+    accessorKey: "AlumnoNombres",
     header: ({ column }) => (
       <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
         Nombre
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => <div className="capitalize">{row.getValue("Nombres")}</div>,
+    cell: ({ row }) => (
+      <div className="capitalize">{`${row.original.AlumnoNombres} ${row.original.AlumnoApellidos}`}</div>
+    ),
   },
   {
-    accessorKey: "Telefono",
+    accessorKey: "AlumnoTelefono",
     header: "Teléfono",
-    cell: ({ row }) => <div>{row.getValue("Telefono")}</div>,
+    cell: ({ row }) => <div>{row.getValue("AlumnoTelefono")}</div>,
   },
   {
-    accessorKey: "FechaNac",
+    accessorKey: "AlumnoFechaNacimiento",
     header: "Fecha de Nacimiento",
-    cell: ({ row }) => <div>{row.getValue("FechaNac")}</div>,
+    cell: ({ row }) => <div>{format(new Date(row.getValue("AlumnoFechaNacimiento")), "yyyy-MM-dd")}</div>,
   },
   {
-    accessorKey: "Observaciones",
+    accessorKey: "AlumnoObservaciones",
     header: "Observaciones",
-    cell: ({ row }) => <div>{row.getValue("Observaciones")}</div>,
+    cell: ({ row }) => <div>{row.getValue("AlumnoObservaciones")}</div>,
   },
   {
-    accessorKey: "Estado",
+    accessorKey: "AlumnoActivo",
     header: "Estado",
-    cell: ({ row }) => <div>{row.getValue("Estado")}</div>,
+    cell: ({ row }) => <div>{row.getValue("AlumnoActivo")}</div>,
   },
 ];
 
@@ -181,8 +184,8 @@ export function ListStudents({ value }) {
             <div className="flex items-center">
               <Input
                 placeholder="Filtrar por nombre..."
-                value={table.getColumn("Nombres")?.getFilterValue() ?? ""}
-                onChange={(event) => table.getColumn("Nombres")?.setFilterValue(event.target.value)}
+                value={table.getColumn("AlumnoNombres")?.getFilterValue() ?? ""}
+                onChange={(event) => table.getColumn("AlumnoNombres")?.setFilterValue(event.target.value)}
                 className="max-w-sm"
               />
             </div>

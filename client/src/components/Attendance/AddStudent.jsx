@@ -10,6 +10,8 @@ import { DropdownAE } from "../DropdownAE";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarAE } from "../CalendarAE";
+import { Button } from "../ui/button";
+import { format } from "date-fns";
 
 export function AddStudent({ value }) {
   const [loadingData, setLoadingData] = useState(true);
@@ -20,10 +22,80 @@ export function AddStudent({ value }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { toast } = useToast();
 
+  // UseState para todos los inputs
+  const [name, setName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [observations, setObservations] = useState("");
+  const [activo, setActivo] = useState("Activo");
+
   // CONTEXTO
   const { user } = useContext(MainContext);
 
-  // EseEffect para cagar ambos datos
+  // Verficar que nombre, apellidos y telefono no esten vacios
+  const validateForm = () => {
+    if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Los campos de nombres, apellidos, teléfono, curso y tutor son obligatorios.",
+        duration: 2500,
+      });
+      return false;
+    } else {
+      setActivo("Activo");
+      return true;
+    }
+  };
+
+  // Funcion para guardar los datos
+  const handleGuardarDatos = async () => {
+    if (validateForm()) {
+      try {
+        console.log(selectedDate);
+        const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+        console.log(formattedDate);
+        const response = await fetch(`${URL_BASE}/post/addStudent`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user.token,
+          },
+          body: JSON.stringify({
+            nombres: name,
+            apellidos: lastName,
+            fecha_nacimiento: formattedDate ?? "",
+            telefono: phone,
+            direccion: address ?? "",
+            tutor_id: parseInt(tutorSelected),
+            modulo_id: parseInt(cursoSelected),
+            activo: activo,
+            observaciones: observations ?? "",
+          }),
+        });
+
+        if (response.ok) {
+          toast({
+            title: "Éxito",
+            description: "El alumno ha sido registrado correctamente.",
+            duration: 2500,
+          });
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al guardar los datos.",
+          duration: 2500,
+        });
+      }
+    }
+  };
+
+  // useEffect para cagar ambos datos
   useEffect(() => {
     const fetchData = async () => {
       setLoadingData(true);
@@ -39,7 +111,6 @@ export function AddStudent({ value }) {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           const formattedData = data.map((curso) => ({
             value: curso.id.toString(),
             label: curso.nombre,
@@ -60,13 +131,11 @@ export function AddStudent({ value }) {
 
         if (responseTutors.ok) {
           const dataTutors = await responseTutors.json();
-          console.log(dataTutors);
           const formattedDataTutors = dataTutors.map((tutor) => ({
             value: tutor.id.toString(),
             label: tutor.nombres + " " + tutor.apellidos,
           }));
           setTutors(formattedDataTutors);
-          console.log(formattedDataTutors);
         } else {
           throw new Error("Failed to fetch");
         }
@@ -102,28 +171,47 @@ export function AddStudent({ value }) {
           <CardTitle>Añadir Alumno</CardTitle>
           <CardDescription>añadir un nuevo alumno</CardDescription>
         </CardHeader>
-        <DropdownAE data={cursos} title="Seleccione un curso" setValueAE={setCursoSelected} />
-        <DropdownAE data={tutors} title="Seleccione un tutor" setValueAE={setTutorSelected} />
-        <CalendarAE title="Seleccione una fecha" setDate={setSelectedDate} />
-
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-2 grid grid-cols-1 sm:grid-cols-2 w-full sm:w-[720px] m-auto gap-4 place-content-center justify-center items-center">
           <div className="space-y-1">
             <Label htmlFor="name">Nombres</Label>
-            <Input placeholder="Ingrese sus nombres" />
+            <Input placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="name">Apellidos</Label>
-            <Input placeholder="Ingrese sus apellidos" />
+            <Label htmlFor="name" className="-mt-1">
+              Apellidos
+            </Label>
+            <Input placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
+          </div>
+          <div className="space-y-1 flex flex-col">
+            <Label htmlFor="name" className="mb-2">
+              Fecha de Nacimiento
+            </Label>
+            <CalendarAE title="Seleccione una fecha" setDate={setSelectedDate} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Teléfono</Label>
-            <Input placeholder="Ingrese su teléfono" />
+            <Input placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Dirección</Label>
-            <Input placeholder="Ingrese su dirección" />
+            <Input placeholder="Ingrese la dirección" onChange={(e) => setAddress(e.target.value)} />
+          </div>
+          <div className="space-y-1 flex flex-col">
+            <Label htmlFor="name">Tutor</Label>
+            <DropdownAE data={tutors} title="Seleccione un tutor" setValueAE={setTutorSelected} />
+          </div>
+          <div className="space-y-1 flex flex-col">
+            <Label htmlFor="name">Curso</Label>
+            <DropdownAE data={cursos} title="Seleccione un curso" setValueAE={setCursoSelected} />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="name">Observaciones</Label>
+            <Input placeholder="Ingrese una observacion" onChange={(e) => setObservations(e.target.value)} />
           </div>
         </CardContent>
+        <Button className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex" onClick={handleGuardarDatos}>
+          Guardar
+        </Button>
       </Card>
     </TabsContent>
   );

@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import Profile from "./pages/Profile";
+import Attendance from "./pages/Attendance";
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/attendance" element={<Attendance />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

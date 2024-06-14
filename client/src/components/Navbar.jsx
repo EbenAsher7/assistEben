@@ -84,15 +84,25 @@ const Navbar = () => {
               {isLogin && (
                 <li className="flex justify-end text-black dark:text-white items-center">
                   <Link
-                    to="/profile"
-                    className="bg-purple-500 text-white dark:bg-purple-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
+                    to="/attendance"
+                    className="bg-green-500 text-white dark:bg-green-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-green-300 dark:border-green-800"
                     onClick={closeNavbar}
                   >
                     Perfil
                   </Link>
                 </li>
               )}
-
+              {isLogin && (
+                <li className="flex justify-end text-black dark:text-white items-center">
+                  <Link
+                    to="/profile"
+                    className="bg-blue-500 text-white dark:bg-blue-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-800"
+                    onClick={closeNavbar}
+                  >
+                    Ajustes
+                  </Link>
+                </li>
+              )}
               <li>
                 <span className="flex justify-end text-black dark:text-white">
                   <ThemeToggle />

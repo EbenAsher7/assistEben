@@ -35,6 +35,7 @@ router.post('/user/login', async (req, res) => {
     const user = result.rows[0]
 
     const {
+      id,
       nombres,
       apellidos,
       fech_nacimiento,
@@ -66,19 +67,24 @@ router.post('/user/login', async (req, res) => {
       httpOnly: true
     })
 
+    const usernameLogin = user.username
     res.status(200).json({
       user: {
-        nombres: nombres + ' ' + apellidos,
+        id,
+        nombres,
+        apellidos,
         fech_nacimiento,
         foto_url,
         telefono,
         direccion,
         tipo,
+        username: usernameLogin,
         observaciones,
         modulo_id,
-        activo
-      },
-      token
+        activo,
+        token
+      }
+      // token
     })
   } catch (error) {
     res.status(500).json({ error: error.message })

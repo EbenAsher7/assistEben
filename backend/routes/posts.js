@@ -327,17 +327,8 @@ router.post('/acceptStudent', async (req, res) => {
 // cambiar datos de un tutor
 router.post('/changeTutorData', async (req, res) => {
   try {
-    const {
-      id,
-      nombres,
-      apellidos,
-      fecha_nacimiento,
-      foto_url,
-      telefono,
-      direccion,
-      tipo,
-      observaciones
-    } = req.body
+    const { id, nombres, apellidos, telefono, direccion, tipo, observaciones } =
+      req.body
 
     // verificar que los datos requeridos estén presentes
     if (!id) {
@@ -356,18 +347,8 @@ router.post('/changeTutorData', async (req, res) => {
 
     // Cambiar los datos del tutor
     const resultado = await turso.execute({
-      sql: 'UPDATE Tutores SET nombres = ?, apellidos = ?, fecha_nacimiento = ?, foto_url = ?, telefono = ?, direccion = ?, tipo = ?, observaciones = ? WHERE id = ?',
-      args: [
-        nombres,
-        apellidos,
-        fecha_nacimiento,
-        foto_url,
-        telefono,
-        direccion,
-        tipo,
-        observaciones,
-        id
-      ]
+      sql: 'UPDATE Tutores SET nombres = ?, apellidos = ?, telefono = ?, direccion = ?, tipo = ?, observaciones = ? WHERE id = ?',
+      args: [nombres, apellidos, telefono, direccion, tipo, observaciones, id]
     })
 
     if (resultado.affectedRows === 0) {

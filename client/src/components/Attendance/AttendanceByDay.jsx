@@ -8,19 +8,25 @@ import { URL_BASE } from "@/config/config";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "../ui/button";
+import LoaderAE from "../LoaderAE"; // Importar el componente LoaderAE
+import RadarByDay from "./RadarByDay";
 
 export function AttendanceByDay({ value }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [onlyTuesday, setOnlyTuesday] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [attendedStudents, setAttendedStudents] = useState([]);
+  const [notAttendedStudents, setNotAttendedStudents] = useState([]);
+  const [allData, setAllData] = useState([]);
   const { toast } = useToast();
 
   // CONTEXTO
   const { user } = useContext(MainContext);
 
   const loadData = async () => {
-    console.log(selectedDate);
     try {
+      setAttendedStudents([]);
+      setNotAttendedStudents([]);
       setLoading(true);
       if (!selectedDate) {
         toast({
@@ -33,12 +39,6 @@ export function AttendanceByDay({ value }) {
       }
 
       const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
-      const dataFinal = {
-        date: formattedDate,
-        tutorID: user.id,
-      };
-
-      console.log(dataFinal);
       const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutor/${formattedDate}/${user.id}`, {
         method: "GET",
         headers: {
@@ -49,7 +49,9 @@ export function AttendanceByDay({ value }) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
+        setAttendedStudents(data.attendedStudents);
+        setNotAttendedStudents(data.notAttendedStudents);
+        setAllData(data);
       } else {
         throw new Error("Failed to fetch");
       }
@@ -76,7 +78,7 @@ export function AttendanceByDay({ value }) {
           <CardTitle>Asistencia por día</CardTitle>
           <CardDescription>Lista de alumnos y su asistencia por día</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-4">
           <div className="space-y-1 flex flex-col pt-4 sm:justify-center sm:items-center">
             <CalendarAE title="Fecha de asistencia" setDate={setSelectedDate} onlyTuesday={onlyTuesday} />
             <label className="flex items-center space-x-2 w-full justify-end sm:justify-center">
@@ -89,11 +91,58 @@ export function AttendanceByDay({ value }) {
               <span className="text-gray-700 dark:text-gray-300">Mostrar solo los Martes</span>
             </label>
           </div>
-          <div className="py-8">
-            <Button disabled={loading} onClick={loadData} className="w-full sm:w-[300px] m-auto justify-center flex">
-              {loading ? "Cargando..." : "Mostrar asistencias registradas"}
-            </Button>
-          </div>
+          <Button disabled={loading} onClick={loadData} className="w-full sm:w-[300px] m-auto justify-center flex">
+            {loading ? <LoaderAE /> : "Mostrar asistencias registradas"}
+          </Button>
+          <br />
+          {(attendedStudents.length > 0 || notAttendedStudents.length > 0) && <RadarByDay data={allData} />}
+          {/* Tabla de alumnos que asistieron */}
+          {attendedStudents.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-green-500 text-lg font-bold">Alumnos que asistieron:</h2>
+              <table className="w-full border-collapse border border-gray-200">
+                <thead className="bg-green-500">
+                  <tr>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Nombre</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attendedStudents.map((student) => (
+                    <tr key={student.AlumnoID}>
+                      <td className="border border-gray-200 px-4 py-2">{student.AlumnoNombres}</td>
+                      <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
+                      <td className="border border-gray-200 px-4 py-2">{student.TipoAsistencia}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Tabla de alumnos que no asistieron */}
+          {notAttendedStudents.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-red-500 text-lg font-bold">Alumnos que no asistieron:</h2>
+              <table className="w-full border-collapse border border-gray-200">
+                <thead className="bg-red-500">
+                  <tr>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Nombre</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {notAttendedStudents.map((student) => (
+                    <tr key={student.AlumnoID}>
+                      <td className="border border-gray-200 px-4 py-2">{student.AlumnoNombres}</td>
+                      <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </TabsContent>

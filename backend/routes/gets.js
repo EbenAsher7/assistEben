@@ -236,13 +236,81 @@ function getDateRangeFromMonthYear(monthYear) {
   return { startDate, endDate: endDate.toISOString().split('T')[0] }
 }
 
-// obtener los alumnos que asistieron en una fecha dada y por un tutor
+// // obtener los alumnos que asistieron en una fecha dada y por un tutor
+// router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
+//   try {
+//     const { date, tutorId } = req.params
+
+//     // Obtener alumnos que asistieron en la fecha dada
+//     const attendedResult = await turso.execute({
+//       sql: `
+//         SELECT
+//           Alumnos.id AS AlumnoID,
+//           Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
+//           Alumnos.telefono AS AlumnoTelefono,
+//           Asistencias.tipo AS TipoAsistencia
+//         FROM Alumnos
+//         JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
+//         WHERE Asistencias.fecha = ? AND Alumnos.tutor_id = ?;
+//       `,
+//       args: [date, tutorId]
+//     })
+
+//     // Obtener alumnos que no asistieron en la fecha dada
+//     const notAttendedResult = await turso.execute({
+//       sql: `
+//         SELECT
+//           Alumnos.id AS AlumnoID,
+//           Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
+//           Alumnos.telefono AS AlumnoTelefono
+//         FROM Alumnos
+//         WHERE Alumnos.tutor_id = ? AND Alumnos.id NOT IN (
+//           SELECT alumno_id
+//           FROM Asistencias
+//           WHERE fecha = ?
+//         );
+//       `,
+//       args: [tutorId, date]
+//     })
+
+//     const attendedColumns = attendedResult.columns
+//     const attendedRows = attendedResult.rows
+//     const notAttendedColumns = notAttendedResult.columns
+//     const notAttendedRows = notAttendedResult.rows
+
+//     const attendedStudents = attendedRows.map((row) => {
+//       return {
+//         AlumnoID: row[attendedColumns.indexOf('AlumnoID')],
+//         AlumnoNombres: row[attendedColumns.indexOf('AlumnoNombres')],
+//         AlumnoTelefono: row[attendedColumns.indexOf('AlumnoTelefono')],
+//         TipoAsistencia: row[attendedColumns.indexOf('TipoAsistencia')]
+//       }
+//     })
+
+//     const notAttendedStudents = notAttendedRows.map((row) => {
+//       return {
+//         AlumnoID: row[notAttendedColumns.indexOf('AlumnoID')],
+//         AlumnoNombres: row[notAttendedColumns.indexOf('AlumnoNombres')],
+//         AlumnoTelefono: row[notAttendedColumns.indexOf('AlumnoTelefono')]
+//       }
+//     })
+
+//     res.status(200).json({
+//       attendedStudents,
+//       notAttendedStudents
+//     })
+//   } catch (error) {
+//     res.status(500).json({ error: error.message })
+//   }
+// })
+
+// obtener los alumnos que asistieron y no asistieron en una fecha dada y por un tutor
 router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
   try {
     const { date, tutorId } = req.params
 
-    // Obtener alumnos que asistieron en la fecha dada
-    const attendedResult = await turso.execute({
+    // Obtener alumnos que asistieron y no asistieron en la fecha dada
+    const result = await turso.execute({
       sql: `
         SELECT
           Alumnos.id AS AlumnoID,
@@ -250,48 +318,30 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
           Alumnos.telefono AS AlumnoTelefono,
           Asistencias.tipo AS TipoAsistencia
         FROM Alumnos
-        JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
-        WHERE Asistencias.fecha = ? AND Alumnos.tutor_id = ?;
+        LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id AND Asistencias.fecha = ?
+        WHERE Alumnos.tutor_id = ?;
       `,
       args: [date, tutorId]
     })
 
-    // Obtener alumnos que no asistieron en la fecha dada
-    const notAttendedResult = await turso.execute({
-      sql: `
-        SELECT
-          Alumnos.id AS AlumnoID,
-          Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
-          Alumnos.telefono AS AlumnoTelefono
-        FROM Alumnos
-        WHERE Alumnos.tutor_id = ? AND Alumnos.id NOT IN (
-          SELECT alumno_id
-          FROM Asistencias
-          WHERE fecha = ?
-        );
-      `,
-      args: [tutorId, date]
-    })
+    const columns = result.columns
+    const rows = result.rows
 
-    const attendedColumns = attendedResult.columns
-    const attendedRows = attendedResult.rows
-    const notAttendedColumns = notAttendedResult.columns
-    const notAttendedRows = notAttendedResult.rows
+    const attendedStudents = []
+    const notAttendedStudents = []
 
-    const attendedStudents = attendedRows.map((row) => {
-      return {
-        AlumnoID: row[attendedColumns.indexOf('AlumnoID')],
-        AlumnoNombres: row[attendedColumns.indexOf('AlumnoNombres')],
-        AlumnoTelefono: row[attendedColumns.indexOf('AlumnoTelefono')],
-        TipoAsistencia: row[attendedColumns.indexOf('TipoAsistencia')]
+    rows.forEach((row) => {
+      const student = {
+        AlumnoID: row[columns.indexOf('AlumnoID')],
+        AlumnoNombres: row[columns.indexOf('AlumnoNombres')],
+        AlumnoTelefono: row[columns.indexOf('AlumnoTelefono')],
+        TipoAsistencia: row[columns.indexOf('TipoAsistencia')]
       }
-    })
-
-    const notAttendedStudents = notAttendedRows.map((row) => {
-      return {
-        AlumnoID: row[notAttendedColumns.indexOf('AlumnoID')],
-        AlumnoNombres: row[notAttendedColumns.indexOf('AlumnoNombres')],
-        AlumnoTelefono: row[notAttendedColumns.indexOf('AlumnoTelefono')]
+      if (student.TipoAsistencia) {
+        attendedStudents.push(student)
+      } else {
+        delete student.TipoAsistencia
+        notAttendedStudents.push(student)
       }
     })
 

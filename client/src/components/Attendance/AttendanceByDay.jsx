@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
 import { CalendarAE } from "../CalendarAE";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { format } from "date-fns";

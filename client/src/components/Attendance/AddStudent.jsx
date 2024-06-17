@@ -94,6 +94,16 @@ export function AddStudent({ value }) {
             description: "El alumno ha sido registrado correctamente.",
             duration: 2500,
           });
+
+          // reset formulario
+          setName("");
+          setLastName("");
+          setPhone("");
+          setAddress("");
+          setObservations("");
+          setTutorSelected(null);
+          setCursoSelected(null);
+          setSelectedDate(new Date());
         } else {
           throw new Error("Failed to fetch");
         }

@@ -196,10 +196,7 @@ export function AddStudent({ value }) {
             <Input placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="name" className="mb-2">
-              Fecha de Nacimiento
-            </Label>
-            <CalendarAE title="Seleccione una fecha" setDate={setSelectedDate} />
+            <CalendarAE title="Fecha de Nacimiento" setDate={setSelectedDate} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Teléfono</Label>

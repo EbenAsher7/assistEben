@@ -56,6 +56,19 @@ export function AddStudent({ value }) {
         console.log(selectedDate);
         const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
         console.log(formattedDate);
+        const dataFinal = {
+          nombres: name,
+          apellidos: lastName,
+          fecha_nacimiento: formattedDate ?? "",
+          telefono: phone,
+          direccion: address ?? "",
+          tutor_id: parseInt(tutorSelected),
+          modulo_id: parseInt(cursoSelected),
+          activo: activo,
+          observaciones: observations ?? "",
+        };
+
+        console.log(dataFinal);
         const response = await fetch(`${URL_BASE}/post/addStudent`, {
           method: "POST",
           headers: {

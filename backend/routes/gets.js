@@ -103,8 +103,23 @@ router.get(
     try {
       const moduleId = req.params.moduleId
       const tutorId = req.params.tutorId
+
       const result = await turso.execute({
-        sql: 'SELECT Alumnos.id AS AlumnoID, Alumnos.nombres AS AlumnoNombres, Alumnos.apellidos AS AlumnoApellidos, Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento, Alumnos.telefono AS AlumnoTelefono, Alumnos.direccion AS AlumnoDireccion, Alumnos.activo AS AlumnoActivo, Alumnos.observaciones AS AlumnoObservaciones FROM Alumnos JOIN Tutores ON Alumnos.tutor_id = Tutores.id WHERE Tutores.modulo_id = ? AND Tutores.id = ?;',
+        sql: `SELECT
+              Alumnos.id AS AlumnoID,
+              Alumnos.nombres AS AlumnoNombres,
+              Alumnos.apellidos AS AlumnoApellidos,
+              Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento,
+              Alumnos.telefono AS AlumnoTelefono,
+              Alumnos.direccion AS AlumnoDireccion,
+              Alumnos.activo AS AlumnoActivo,
+              Alumnos.observaciones AS AlumnoObservaciones
+            FROM
+              Alumnos
+            JOIN
+              Tutores ON Alumnos.tutor_id = Tutores.id
+            WHERE
+              Alumnos.modulo_id = ? AND Tutores.id = ?;`,
         args: [moduleId, tutorId]
       })
 

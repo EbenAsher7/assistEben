@@ -176,7 +176,9 @@ export function ListStudents({ value }) {
           <CardTitle>Listado de alumnos</CardTitle>
           <CardDescription>Mostrar todos los alumnos asignados.</CardDescription>
         </CardHeader>
-        <div className={`w-full flex justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-80"}`}>
+        <div
+          className={`w-8/12 m-auto flex justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-80"}`}
+        >
           <DropdownAE data={cursos} title="Seleccione un curso" setValueAE={setCursoSeleccionado} />
         </div>
         {cursoSeleccionado && !isLoadingAlumnos ? (

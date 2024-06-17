@@ -236,6 +236,74 @@ function getDateRangeFromMonthYear(monthYear) {
   return { startDate, endDate: endDate.toISOString().split('T')[0] }
 }
 
+// obtener los alumnos que asistieron en una fecha dada y por un tutor
+router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
+  try {
+    const { date, tutorId } = req.params
+
+    // Obtener alumnos que asistieron en la fecha dada
+    const attendedResult = await turso.execute({
+      sql: `
+        SELECT
+          Alumnos.id AS AlumnoID,
+          Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
+          Alumnos.telefono AS AlumnoTelefono,
+          Asistencias.tipo AS TipoAsistencia
+        FROM Alumnos
+        JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
+        WHERE Asistencias.fecha = ? AND Alumnos.tutor_id = ?;
+      `,
+      args: [date, tutorId]
+    })
+
+    // Obtener alumnos que no asistieron en la fecha dada
+    const notAttendedResult = await turso.execute({
+      sql: `
+        SELECT
+          Alumnos.id AS AlumnoID,
+          Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
+          Alumnos.telefono AS AlumnoTelefono
+        FROM Alumnos
+        WHERE Alumnos.tutor_id = ? AND Alumnos.id NOT IN (
+          SELECT alumno_id
+          FROM Asistencias
+          WHERE fecha = ?
+        );
+      `,
+      args: [tutorId, date]
+    })
+
+    const attendedColumns = attendedResult.columns
+    const attendedRows = attendedResult.rows
+    const notAttendedColumns = notAttendedResult.columns
+    const notAttendedRows = notAttendedResult.rows
+
+    const attendedStudents = attendedRows.map((row) => {
+      return {
+        AlumnoID: row[attendedColumns.indexOf('AlumnoID')],
+        AlumnoNombres: row[attendedColumns.indexOf('AlumnoNombres')],
+        AlumnoTelefono: row[attendedColumns.indexOf('AlumnoTelefono')],
+        TipoAsistencia: row[attendedColumns.indexOf('TipoAsistencia')]
+      }
+    })
+
+    const notAttendedStudents = notAttendedRows.map((row) => {
+      return {
+        AlumnoID: row[notAttendedColumns.indexOf('AlumnoID')],
+        AlumnoNombres: row[notAttendedColumns.indexOf('AlumnoNombres')],
+        AlumnoTelefono: row[notAttendedColumns.indexOf('AlumnoTelefono')]
+      }
+    })
+
+    res.status(200).json({
+      attendedStudents,
+      notAttendedStudents
+    })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Obtener sumatoria de asistencias por tipo dado un mes y año
 router.get('/getAttendanceByMonth/:monthYear', async (req, res) => {
   try {

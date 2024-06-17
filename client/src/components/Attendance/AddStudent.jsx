@@ -15,6 +15,7 @@ import { format } from "date-fns";
 
 export function AddStudent({ value }) {
   const [loadingData, setLoadingData] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [tutors, setTutors] = useState([]);
   const [cursos, setCursos] = useState([]);
   const [cursoSelected, setCursoSelected] = useState(null);
@@ -52,10 +53,9 @@ export function AddStudent({ value }) {
   // Funcion para guardar los datos
   const handleGuardarDatos = async () => {
     if (validateForm()) {
+      setLoading(true);
       try {
-        console.log(selectedDate);
         const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
-        console.log(formattedDate);
         const dataFinal = {
           nombres: name,
           apellidos: lastName,
@@ -68,24 +68,13 @@ export function AddStudent({ value }) {
           observaciones: observations ?? "",
         };
 
-        console.log(dataFinal);
         const response = await fetch(`${URL_BASE}/post/addStudent`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: user.token,
           },
-          body: JSON.stringify({
-            nombres: name,
-            apellidos: lastName,
-            fecha_nacimiento: formattedDate ?? "",
-            telefono: phone,
-            direccion: address ?? "",
-            tutor_id: parseInt(tutorSelected),
-            modulo_id: parseInt(cursoSelected),
-            activo: activo,
-            observaciones: observations ?? "",
-          }),
+          body: JSON.stringify(dataFinal),
         });
 
         if (response.ok) {
@@ -114,11 +103,13 @@ export function AddStudent({ value }) {
           description: "Ocurrió un error al guardar los datos.",
           duration: 2500,
         });
+      } finally {
+        setLoading(false);
       }
     }
   };
 
-  // useEffect para cagar ambos datos
+  // useEffect para cargar ambos datos
   useEffect(() => {
     const fetchData = async () => {
       setLoadingData(true);
@@ -197,24 +188,29 @@ export function AddStudent({ value }) {
         <CardContent className="space-y-2 grid grid-cols-1 sm:grid-cols-2 w-full sm:w-[720px] m-auto gap-4 place-content-center justify-center items-center">
           <div className="space-y-1">
             <Label htmlFor="name">Nombres</Label>
-            <Input placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} />
+            <Input value={name} placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name" className="-mt-1">
               Apellidos
             </Label>
-            <Input placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
+            <Input value={lastName} placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
           </div>
           <div className="space-y-1 flex flex-col">
             <CalendarAE title="Fecha de Nacimiento" setDate={setSelectedDate} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Teléfono</Label>
-            <Input placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" />
+            <Input
+              value={phone}
+              placeholder="Ingrese el teléfono"
+              onChange={(e) => setPhone(e.target.value)}
+              type="number"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Dirección</Label>
-            <Input placeholder="Ingrese la dirección" onChange={(e) => setAddress(e.target.value)} />
+            <Input value={address} placeholder="Ingrese la dirección" onChange={(e) => setAddress(e.target.value)} />
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="name">Tutor</Label>
@@ -226,11 +222,19 @@ export function AddStudent({ value }) {
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Observaciones</Label>
-            <Input placeholder="Ingrese una observacion" onChange={(e) => setObservations(e.target.value)} />
+            <Input
+              value={observations}
+              placeholder="Ingrese una observacion"
+              onChange={(e) => setObservations(e.target.value)}
+            />
           </div>
         </CardContent>
-        <Button className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex" onClick={handleGuardarDatos}>
-          Guardar
+        <Button
+          className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex"
+          onClick={handleGuardarDatos}
+          disabled={loading}
+        >
+          {loading ? "Cargando..." : "Guardar"}
         </Button>
       </Card>
     </TabsContent>

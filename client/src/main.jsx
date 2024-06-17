@@ -7,7 +7,7 @@ import MainProvider from "./context/MainProvider.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <MainProvider>
         <BrowserRouter>
           <App />

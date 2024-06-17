@@ -1,4 +1,3 @@
-import React from "react";
 import { Pie, PieChart, Cell, ResponsiveContainer } from "recharts";
 import PropTypes from "prop-types";
 

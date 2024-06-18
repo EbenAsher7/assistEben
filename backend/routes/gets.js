@@ -316,7 +316,8 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
           Alumnos.id AS AlumnoID,
           Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
           Alumnos.telefono AS AlumnoTelefono,
-          Asistencias.tipo AS TipoAsistencia
+          Asistencias.tipo AS TipoAsistencia,
+          Asistencias.pregunta as Pregunta
         FROM Alumnos
         LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id AND Asistencias.fecha = ?
         WHERE Alumnos.tutor_id = ?;
@@ -324,6 +325,7 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
       args: [date, tutorId]
     })
 
+    console.log(result)
     const columns = result.columns
     const rows = result.rows
 
@@ -335,7 +337,8 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
         AlumnoID: row[columns.indexOf('AlumnoID')],
         AlumnoNombres: row[columns.indexOf('AlumnoNombres')],
         AlumnoTelefono: row[columns.indexOf('AlumnoTelefono')],
-        TipoAsistencia: row[columns.indexOf('TipoAsistencia')]
+        TipoAsistencia: row[columns.indexOf('TipoAsistencia')],
+        Pregunta: row[columns.indexOf('Pregunta')]
       }
       if (student.TipoAsistencia) {
         attendedStudents.push(student)

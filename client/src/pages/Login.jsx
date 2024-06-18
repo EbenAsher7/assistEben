@@ -7,8 +7,8 @@ import MainContext from "../context/MainContext";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [userLogin, setUserLogin] = useState("crpaiz6");
-  const [pass, setPass] = useState("1234");
+  const [userLogin, setUserLogin] = useState("");
+  const [pass, setPass] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();

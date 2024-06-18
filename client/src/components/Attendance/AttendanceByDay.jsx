@@ -52,6 +52,7 @@ export function AttendanceByDay({ value }) {
         setAttendedStudents(data.attendedStudents);
         setNotAttendedStudents(data.notAttendedStudents);
         setAllData(data);
+        console.log(allData);
       } else {
         throw new Error("Failed to fetch");
       }
@@ -103,17 +104,23 @@ export function AttendanceByDay({ value }) {
               <table className="w-full border-collapse border border-gray-200">
                 <thead className="bg-green-500">
                   <tr>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Nombre</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Pregunta</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {attendedStudents.map((student) => (
+                  {attendedStudents.map((student, index) => (
                     <tr key={student.AlumnoID}>
+                      <td className="border border-gray-200 px-4 py-2">{index + 1}</td>
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoNombres}</td>
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
                       <td className="border border-gray-200 px-4 py-2">{student.TipoAsistencia}</td>
+                      <td className="border border-gray-200 px-4 py-2 overflow-x-auto max-w-[100px]">
+                        {student.Pregunta}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -128,13 +135,15 @@ export function AttendanceByDay({ value }) {
               <table className="w-full border-collapse border border-gray-200">
                 <thead className="bg-red-500">
                   <tr>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Nombre</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {notAttendedStudents.map((student) => (
+                  {notAttendedStudents.map((student, index) => (
                     <tr key={student.AlumnoID}>
+                      <td className="border border-gray-200 px-4 py-2">{index + 1}</td>
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoNombres}</td>
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
                     </tr>

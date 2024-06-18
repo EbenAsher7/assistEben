@@ -423,41 +423,4 @@ router.post('/changeStudentData', async (req, res) => {
   }
 })
 
-router.post('/registerAttendance', async (req, res) => {
-  try {
-    const { alumno_id, fecha, pregunta, tipo } = req.body
-
-    // verificar que los datos requeridos estén presentes
-    if (!alumno_id || !fecha || !tipo) {
-      return res.status(400).json({ error: 'Faltan datos requeridos' })
-    }
-
-    // Verificar que el alumno exista
-    const alumno = await turso.execute({
-      sql: 'SELECT * FROM Alumnos WHERE id = ? AND activo = "Activo"',
-      args: [alumno_id]
-    })
-
-    if (alumno.rows.length === 0) {
-      return res.status(400).json({ error: 'Alumno no existe' })
-    }
-
-    // Agregar la asistencia
-    const resultado = await turso.execute({
-      sql: 'INSERT INTO Asistencias (alumno_id, fecha, pregunta, tipo) VALUES (?, ?, ?, ?)',
-      args: [alumno_id, fecha, pregunta, tipo]
-    })
-
-    if (resultado.affectedRows === 0) {
-      return res
-        .status(500)
-        .json({ error: 'No se pudo registrar la asistencia' })
-    }
-
-    res.json({ Success: 'Asistencia registrada correctamente' })
-  } catch (error) {
-    res.status(500).json({ error: error.message })
-  }
-})
-
 export default router

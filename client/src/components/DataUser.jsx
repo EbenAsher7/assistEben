@@ -19,7 +19,7 @@ export function DataUser({ user }) {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-  const [isSaving, setIsSaving] = useState(false); // Estado para controlar el guardado de datos
+  const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   //CONTEXTO

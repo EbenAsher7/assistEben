@@ -1,5 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import { useDebounce } from "use-debounce";
+import { useNavigate } from "react-router-dom";
+import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -12,12 +14,13 @@ const InputDebounce = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const inputRef = useRef(null);
+  const navigate = useNavigate();
+  const { setAlumnoSeleccionado } = useContext(MainContext);
 
   useEffect(() => {
     const fetchNombre = async () => {
-      setLoading(true); 
+      setLoading(true);
       try {
         const response = await fetch(`${URL_BASE}/api/user/searchStudent`, {
           method: "POST",
@@ -33,6 +36,10 @@ const InputDebounce = () => {
           const data = await response.json();
           setResults(data);
           setShowRegister(data.length === 0);
+          // Ocultar los botones de confirmación si no hay resultados
+          if (data.length === 0) {
+            setShowConfirm(false);
+          }
         } else {
           toast({
             title: "Error",
@@ -54,12 +61,20 @@ const InputDebounce = () => {
     if (valueDebounce.length > 0) {
       fetchNombre();
     } else {
+      setNombre("");
+      setShowConfirm(false);
       setSelectedResult(null);
       setResults([]);
-      setShowConfirm(false);
-      setShowRegister(false);
     }
   }, [valueDebounce, toast]);
+
+  useEffect(() => {
+    // Limpiar estado cuando no hay resultados y se borra el texto
+    if (results.length === 0 && valueDebounce.length === 0) {
+      setShowConfirm(false);
+      setSelectedResult(null);
+    }
+  }, [results, valueDebounce]);
 
   const handleSelect = (result) => {
     setSelectedResult(result);
@@ -69,12 +84,17 @@ const InputDebounce = () => {
   };
 
   const handleConfirm = (isConfirmed) => {
-    if (!isConfirmed) {
+    if (isConfirmed) {
+      setAlumnoSeleccionado(selectedResult);
+      navigate("/registerAttendance");
+    } else {
+      setAlumnoSeleccionado(null);
       inputRef.current.focus();
     }
     setNombre("");
     setShowConfirm(false);
     setSelectedResult(null);
+    setResults([]);
   };
 
   const handleRegister = () => {
@@ -131,9 +151,9 @@ const InputDebounce = () => {
         </div>
       )}
       {showRegister && (
-        <div className="mt-12 w-full flex flex-col gap-2 justify-center items-center p-6">
+        <div className="mt-12 w-full flex flex-col gap-2 justify-center items-center p-4">
           <p className="font-bold text-lg">¿No apareces en la lista?</p>
-          <button className="bg-green-500 text-white px-4 py-2 rounded-md w-1/2" onClick={handleRegister}>
+          <button className="bg-green-500 text-white px-4 py-4 rounded-md w-1/2" onClick={handleRegister}>
             ¡Regístrate aquí!
           </button>
         </div>

@@ -91,4 +91,39 @@ router.post('/user/login', async (req, res) => {
   }
 })
 
+// Buscar alumno por nombres y apellidos "LIKE"
+router.post('/user/searchStudent', async (req, res) => {
+  try {
+    const { search } = req.body
+
+    // verificar que los datos requeridos estén presentes
+    if (!search) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
+    }
+
+    // Buscar el alumno
+    const resultado = await turso.execute({
+      sql: `SELECT id, nombres, apellidos, telefono
+            FROM Alumnos
+            WHERE CONCAT(nombres, ' ', apellidos) LIKE ?`,
+      args: [`%${search}%`]
+    })
+
+    const columns = resultado.columns
+    const rows = resultado.rows
+
+    const students = rows.map((row) => {
+      const student = {}
+      columns.forEach((col, index) => {
+        student[col] = row[index]
+      })
+      return student
+    })
+
+    res.status(200).json(students)
+  } catch (error) {
+    return res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

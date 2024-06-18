@@ -8,7 +8,7 @@ import MainContext from "../context/MainContext";
 import PropTypes from "prop-types";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
-import { Loader2 } from "lucide-react";
+import { Loader } from "lucide-react";
 
 export function DataUser({ user }) {
   // Estados para los campos del formulario
@@ -173,7 +173,7 @@ export function DataUser({ user }) {
               <CardTitle>Cuenta</CardTitle>
               <CardDescription>
                 Haz cambios a tu cuenta aquí, luego haz click en &quot;Guardar cambios&quot; para finalizar <br />
-                <br />{" "}
+                <br />
                 <span className="text-red-500 font-semibold">
                   NOTA: Al cambiar los datos, se cerrará tu sesión actual.
                 </span>
@@ -213,7 +213,7 @@ export function DataUser({ user }) {
               <Button onClick={handleGuardarCambios} disabled={isSaving}>
                 {isSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
                     Guardando...
                   </>
                 ) : (
@@ -254,7 +254,7 @@ export function DataUser({ user }) {
               <Button onClick={handleCambiarPass} disabled={isSaving}>
                 {isSaving ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
                     Cambiando contraseña...
                   </>
                 ) : (

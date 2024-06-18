@@ -125,7 +125,7 @@ const InputDebounce = () => {
             <li
               key={result.id}
               onClick={() => handleSelect(result)}
-              className="p-2 cursor-pointer border-b border-gray-300 hover:bg-gray-100 text-black dark:text-white"
+              className="p-2 cursor-pointer border-b border-gray-300 hover:bg-gray-100 text-black dark:text-white dark:hover:bg-neutral-600"
             >
               {result.nombres} {result.apellidos}
             </li>

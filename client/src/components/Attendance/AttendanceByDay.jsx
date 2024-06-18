@@ -2,7 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
 import { CalendarAE } from "../CalendarAE";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { format } from "date-fns";
@@ -22,6 +22,20 @@ export function AttendanceByDay({ value }) {
 
   // CONTEXTO
   const { user } = useContext(MainContext);
+
+  const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    const date = new Date();
+    const hours = date.getHours();
+    if (hours >= 6 && hours < 12) {
+      setGreeting("Buenos días hermano(a):");
+    } else if (hours >= 12 && hours < 19) {
+      setGreeting("Buenas tardes hermano(a):");
+    } else {
+      setGreeting("Buenas noches hermano(a):");
+    }
+  }, []);
 
   const loadData = async () => {
     try {
@@ -126,7 +140,22 @@ export function AttendanceByDay({ value }) {
                       <td className="border border-gray-200 px-4 py-2 min-w-[200px] max-w-[300px]">
                         {student.AlumnoNombres}
                       </td>
-                      <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
+                      <td className="border border-gray-200 px-4 py-2 min-w-[100px]">
+                        {student.Pregunta?.length > 0 ? (
+                          <a
+                            className="text-yellow-500 underline"
+                            href={`https://wa.me/502${student.AlumnoTelefono}?text=${encodeURIComponent(
+                              `${greeting} ${student.AlumnoNombres},\nLe saluda su tutor(a) de Ebenezer, con respecto a la pregunta que hizo:\n\n*${student.Pregunta}.* \n\nLe comento:\n\n`
+                            )}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            {student.AlumnoTelefono}
+                          </a>
+                        ) : (
+                          <>{student.AlumnoTelefono}</>
+                        )}
+                      </td>
                       <td
                         className={`border border-gray-200 px-4 py-2 font-bold ${
                           student.TipoAsistencia === "Virtual" ? "text-blue-500" : "text-green-500"

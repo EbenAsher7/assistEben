@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainContext from "../context/MainContext";
 import { PersonStanding, Monitor } from "lucide-react";
 import ConfettiExplosion from "react-confetti-explosion";
+import { Input } from "@/components/ui/input";
 
 const RegisterAttendance = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const RegisterAttendance = () => {
   const [virtualSelected, setVirtualSelected] = useState(false);
   const [confirmClicked, setConfirmClicked] = useState(false);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [pregunta, setPregunta] = useState(false);
 
   useEffect(() => {
     if (alumnoSeleccionado === null) {
@@ -59,9 +61,9 @@ const RegisterAttendance = () => {
 
   const handleConfirmClick = () => {
     if (presencialSelected) {
-      setAlumnoSeleccionado({ ...alumnoSeleccionado, tipo: "Presencial" });
+      setAlumnoSeleccionado({ ...alumnoSeleccionado, tipo: "Presencial", pregunta });
     } else if (virtualSelected) {
-      setAlumnoSeleccionado({ ...alumnoSeleccionado, tipo: "Virtual" });
+      setAlumnoSeleccionado({ ...alumnoSeleccionado, tipo: "Virtual", pregunta });
     }
     setConfirmClicked(true);
 
@@ -96,12 +98,12 @@ const RegisterAttendance = () => {
         setVirtualSelected(false);
         setAlumnoSeleccionado(null);
         navigate("/");
-      }, 3000);
+      }, 4500);
     }
   }, [confirmClicked, navigate, setAlumnoSeleccionado]);
 
   return (
-    <div className="flex justify-center items-center pt-24">
+    <div className="flex justify-center items-center sm:pt-8 pt-24">
       {!alreadyRegistered && !confirmClicked ? (
         <div className="w-full p-4 flex flex-col justify-center items-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-pretty text-center py-9">
@@ -111,7 +113,7 @@ const RegisterAttendance = () => {
             {/* Botón Presencial */}
             <button
               className={`flex flex-col w-full items-center justify-center p-4 rounded-md border border-gray-300 ${
-                presencialSelected ? "bg-green-500 text-white" : "bg-gray-200 text-gray-600"
+                presencialSelected ? "bg-green-500 text-white " : "bg-gray-200 text-gray-600 hover:bg-gray-300"
               }`}
               onClick={handlePresencialClick}
             >
@@ -122,7 +124,7 @@ const RegisterAttendance = () => {
             {/* Botón Virtual */}
             <button
               className={`flex flex-col w-full items-center justify-center p-4 rounded-md border border-gray-300 ${
-                virtualSelected ? "bg-purple-500 text-white" : "bg-gray-200 text-gray-600"
+                virtualSelected ? "bg-purple-500 text-white" : "bg-gray-200 text-gray-600 hover:bg-gray-300"
               }`}
               onClick={handleVirtualClick}
             >
@@ -133,16 +135,31 @@ const RegisterAttendance = () => {
 
           {/* Botón de Confirmar */}
           {(presencialSelected || virtualSelected) && (
-            <div className="w-full flex flex-row justify-center gap-4 mt-8">
-              <button
-                className="mt-4 p-2 px-4 text-black dark:text-white border-2 rounded-md"
-                onClick={handleBackClick}
-              >
-                Regresar
-              </button>
-              <button className="mt-4 p-2 px-4 bg-blue-500 text-white rounded-md" onClick={handleConfirmClick}>
-                Confirmar
-              </button>
+            <div className="w-full sm:w-[800px] flex flex-col justify-center gap-4 mt-8">
+              <div className="w-full border-2 border-neutral-500/30 rounded-lg ">
+                <h3 className="text-bold text-lg mb-3 p-3 text-center">
+                  <span className="font-extrabold text-red-500">OPCIONAL: </span>
+                  <br />
+                  ¿Tienes alguna pregunta sobre el tema de hoy?
+                </h3>
+                <Input
+                  className="w-11/12 m-auto mb-4"
+                  resizable
+                  placeholder="Ingresa tu pregunta aquí..."
+                  onChange={(e) => setPregunta(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-row w-full gap-4 justify-center">
+                <button
+                  className="mt-4 p-2 px-4 text-black dark:text-white border-2 rounded-md"
+                  onClick={handleBackClick}
+                >
+                  Regresar
+                </button>
+                <button className="mt-4 p-2 px-4 bg-blue-500 text-white rounded-md" onClick={handleConfirmClick}>
+                  Confirmar asistencia
+                </button>
+              </div>
             </div>
           )}
         </div>

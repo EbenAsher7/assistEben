@@ -31,7 +31,16 @@ const RadarByDay = ({ data }) => {
       </div>
       <ResponsiveContainer width="100%" height={250}>
         <PieChart>
-          <Pie data={Daydata} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+          <Pie
+            data={Daydata}
+            dataKey="value"
+            nameKey="name"
+            cx="50%"
+            cy="50%"
+            outerRadius={80}
+            label
+            animationDuration={500}
+          >
             {Daydata.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
             ))}

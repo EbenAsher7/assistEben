@@ -88,7 +88,7 @@ const MainProvider = ({ children }) => {
             body: JSON.stringify({
               alumno_id: id,
               fecha: new Date().toISOString().split("T")[0],
-              pregunta: alumnoSeleccionado.Pregunta || "",
+              pregunta: alumnoSeleccionado.pregunta || "",
               tipo: alumnoSeleccionado.tipo,
             }),
           });

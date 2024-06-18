@@ -30,8 +30,8 @@ const Navbar = () => {
       <div className="w-full flex flex-wrap items-center justify-between p-2 sm:pl-4">
         <Link to="/" className="flex items-center gap-2" onClick={closeNavbar}>
           <img src={LOGO} className="size-10 -mt-2 dark:invert-0 invert" alt="Logo Ministerios Ebenezer" />
-          <span className="self-center text-xl font-semibold whitespace-nowrap dark:text-white">
-            Asistencias Ebenezer
+          <span className="self-center text-md sm:text-xl font-semibold whitespace-nowrap dark:text-white">
+            Ministerios Ebenezer
           </span>
         </Link>
         <button

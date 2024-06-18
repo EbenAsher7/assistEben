@@ -11,10 +11,33 @@ const RegisterAttendance = () => {
   const [presencialSelected, setPresencialSelected] = useState(false);
   const [virtualSelected, setVirtualSelected] = useState(false);
   const [confirmClicked, setConfirmClicked] = useState(false);
+  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
 
   useEffect(() => {
     if (alumnoSeleccionado === null) {
       navigate("/");
+    } else {
+      try {
+        // Verificar en localStorage el historial de asistencias
+        const attendanceHistoryStr = localStorage.getItem("attendanceHistory");
+        if (!attendanceHistoryStr) {
+          throw new Error("attendanceHistory no existe en localStorage");
+        }
+
+        const attendanceHistory = JSON.parse(attendanceHistoryStr);
+        const today = new Date().toISOString().slice(0, 10); // Fecha actual en formato "YYYY-MM-DD"
+        if (!attendanceHistory[today] || !attendanceHistory[today].asistencias) {
+          throw new Error("attendanceHistory no tiene la estructura esperada para hoy");
+        }
+
+        const alreadyRegistered = attendanceHistory[today].asistencias.some(
+          (asistencia) => asistencia.id === alumnoSeleccionado.id
+        );
+        setAlreadyRegistered(alreadyRegistered);
+      } catch (error) {
+        console.error("Error al leer o parsear attendanceHistory:", error);
+        // Manejar el error o establecer un comportamiento predeterminado
+      }
     }
   }, [alumnoSeleccionado, navigate]);
 
@@ -41,6 +64,23 @@ const RegisterAttendance = () => {
       setAlumnoSeleccionado({ ...alumnoSeleccionado, tipo: "Virtual" });
     }
     setConfirmClicked(true);
+
+    if (!alreadyRegistered) {
+      const newAttendance = {
+        id: alumnoSeleccionado.id,
+        nombres: alumnoSeleccionado.nombres,
+        apellidos: alumnoSeleccionado.apellidos,
+        fecha: new Date().toISOString().slice(0, 10), // Fecha actual en formato "YYYY-MM-DD"
+      };
+      const attendanceHistoryStr = localStorage.getItem("attendanceHistory") || "{}";
+      const attendanceHistory = JSON.parse(attendanceHistoryStr);
+      const today = new Date().toISOString().slice(0, 10);
+      if (!attendanceHistory[today]) {
+        attendanceHistory[today] = { asistencias: [] };
+      }
+      attendanceHistory[today].asistencias.push(newAttendance);
+      localStorage.setItem("attendanceHistory", JSON.stringify(attendanceHistory));
+    }
   };
 
   const handleBackClick = () => {
@@ -62,7 +102,7 @@ const RegisterAttendance = () => {
 
   return (
     <div className="flex justify-center items-center pt-24">
-      {!confirmClicked ? (
+      {!alreadyRegistered && !confirmClicked ? (
         <div className="w-full p-4 flex flex-col justify-center items-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-pretty text-center py-9">
             Seleccione su tipo de asistencia
@@ -108,10 +148,19 @@ const RegisterAttendance = () => {
         </div>
       ) : (
         <div className="w-full flex flex-col items-center justify-center h-screen -mt-52">
-          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">
-            ¡Asistencia registrada correctamente!
-          </p>
-          <ConfettiExplosion />
+          {alreadyRegistered && (
+            <p className="text-3xl font-bold text-center text-gray-800 dark:text-white mb-8">
+              ¡Ya se ha registrado la asistencia de {alumnoSeleccionado.nombres} {alumnoSeleccionado.apellidos}!
+            </p>
+          )}
+          {confirmClicked && (
+            <>
+              <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">
+                ¡Asistencia registrada correctamente!
+              </p>
+              <ConfettiExplosion />
+            </>
+          )}
         </div>
       )}
     </div>

@@ -11,13 +11,13 @@ const InputDebounce = () => {
   const [selectedResult, setSelectedResult] = useState(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
-  const [loading, setLoading] = useState(false); // Nuevo estado para el loader
+  const [loading, setLoading] = useState(false);
 
   const inputRef = useRef(null);
 
   useEffect(() => {
     const fetchNombre = async () => {
-      setLoading(true); // Mostrar el loader cuando comienza la búsqueda
+      setLoading(true); 
       try {
         const response = await fetch(`${URL_BASE}/api/user/searchStudent`, {
           method: "POST",

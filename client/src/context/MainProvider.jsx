@@ -16,7 +16,7 @@ const MainProvider = ({ children }) => {
   // Estado para guardar el historial de asistencias
   const [attendanceHistory, setAttendanceHistory] = useState({});
   // Estado para guardar el último registro de asistencia
-  const [lastAttendance, setLastAttendance] = useState(null);
+  // const [lastAttendance, setLastAttendance] = useState(null);
 
   // Verificar usuario al cargar la app
   useEffect(() => {
@@ -75,10 +75,21 @@ const MainProvider = ({ children }) => {
     localStorage.setItem("isLogin", JSON.stringify(isLogin));
   }, [isLogin]);
 
+  // Función para verificar si una fecha está dentro del último mes
+  const isWithinLastMonth = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Restar un mes
+    return date >= cutoffDate;
+  };
+
   // Efecto para registrar la asistencia si hay un cambio en alumnoSeleccionado y existe tipo
   useEffect(() => {
     if (alumnoSeleccionado && alumnoSeleccionado.tipo) {
       const registerAttendance = async () => {
+        const now = new Date();
+        const fechaActual = now.toISOString().split("T")[0];
+
         try {
           const response = await fetch(`${URL_BASE}/api/user/registerAttendance`, {
             method: "POST",
@@ -87,16 +98,13 @@ const MainProvider = ({ children }) => {
             },
             body: JSON.stringify({
               alumno_id: id,
-              fecha: new Date().toISOString().split("T")[0],
+              fecha: fechaActual,
               pregunta: alumnoSeleccionado.pregunta || "",
               tipo: alumnoSeleccionado.tipo,
             }),
           });
 
           if (response.ok) {
-            const now = new Date();
-            const fechaActual = now.toISOString().split("T")[0];
-
             // Construir objeto de asistencia
             const attendanceData = {
               id,
@@ -105,10 +113,19 @@ const MainProvider = ({ children }) => {
               fecha: fechaActual,
             };
 
-            // Actualizar historial de asistencias
-            setAttendanceHistory((prevHistory) => {
-              // Clonar el historial para no mutar el estado directamente
-              const newHistory = { ...prevHistory };
+            setAttendanceHistory(() => {
+              // Obtener historial del localStorage
+              const storedHistory = JSON.parse(localStorage.getItem("attendanceHistory")) || {};
+
+              // Verificar si la fecha actual está dentro del último mes
+              if (!isWithinLastMonth(fechaActual)) {
+                // Limpiar registros si la fecha es mayor a un mes
+                localStorage.removeItem("attendanceHistory");
+                localStorage.removeItem("lastAttendance");
+              }
+
+              // Actualizar historial de asistencias
+              const newHistory = { ...storedHistory };
 
               // Verificar si hay un registro para la fecha actual
               if (!newHistory[fechaActual]) {
@@ -118,25 +135,14 @@ const MainProvider = ({ children }) => {
               // Añadir la nueva asistencia al registro correspondiente
               newHistory[fechaActual].asistencias.push(attendanceData);
 
-              // Limpiar registros antiguos si la fecha es mayor a un mes
-              const cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000); // Restar un mes
-              Object.keys(newHistory).forEach((fecha) => {
-                if (new Date(fecha) < cutoffDate) {
-                  delete newHistory[fecha];
-                }
-              });
-
               // Guardar en localStorage
               localStorage.setItem("attendanceHistory", JSON.stringify(newHistory));
 
+              // Guardar en localStorage solo si es un registro nuevo
+              localStorage.setItem("lastAttendance", JSON.stringify(attendanceData));
+
               return newHistory;
             });
-
-            // Guardar en localStorage solo si es un registro nuevo
-            if (!lastAttendance || lastAttendance.fecha !== fechaActual) {
-              setLastAttendance(attendanceData);
-              localStorage.setItem("lastAttendance", JSON.stringify(attendanceData));
-            }
           } else {
             toast({
               variant: "destructive",
@@ -157,7 +163,7 @@ const MainProvider = ({ children }) => {
 
       registerAttendance();
     }
-  }, [alumnoSeleccionado, nombres, apellidos, id, toast, lastAttendance]);
+  }, [alumnoSeleccionado, nombres, apellidos, id, toast]);
 
   // Cargar historial de asistencias desde localStorage al iniciar
   useEffect(() => {

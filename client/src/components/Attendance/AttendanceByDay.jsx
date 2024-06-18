@@ -66,7 +66,6 @@ export function AttendanceByDay({ value }) {
         setAttendedStudents(data.attendedStudents);
         setNotAttendedStudents(data.notAttendedStudents);
         setAllData(data);
-        console.log(allData);
       } else {
         throw new Error("Failed to fetch");
       }

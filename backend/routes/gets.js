@@ -229,7 +229,7 @@ router.get('/getAttendanceByDate/:date', async (req, res) => {
 })
 
 // Convertir el mes y año en un rango de fechas
-function getDateRangeFromMonthYear(monthYear) {
+const getDateRangeFromMonthYear = (monthYear) => {
   const [month, year] = monthYear.split('-')
   const startDate = `${year}-${month}-01`
   const endDate = new Date(year, month, 0) // último día del mes

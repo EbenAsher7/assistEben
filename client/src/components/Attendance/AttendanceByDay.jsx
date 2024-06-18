@@ -72,6 +72,10 @@ export function AttendanceByDay({ value }) {
     setOnlyTuesday(!onlyTuesday);
   };
 
+  // Calcular el número de estudiantes virtuales y presenciales
+  const virtualCount = attendedStudents.filter((student) => student.TipoAsistencia === "Virtual").length;
+  const presencialCount = attendedStudents.filter((student) => student.TipoAsistencia === "Presencial").length;
+
   return (
     <TabsContent value={value}>
       <Card>
@@ -99,38 +103,61 @@ export function AttendanceByDay({ value }) {
           {(attendedStudents.length > 0 || notAttendedStudents.length > 0) && <RadarByDay data={allData} />}
           {/* Tabla de alumnos que asistieron */}
           {attendedStudents.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-4 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-green-500 text-lg font-bold">Alumnos que asistieron:</h2>
               <table className="w-full border-collapse border border-gray-200">
                 <thead className="bg-green-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
-                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Nombre</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white min-w-[200px] max-w-[300px]">
+                      Nombre
+                    </th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
-                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Pregunta</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">
+                      Pregunta
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {attendedStudents.map((student, index) => (
                     <tr key={student.AlumnoID}>
                       <td className="border border-gray-200 px-4 py-2">{index + 1}</td>
-                      <td className="border border-gray-200 px-4 py-2">{student.AlumnoNombres}</td>
+                      <td className="border border-gray-200 px-4 py-2 min-w-[200px] max-w-[300px]">
+                        {student.AlumnoNombres}
+                      </td>
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
-                      <td className="border border-gray-200 px-4 py-2">{student.TipoAsistencia}</td>
-                      <td className="border border-gray-200 px-4 py-2 overflow-x-auto max-w-[100px]">
+                      <td
+                        className={`border border-gray-200 px-4 py-2 font-bold ${
+                          student.TipoAsistencia === "Virtual" ? "text-blue-500" : "text-green-500"
+                        }`}
+                      >
+                        {student.TipoAsistencia}
+                      </td>
+                      <td className="border border-gray-200 px-4 py-2 overflow-x-auto min-w-[200px] max-w-[300px]">
                         {student.Pregunta}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              {/* Indicador de tipo de asistencia */}
+              <div className="flex gap-8 pt-4 text-xl">
+                <div className="text-green-500 font-bold">
+                  <span>Presenciales: </span>
+                  {presencialCount}
+                </div>
+                <div className="text-blue-500 font-bold">
+                  <span>Virtuales: </span>
+                  {virtualCount}
+                </div>
+              </div>
             </div>
           )}
 
           {/* Tabla de alumnos que no asistieron */}
           {notAttendedStudents.length > 0 && (
-            <div className="space-y-4">
+            <div className="space-y-4 pt-8 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-red-500 text-lg font-bold">Alumnos que no asistieron:</h2>
               <table className="w-full border-collapse border border-gray-200">
                 <thead className="bg-red-500">

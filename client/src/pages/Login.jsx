@@ -14,19 +14,20 @@ const Login = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  //CONTEXTO
+  // CONTEXTO
   const { setIsLogin, setUser } = useContext(MainContext);
 
   const handleLogin = () => {
-    if (!userLogin || !pass)
+    if (!userLogin || !pass) {
       return toast({
         variant: "destructive",
         title: "Error",
         description: "Tanto el usuario como la contraseña son requeridos",
         duration: 2500,
       });
+    }
 
-    //fetch post async/await
+    // fetch post async/await
     const login = async () => {
       setIsLoading(true);
       try {
@@ -67,15 +68,19 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleLogin();
+    }
+  };
+
   return (
     <section>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto h-screen -mt-20 sm:-mt-12 lg:py-0">
         <div className="w-full bg-white dark:bg-neutral-800 rounded-lg shadow mt-0 sm:max-w-md xl:p-0">
           <div className="p-6 space-y-4 sm:p-8 text-neutral-900 dark:text-white">
             <img src={LOGO} alt="logo" className="size-32 mx-auto -mt-4 invert dark:invert-0" />
-            <h1 className="text-xl font-bold text-center leading-tight tracking-tight text-neutral-900 dark:text-white">
-              Inicia sesión con tu cuenta
-            </h1>
+            <h1 className="text-xl font-bold text-center leading-tight tracking-tight text-neutral-900 dark:text-white">Inicia sesión con tu cuenta</h1>
             <article className="space-y-4" action="#">
               <div>
                 <label htmlFor="email" className="block mb-2 text-sm font-medium text-neutral-900 dark:text-white">
@@ -86,6 +91,7 @@ const Login = () => {
                   autoComplete="off"
                   value={userLogin}
                   onChange={(e) => setUserLogin(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   className="bg-neutral-50 border dark:text-white placeholder:dark:text-[#333333] dark:bg-neutral-900 dark:border-0 placeholder:text-[#ccc] border-neutral-300 text-neutral-900 sm:text-sm rounded-lg block w-full p-2.5"
                   placeholder="Ej. joselopez"
                   required
@@ -100,16 +106,13 @@ const Login = () => {
                   name="password"
                   value={pass}
                   onChange={(e) => setPass(e.target.value)}
+                  onKeyPress={handleKeyPress}
                   id="password"
                   placeholder="••••••••"
                   className="bg-neutral-50 dark:text-white dark:bg-neutral-900 placeholder:dark:text-[#333333] border dark:border-0 placeholder:text-[#ccc] border-neutral-300 text-neutral-900 sm:text-sm rounded-lg block w-full p-2.5"
                   required
                 />
-                <button
-                  type="button"
-                  onClick={toggleShowPassword}
-                  className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-sm leading-5"
-                >
+                <button type="button" onClick={toggleShowPassword} className="absolute inset-y-0 right-0 top-7 pr-3 flex items-center text-sm leading-5">
                   {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
@@ -121,20 +124,8 @@ const Login = () => {
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center">
-                    <svg
-                      className="w-5 h-5 mr-3 text-white animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
+                    <svg className="w-5 h-5 mr-3 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8h8a8 8 0 01-16 0z"></path>
                     </svg>
                     Iniciando sesión...

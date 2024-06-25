@@ -14,12 +14,14 @@ const InputDebounce = () => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [lastSearched, setLastSearched] = useState(""); // Nuevo estado para controlar la última búsqueda
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const { setAlumnoSeleccionado } = useContext(MainContext);
 
   useEffect(() => {
     const fetchNombre = async () => {
+      if (valueDebounce === lastSearched) return; // Evita búsquedas duplicadas
       setLoading(true);
       try {
         const response = await fetch(`${URL_BASE}/api/user/searchStudent`, {
@@ -36,7 +38,6 @@ const InputDebounce = () => {
           const data = await response.json();
           setResults(data);
           setShowRegister(data.length === 0);
-          // Ocultar los botones de confirmación si no hay resultados
           if (data.length === 0) {
             setShowConfirm(false);
           }
@@ -55,21 +56,22 @@ const InputDebounce = () => {
         });
       } finally {
         setLoading(false);
+        setLastSearched(valueDebounce); // Actualiza la última búsqueda realizada
       }
     };
 
-    if (valueDebounce.length > 0) {
+    if (valueDebounce.length >= 3) {
       fetchNombre();
     } else {
-      setNombre("");
-      setShowConfirm(false);
-      setSelectedResult(null);
       setResults([]);
+      setShowConfirm(false);
+      setShowRegister(false);
+      setSelectedResult(null);
+      setLastSearched(""); // Reinicia la última búsqueda
     }
   }, [valueDebounce, toast]);
 
   useEffect(() => {
-    // Limpiar estado cuando no hay resultados y se borra el texto
     if (results.length === 0 && valueDebounce.length === 0) {
       setShowConfirm(false);
       setSelectedResult(null);
@@ -81,6 +83,8 @@ const InputDebounce = () => {
     setShowConfirm(true);
     setResults([]);
     setShowRegister(false);
+    setNombre(`${result.nombres} ${result.apellidos}`); // Actualiza el input con el nombre seleccionado
+    setLastSearched(`${result.nombres} ${result.apellidos}`); // Actualiza la última búsqueda para evitar una nueva búsqueda
   };
 
   const handleConfirm = (isConfirmed) => {
@@ -89,9 +93,10 @@ const InputDebounce = () => {
       navigate("/registerAttendance");
     } else {
       setAlumnoSeleccionado(null);
+      setNombre(""); // Limpia el input si no se confirma
+      setLastSearched(""); // Reinicia la última búsqueda
       inputRef.current.focus();
     }
-    setNombre("");
     setShowConfirm(false);
     setSelectedResult(null);
     setResults([]);
@@ -105,16 +110,25 @@ const InputDebounce = () => {
     });
   };
 
+  const handleInputChange = (e) => {
+    const newValue = e.target.value;
+    setNombre(newValue);
+    if (newValue !== lastSearched) {
+      setShowConfirm(false);
+      setSelectedResult(null);
+    }
+  };
+
   return (
     <div className="relative w-full mt-8">
       <input
         value={nombre}
-        onChange={(e) => setNombre(e.target.value)}
+        onChange={handleInputChange}
         ref={inputRef}
         placeholder="Ingrese su nombre"
         className="w-full py-2 px-4 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 dark:bg-neutral-700 dark:text-white dark:placeholder:text-white/60 placeholder:text-black/60 dark:border-neutral-500"
       />
-      {loading && valueDebounce.length > 0 && (
+      {loading && valueDebounce.length >= 3 && (
         <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10">
           <p>Buscando nombre...</p>
         </div>
@@ -127,21 +141,25 @@ const InputDebounce = () => {
               onClick={() => handleSelect(result)}
               className="p-2 cursor-pointer border-b border-gray-300 hover:bg-gray-100 text-black dark:text-white dark:hover:bg-neutral-600"
             >
-              {result.nombres} {result.apellidos}
+              <div className="flex flex-row gap-4 text-black dark:text-white">
+                <span>
+                  {result.nombres} {result.apellidos}
+                </span>
+                <span className="font-bold">-</span>
+                <span className="text-black/20 dark:text-white/20">
+                  {result.tutor_nombres} {result.tutor_apellidos}
+                </span>
+              </div>
             </li>
           ))}
         </ul>
       )}
-      {showConfirm && selectedResult && valueDebounce?.length > 0 && (
+      {showConfirm && selectedResult && valueDebounce?.length >= 3 && (
         <div className="w-full p-4 mt-12 flex flex-col items-center justify-center">
-          <p className="text-xl font-semibold text-center">
-            ¿Eres, {selectedResult.nombres + " " + selectedResult.apellidos}?
-          </p>
+          <p className="text-xl font-semibold text-center">¿Eres, {selectedResult.nombres + " " + selectedResult.apellidos}?</p>
+          <p className="text-black/40 dark:text-white/30 mb-3 mt-1">Tutor: {selectedResult.tutor_nombres + " " + selectedResult.tutor_apellidos}</p>
           <div className="flex flex-row w-1/2 gap-4 items-center justify-center mt-4">
-            <button
-              className="bg-green-500 px-6 py-4 rounded-md font-lg text-white"
-              onClick={() => handleConfirm(true)}
-            >
+            <button className="bg-green-500 px-6 py-4 rounded-md font-lg text-white" onClick={() => handleConfirm(true)}>
               Sí
             </button>
             <button className="bg-red-500 px-6 py-4 rounded-md font-lg text-white" onClick={() => handleConfirm(false)}>

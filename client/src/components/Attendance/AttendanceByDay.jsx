@@ -98,7 +98,7 @@ export function AttendanceByDay({ value }) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1 flex flex-col pt-4 sm:justify-center sm:items-center">
-            <CalendarAE title="Fecha de asistencia" setDate={setSelectedDate} onlyTuesday={onlyTuesday} />
+            <CalendarAE title="Fecha de asistencia" setDate={setSelectedDate} onlyTuesday={onlyTuesday} size="25px" />
             <label className="flex items-center space-x-2 w-full justify-end sm:justify-center">
               <input
                 type="checkbox"
@@ -122,23 +122,17 @@ export function AttendanceByDay({ value }) {
                 <thead className="bg-green-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
-                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white min-w-[200px] max-w-[300px]">
-                      Nombre
-                    </th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white min-w-[200px] max-w-[300px]">Nombre</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
-                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">
-                      Pregunta
-                    </th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">Pregunta</th>
                   </tr>
                 </thead>
                 <tbody>
                   {attendedStudents.map((student, index) => (
                     <tr key={student.AlumnoID}>
                       <td className="border border-gray-200 px-4 py-2">{index + 1}</td>
-                      <td className="border border-gray-200 px-4 py-2 min-w-[200px] max-w-[300px]">
-                        {student.AlumnoNombres}
-                      </td>
+                      <td className="border border-gray-200 px-4 py-2 min-w-[200px] max-w-[300px]">{student.AlumnoNombres}</td>
                       <td className="border border-gray-200 px-4 py-2 min-w-[100px]">
                         {student.Pregunta?.length > 0 ? (
                           <a
@@ -162,9 +156,7 @@ export function AttendanceByDay({ value }) {
                       >
                         {student.TipoAsistencia}
                       </td>
-                      <td className="border border-gray-200 px-4 py-2 overflow-x-auto min-w-[200px] max-w-[300px]">
-                        {student.Pregunta}
-                      </td>
+                      <td className="border border-gray-200 px-4 py-2 overflow-x-auto min-w-[200px] max-w-[300px]">{student.Pregunta}</td>
                     </tr>
                   ))}
                 </tbody>

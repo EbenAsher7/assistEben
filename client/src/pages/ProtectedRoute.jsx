@@ -1,53 +1,60 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import MainContext from "../context/MainContext";
 import PropTypes from "prop-types";
+import { memo } from "react";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = memo(({ children }) => {
   const { isLogin } = useContext(MainContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [dataLoaded, setDataLoaded] = useState(false); // Nuevo estado para verificar si los datos están cargados
+  const [dataLoaded, setDataLoaded] = useState(false);
 
-  useEffect(() => {
-    // Verificar si hay datos cargados en el localStorage
+  const checkLocalStorage = useCallback(() => {
     const storedIsLogin = localStorage.getItem("isLogin");
     if (storedIsLogin !== null) {
-      setDataLoaded(true); // Marcar como cargados los datos del localStorage
+      setDataLoaded(true);
     }
+  }, []);
+
+  const handleNavigation = useCallback(() => {
+    if (!isLogin && dataLoaded) {
+      navigate("/login");
+    }
+  }, [isLogin, dataLoaded, navigate]);
+
+  useEffect(() => {
+    checkLocalStorage();
 
     const delay = setTimeout(() => {
       setLoading(false);
-      // Verificar si está autenticado solo si los datos están cargados
-      if (!isLogin && dataLoaded) {
-        navigate("/login");
-      }
+      handleNavigation();
     }, 100);
 
-    return () => clearTimeout(delay); // Limpiamos el timeout si el componente se desmonta antes de que termine
-  }, [isLogin, navigate, dataLoaded]);
+    return () => clearTimeout(delay);
+  }, [checkLocalStorage, handleNavigation]);
 
-  // Mostrar un indicador de carga mientras se verifica el inicio de sesión y carga de datos
+  const loadingComponent = useMemo(() => <div className="flex w-full h-dvh justify-center items-center">Cargando...</div>, []);
+
   if (loading) {
-    return <div className="flex w-full h-dvh justify-center items-center">Cargando...</div>;
+    return loadingComponent;
   }
 
-  // Si los datos no están cargados, no renderizar contenido
   if (!dataLoaded) {
     return null;
   }
 
-  // Si no está autenticado y los datos están cargados, redirigir al login
   if (!isLogin && dataLoaded) {
-    return null; // Opcionalmente podrías mostrar un mensaje o un spinner antes de redirigir
+    return null;
   }
 
-  // Si está autenticado y los datos están cargados, renderizar el contenido protegido
   return <>{children}</>;
-};
-
-export default ProtectedRoute;
+});
 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
 };
+
+ProtectedRoute.displayName = "ProtectedRoute";
+
+export default ProtectedRoute;

@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,88 +9,86 @@ import PropTypes from "prop-types";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader } from "lucide-react";
+import { memo } from "react";
 
-export function DataUser({ user }) {
-  // Estados para los campos del formulario
-  const [nombres, setNombres] = useState(user?.nombres || "");
-  const [apellidos, setApellidos] = useState(user?.apellidos || "");
-  const [telefono, setTelefono] = useState(user?.telefono || "");
-  const [direccion, setDireccion] = useState(user?.direccion || "");
-  const [password, setPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
+export const DataUser = memo(({ user }) => {
+  const [formData, setFormData] = useState({
+    nombres: user?.nombres || "",
+    apellidos: user?.apellidos || "",
+    telefono: user?.telefono || "",
+    direccion: user?.direccion || "",
+    password: "",
+    newPassword: "",
+    repeatPassword: "",
+  });
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
-  //CONTEXTO
   const { setIsLogin, setUser } = useContext(MainContext);
 
-  // Función para manejar el envío del formulario
-  const handleGuardarCambios = () => {
-    // Validación simple: verificar que todos los campos requeridos no estén vacíos
-    if (!nombres || !apellidos || !telefono) {
-      alert("Por favor complete todos los campos.");
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const handleGuardarCambios = useCallback(async () => {
+    if (!formData.nombres || !formData.apellidos || !formData.telefono) {
+      toast({
+        variant: "destructive",
+        title: "Campos incompletos",
+        description: "Por favor complete todos los campos.",
+        duration: 2500,
+      });
       return;
     }
-    // Enviar los datos al servidor con post usando async/await
-    const sendData = async () => {
-      setIsSaving(true); // Iniciar estado de guardado
-      try {
-        const response = await fetch(`${URL_BASE}/post/changeTutorData`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user.token,
-          },
-          body: JSON.stringify({
-            id: user.id,
-            nombres,
-            apellidos,
-            telefono,
-            direccion,
-            tipo: user.tipo, //estos datos no cambian
-            observaciones: user.observaciones, //estos datos no cambian
-          }),
-        });
 
-        if (response.ok) {
-          toast({
-            title: "Cambios guardados",
-            description: "Los cambios se guardaron correctamente",
-            duration: 2500,
-          });
-          setTimeout(() => {
-            setIsLogin(false);
-            setUser({});
-          }, 2500);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Ocurrió un error al guardar los cambios.",
-            duration: 2500,
-          });
-        }
-      } catch (error) {
-        console.error(error);
+    setIsSaving(true);
+    try {
+      const response = await fetch(`${URL_BASE}/post/changeTutorData`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+        body: JSON.stringify({
+          id: user.id,
+          nombres: formData.nombres,
+          apellidos: formData.apellidos,
+          telefono: formData.telefono,
+          direccion: formData.direccion,
+          tipo: user.tipo,
+          observaciones: user.observaciones,
+        }),
+      });
+
+      if (response.ok) {
         toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message,
+          title: "Cambios guardados",
+          description: "Los cambios se guardaron correctamente",
           duration: 2500,
         });
-      } finally {
-        setIsSaving(false); // Finalizar estado de guardado
+        setTimeout(() => {
+          setIsLogin(false);
+          setUser({});
+        }, 2500);
+      } else {
+        throw new Error("Ocurrió un error al guardar los cambios.");
       }
-    };
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+        duration: 2500,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [formData, user, toast, setIsLogin, setUser]);
 
-    sendData();
-  };
-
-  // Función para manejar el cambio de contraseña
-  const handleCambiarPass = () => {
-    // Validación simple: verificar que todos los campos requeridos no estén vacíos
-    if (!password || !newPassword || !repeatPassword) {
+  const handleCambiarPass = useCallback(async () => {
+    if (!formData.password || !formData.newPassword || !formData.repeatPassword) {
       toast({
         variant: "destructive",
         title: "Campos incompletos",
@@ -99,8 +97,7 @@ export function DataUser({ user }) {
       });
       return;
     }
-    // Validación simple: verificar que las contraseñas coincidan
-    if (newPassword !== repeatPassword) {
+    if (formData.newPassword !== formData.repeatPassword) {
       toast({
         variant: "destructive",
         title: "Contraseñas no coinciden",
@@ -109,56 +106,79 @@ export function DataUser({ user }) {
       });
       return;
     }
-    // Enviar los datos al servidor con post usando async/await
-    const sendData = async () => {
-      setIsSaving(true); // Iniciar estado de guardado
-      try {
-        const response = await fetch(`${URL_BASE}/post/changePassword`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user.token,
-          },
-          body: JSON.stringify({
-            username: user.username,
-            oldPassword: password,
-            newPassword,
-          }),
-        });
 
-        if (response.ok) {
-          toast({
-            title: "Contraseña cambiada",
-            description: "La contraseña se cambió correctamente",
-            duration: 2500,
-          });
-          setTimeout(() => {
-            setIsLogin(false);
-            setUser({});
-          }, 2500);
-        } else {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Ocurrió un error al cambiar la contraseña.",
-            duration: 2500,
-          });
-        }
-      } catch (error) {
-        console.error(error);
+    setIsSaving(true);
+    try {
+      const response = await fetch(`${URL_BASE}/post/changePassword`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+        body: JSON.stringify({
+          username: user.username,
+          oldPassword: formData.password,
+          newPassword: formData.newPassword,
+        }),
+      });
+
+      if (response.ok) {
         toast({
-          variant: "destructive",
-          title: "Error",
-          description: error.message,
+          title: "Contraseña cambiada",
+          description: "La contraseña se cambió correctamente",
           duration: 2500,
         });
-      } finally {
-        setIsSaving(false);
+        setTimeout(() => {
+          setIsLogin(false);
+          setUser({});
+        }, 2500);
+      } else {
+        throw new Error("Ocurrió un error al cambiar la contraseña.");
       }
-    };
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message,
+        duration: 2500,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  }, [formData, user, toast, setIsLogin, setUser]);
 
-    sendData();
-  };
+  const renderButton = useMemo(
+    () => (
+      <Button onClick={handleGuardarCambios} disabled={isSaving}>
+        {isSaving ? (
+          <>
+            <Loader className="mr-2 h-4 w-4 animate-spin" />
+            Guardando...
+          </>
+        ) : (
+          "Guardar Cambios"
+        )}
+      </Button>
+    ),
+    [handleGuardarCambios, isSaving]
+  );
+
+  const renderPasswordButton = useMemo(
+    () => (
+      <Button onClick={handleCambiarPass} disabled={isSaving}>
+        {isSaving ? (
+          <>
+            <Loader className="mr-2 h-4 w-4 animate-spin" />
+            Cambiando contraseña...
+          </>
+        ) : (
+          "Cambiar Contraseña"
+        )}
+      </Button>
+    ),
+    [handleCambiarPass, isSaving]
+  );
 
   return (
     <div className="w-full flex justify-center px-8 mt-5">
@@ -174,53 +194,18 @@ export function DataUser({ user }) {
               <CardDescription>
                 Haz cambios a tu cuenta aquí, luego haz click en &quot;Guardar cambios&quot; para finalizar <br />
                 <br />
-                <span className="text-red-500 font-semibold">
-                  NOTA: Al cambiar los datos, se cerrará tu sesión actual.
-                </span>
+                <span className="text-red-500 font-semibold">NOTA: Al cambiar los datos, se cerrará tu sesión actual.</span>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="space-y-1">
-                <Label htmlFor="name">Nombres</Label>
-                <Input placeholder="Ingrese sus nombres" value={nombres} onChange={(e) => setNombres(e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="name">Apellidos</Label>
-                <Input
-                  placeholder="Ingrese sus apellidos"
-                  value={apellidos}
-                  onChange={(e) => setApellidos(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="name">Teléfono</Label>
-                <Input
-                  placeholder="Ingrese su teléfono"
-                  value={telefono}
-                  onChange={(e) => setTelefono(e.target.value)}
-                />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="name">Dirección</Label>
-                <Input
-                  placeholder="Ingrese su dirección"
-                  value={direccion}
-                  onChange={(e) => setDireccion(e.target.value)}
-                />
-              </div>
+              {["nombres", "apellidos", "telefono", "direccion"].map((field) => (
+                <div key={field} className="space-y-1">
+                  <Label htmlFor={field}>{field.charAt(0).toUpperCase() + field.slice(1)}</Label>
+                  <Input name={field} placeholder={`Ingrese su ${field}`} value={formData[field]} onChange={handleInputChange} />
+                </div>
+              ))}
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleGuardarCambios} disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Guardando...
-                  </>
-                ) : (
-                  "Guardar Cambios"
-                )}
-              </Button>
-            </CardFooter>
+            <CardFooter className="w-full justify-center">{renderButton}</CardFooter>
           </Card>
         </TabsContent>
         <TabsContent value="password">
@@ -231,43 +216,28 @@ export function DataUser({ user }) {
                 Haz cambios a tu contraseña aquí.
                 <br />
                 <br />
-                <span className="text-red-500 font-semibold">
-                  NOTA: Al cambiar la contraseña, se cerrará tu sesión actual.
-                </span>
+                <span className="text-red-500 font-semibold">NOTA: Al cambiar la contraseña, se cerrará tu sesión actual.</span>
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-2">
-              <div className="space-y-1">
-                <Label htmlFor="current">Contraseña actual</Label>
-                <Input value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="new">Nueva contraseña</Label>
-                <Input value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-              </div>
-              <div className="space-y-1">
-                <Label htmlFor="new">Repetir la Nueva contraseña</Label>
-                <Input value={repeatPassword} onChange={(e) => setRepeatPassword(e.target.value)} />
-              </div>
+              {["password", "newPassword", "repeatPassword"].map((field) => (
+                <div key={field} className="space-y-1">
+                  <Label htmlFor={field}>
+                    {field === "password" ? "Contraseña actual" : field === "newPassword" ? "Nueva contraseña" : "Repetir la Nueva contraseña"}
+                  </Label>
+                  <Input name={field} value={formData[field]} onChange={handleInputChange} />
+                </div>
+              ))}
             </CardContent>
-            <CardFooter>
-              <Button onClick={handleCambiarPass} disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <Loader className="mr-2 h-4 w-4 animate-spin" />
-                    Cambiando contraseña...
-                  </>
-                ) : (
-                  "Cambiar Contraseña"
-                )}
-              </Button>
-            </CardFooter>
+            <CardFooter className="w-full justify-center">{renderPasswordButton}</CardFooter>
           </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+});
+
+DataUser.displayName = "DataUser";
 
 DataUser.propTypes = {
   user: PropTypes.object,

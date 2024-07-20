@@ -325,7 +325,6 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
       args: [date, tutorId]
     })
 
-    console.log(result)
     const columns = result.columns
     const rows = result.rows
 

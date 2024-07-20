@@ -47,7 +47,6 @@ const Login = () => {
 
         setIsLogin(true);
         setUser(data.user);
-        console.log(data);
         navigate("/attendance");
       } catch (error) {
         toast({

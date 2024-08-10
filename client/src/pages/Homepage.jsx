@@ -5,16 +5,16 @@ const Homepage = () => {
   return (
     <div>
       <ul className="circles">
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
-        <li></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
+        <li className="dark:invert-0 invert"></li>
       </ul>
       <div className="w-full flex justify-center items-center flex-col sm:flex-row h-dvh sm:-mt-24 -mt-48 background-pattern">
         <div className="flex flex-col gap-3 justify-center max-w-[400px] items-center sm:mr-24">

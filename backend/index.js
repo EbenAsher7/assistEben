@@ -5,6 +5,7 @@ import api from './routes/api.js'
 import user from './routes/user.js'
 import gets from './routes/gets.js'
 import posts from './routes/posts.js'
+import puts from './routes/put.js'
 import authMiddleware from './middleware/auth.js'
 
 const app = express()
@@ -29,6 +30,7 @@ app.use(authMiddleware)
 app.use('/api', api)
 app.use('/get', gets)
 app.use('/post', posts)
+app.use('/put', puts)
 
 // Manejo de errores globales en Express
 app.use((err, req, res, next) => {

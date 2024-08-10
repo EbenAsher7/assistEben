@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CalendarAE } from "../CalendarAE";
 import { Button } from "../ui/button";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns"; // Importa addDays
 
 export function AddStudent({ value }) {
   const [loadingData, setLoadingData] = useState(true);
@@ -34,7 +34,7 @@ export function AddStudent({ value }) {
   // CONTEXTO
   const { user } = useContext(MainContext);
 
-  // Verficar que nombre, apellidos y telefono no esten vacios
+  // Verificar que nombre, apellidos y teléfono no estén vacíos
   const validateForm = () => {
     if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
       toast({
@@ -50,12 +50,13 @@ export function AddStudent({ value }) {
     }
   };
 
-  // Funcion para guardar los datos
+  // Función para guardar los datos
   const handleGuardarDatos = async () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+        const adjustedDate = addDays(selectedDate, 1); // Ajusta la fecha sumando un día
+        const formattedDate = adjustedDate ? format(adjustedDate, "yyyy-MM-dd") : "";
         const dataFinal = {
           nombres: name,
           apellidos: lastName,

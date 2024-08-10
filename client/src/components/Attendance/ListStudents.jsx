@@ -13,54 +13,205 @@ import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import { DropdownAE } from "../DropdownAE";
 import { format } from "date-fns";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { addDays } from "date-fns";
 
-const columns = [
-  {
-    accessorKey: "AlumnoNombres",
-    header: ({ column }) => (
-      <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
-        Nombre
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    ),
-    cell: ({ row }) => <div className="capitalize">{`${row.original.AlumnoNombres} ${row.original.AlumnoApellidos}`}</div>,
-  },
-  {
-    accessorKey: "AlumnoTelefono",
-    header: "Teléfono",
-    cell: ({ row }) => <div>{row.getValue("AlumnoTelefono")}</div>,
-  },
-  {
-    accessorKey: "AlumnoFechaNacimiento",
-    header: "Fecha de Nacimiento",
-    cell: ({ row }) => <div>{format(new Date(row.getValue("AlumnoFechaNacimiento")), "yyyy-MM-dd")}</div>,
-  },
-  {
-    accessorKey: "AlumnoObservaciones",
-    header: "Observaciones",
-    cell: ({ row }) => <div>{row.getValue("AlumnoObservaciones")}</div>,
-  },
-  {
-    accessorKey: "AlumnoActivo",
-    header: "Estado",
-    cell: ({ row }) => <div>{row.getValue("AlumnoActivo")}</div>,
-  },
-];
+function EditStudentDialog({ student, onStudentUpdate }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    AlumnoID: student.AlumnoID,
+    AlumnoNombres: student.AlumnoNombres,
+    AlumnoApellidos: student.AlumnoApellidos,
+    AlumnoTelefono: student.AlumnoTelefono,
+    AlumnoFechaNacimiento: format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd"),
+    AlumnoObservaciones: student.AlumnoObservaciones,
+  });
+  const { user } = useContext(MainContext);
+  const { toast } = useToast();
+
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    // Sumamos un día a la fecha de nacimiento antes de enviarla
+    const newFechaNacimiento = format(addDays(new Date(formData.AlumnoFechaNacimiento), 1), "yyyy-MM-dd");
+
+    // Actualizamos el formData con la nueva fecha de nacimiento
+    const updatedFormData = {
+      ...formData,
+      AlumnoFechaNacimiento: newFechaNacimiento,
+    };
+
+    try {
+      const response = await fetch(`${URL_BASE}/put/updateStudent/${updatedFormData.AlumnoID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+        body: JSON.stringify(updatedFormData),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Éxito",
+          description: "Estudiante actualizado correctamente.",
+          duration: 2500,
+        });
+        setIsOpen(false);
+        //sumar 1 dia a la fecha antes de actualizar
+        const fecha = new Date(updatedFormData.AlumnoFechaNacimiento);
+        fecha.setDate(fecha.getDate() + 1);
+        updatedFormData.AlumnoFechaNacimiento = fecha;
+
+        onStudentUpdate(updatedFormData); // Llamar a la función de actualización con los datos actualizados
+      } else {
+        throw new Error("Falló al actualizar");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al actualizar el estudiante.",
+        duration: 2500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          Editar
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
+        <DialogHeader>
+          <DialogTitle>Editar estudiante</DialogTitle>
+          <DialogDescription>Realiza cambios en la información del estudiante aquí. Haz clic en guardar cuando hayas terminado.</DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="AlumnoNombres" className="text-right">
+                Nombres
+              </Label>
+              <Input id="AlumnoNombres" value={formData.AlumnoNombres} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="AlumnoApellidos" className="text-right">
+                Apellidos
+              </Label>
+              <Input id="AlumnoApellidos" value={formData.AlumnoApellidos} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="AlumnoTelefono" className="text-right">
+                Teléfono
+              </Label>
+              <Input id="AlumnoTelefono" value={formData.AlumnoTelefono} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="AlumnoFechaNacimiento" className="text-right">
+                Fecha de Nacimiento
+              </Label>
+              <Input id="AlumnoFechaNacimiento" type="date" value={formData.AlumnoFechaNacimiento} onChange={handleInputChange} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="AlumnoObservaciones" className="text-right">
+                Observaciones
+              </Label>
+              <Input id="AlumnoObservaciones" value={formData.AlumnoObservaciones} onChange={handleInputChange} className="col-span-3" />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? <LoaderAE /> : "Guardar cambios"}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export function ListStudents({ value }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [alumnosCursos, setAlumnosCursos] = useState([]);
-  const [isLoadingAlumnos, setIsLoadingAlumnos] = useState(false); // Inicialmente false para que el dropdown no esté deshabilitado al cargar
+  const [isLoadingAlumnos, setIsLoadingAlumnos] = useState(false);
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [isLoadingCursos, setIsLoadingCursos] = useState(true);
   const { toast } = useToast();
 
-  // CONTEXTO
   const { user, fetchModulos } = useContext(MainContext);
 
-  //cargar la lista de cursos
+  const handleStudentUpdate = (updatedStudent) => {
+    setAlumnosCursos((prevAlumnos) =>
+      prevAlumnos.map((alumno) => (alumno.AlumnoID === updatedStudent.AlumnoID ? { ...alumno, ...updatedStudent } : alumno))
+    );
+  };
+
+  const columns = [
+    {
+      accessorKey: "AlumnoNombres",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Nombre
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <div className="capitalize">{`${row.original.AlumnoNombres} ${row.original.AlumnoApellidos}`}</div>,
+    },
+    {
+      accessorKey: "AlumnoTelefono",
+      header: "Teléfono",
+      cell: ({ row }) => <div>{row.getValue("AlumnoTelefono")}</div>,
+    },
+    {
+      accessorKey: "AlumnoFechaNacimiento",
+      header: "Fecha de Nacimiento",
+      cell: ({ row }) => <div>{format(new Date(row.getValue("AlumnoFechaNacimiento")), "yyyy-MM-dd")}</div>,
+    },
+    {
+      accessorKey: "AlumnoObservaciones",
+      header: "Observaciones",
+      cell: ({ row }) => <div>{row.getValue("AlumnoObservaciones")}</div>,
+    },
+    {
+      accessorKey: "AlumnoActivo",
+      header: "Estado",
+      cell: ({ row }) => <div>{row.getValue("AlumnoActivo")}</div>,
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => <EditStudentDialog student={row.original} onStudentUpdate={handleStudentUpdate} />,
+    },
+  ];
+
+  const table = useReactTable({
+    data: alumnosCursos,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: {
+      sorting,
+      columnFilters,
+    },
+  });
+
   useEffect(() => {
     fetchModulos().then((data) => {
       setCursos(data);
@@ -68,7 +219,6 @@ export function ListStudents({ value }) {
     });
   }, [fetchModulos]);
 
-  // Cargar los alumnos del curso seleccionado
   useEffect(() => {
     if (cursoSeleccionado) {
       const fetchData = async () => {
@@ -103,21 +253,6 @@ export function ListStudents({ value }) {
       fetchData();
     }
   }, [cursoSeleccionado, user.id, user.token, toast]);
-
-  const table = useReactTable({
-    data: alumnosCursos,
-    columns,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
-  });
 
   if (isLoadingCursos) {
     return (

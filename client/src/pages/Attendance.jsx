@@ -28,7 +28,6 @@ const Attendance = () => {
                 <TabsTrigger value="AddStudent">Añadir Alumno</TabsTrigger>
                 <TabsTrigger value="asisDia">Asistencia por Día</TabsTrigger>
                 <TabsTrigger value="asisMes">Asistencia por Mes</TabsTrigger>
-                <TabsTrigger value="editarEstudiante">Editar Alumno</TabsTrigger>
                 <TabsTrigger value="graficas">Gráficas</TabsTrigger>
                 <TabsTrigger value="pendientes">Pendientes</TabsTrigger>
               </TabsList>
@@ -37,7 +36,6 @@ const Attendance = () => {
             <AddStudent value="AddStudent" />
             <AttendanceByDay value="asisDia" />
             <AttendanceByMonth value="asisMes" />
-            <EditStudents value="editarEstudiante" />
             <Graphics value="graficas" />
             <PendantStudents value="pendientes" />
           </Tabs>

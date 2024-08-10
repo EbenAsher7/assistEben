@@ -4,6 +4,7 @@ import "./Homepage.css";
 const Homepage = () => {
   return (
     <div>
+      {/* Fondo animaod para el homepage */}
       <ul className="circles">
         <li className="dark:invert-0 invert"></li>
         <li className="dark:invert-0 invert"></li>

@@ -58,46 +58,15 @@ export function ListStudents({ value }) {
   const { toast } = useToast();
 
   // CONTEXTO
-  const { user } = useContext(MainContext);
+  const { user, fetchModulos } = useContext(MainContext);
 
-  // Cargar los cursos existentes
+  //cargar la lista de cursos
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoadingCursos(true);
-      try {
-        const response = await fetch(`${URL_BASE}/api/modules`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user.token,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          // Transformar los datos
-          const formattedData = data.map((curso) => ({
-            value: curso.id.toString(),
-            label: curso.nombre,
-          }));
-          setCursos(formattedData);
-        } else {
-          throw new Error("Failed to fetch");
-        }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Ocurrió un error al consultar los módulos disponibles.",
-          duration: 2500,
-        });
-      } finally {
-        setIsLoadingCursos(false);
-      }
-    };
-
-    fetchData();
-  }, [user.token, toast]);
+    fetchModulos().then((data) => {
+      setCursos(data);
+      setIsLoadingCursos(false);
+    });
+  }, [fetchModulos]);
 
   // Cargar los alumnos del curso seleccionado
   useEffect(() => {

@@ -166,6 +166,41 @@ const MainProvider = ({ children }) => {
     }
   }, []);
 
+  //Cargar lista de modulos
+  const fetchModulos = async () => {
+    try {
+      const response = await fetch(`${URL_BASE}/api/modules`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Transformar los datos
+        const formattedData = data.map((curso) => ({
+          value: curso.id.toString(),
+          label: curso.nombre,
+        }));
+        return formattedData;
+      } else {
+        throw new Error("Failed to fetch");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al consultar los módulos disponibles.",
+        duration: 2500,
+      });
+    }
+    // finally {
+    // setIsLoadingCursos(false);
+    // }
+  };
+
   // RETURN
   return (
     <MainContext.Provider
@@ -179,6 +214,7 @@ const MainProvider = ({ children }) => {
         attendanceHistory,
         setAttendanceHistory,
         checkAttendanceStatus,
+        fetchModulos,
       }}
     >
       {children}

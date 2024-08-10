@@ -17,12 +17,7 @@ export function DropdownAE({ data, title, setValueAE }) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full m-auto sm:w-[330px] justify-between"
-        >
+        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full m-auto sm:w-[330px] justify-between">
           {value ? data.find((item) => item.value === value)?.label : title}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

@@ -236,74 +236,6 @@ const getDateRangeFromMonthYear = (monthYear) => {
   return { startDate, endDate: endDate.toISOString().split('T')[0] }
 }
 
-// // obtener los alumnos que asistieron en una fecha dada y por un tutor
-// router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
-//   try {
-//     const { date, tutorId } = req.params
-
-//     // Obtener alumnos que asistieron en la fecha dada
-//     const attendedResult = await turso.execute({
-//       sql: `
-//         SELECT
-//           Alumnos.id AS AlumnoID,
-//           Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
-//           Alumnos.telefono AS AlumnoTelefono,
-//           Asistencias.tipo AS TipoAsistencia
-//         FROM Alumnos
-//         JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
-//         WHERE Asistencias.fecha = ? AND Alumnos.tutor_id = ?;
-//       `,
-//       args: [date, tutorId]
-//     })
-
-//     // Obtener alumnos que no asistieron en la fecha dada
-//     const notAttendedResult = await turso.execute({
-//       sql: `
-//         SELECT
-//           Alumnos.id AS AlumnoID,
-//           Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
-//           Alumnos.telefono AS AlumnoTelefono
-//         FROM Alumnos
-//         WHERE Alumnos.tutor_id = ? AND Alumnos.id NOT IN (
-//           SELECT alumno_id
-//           FROM Asistencias
-//           WHERE fecha = ?
-//         );
-//       `,
-//       args: [tutorId, date]
-//     })
-
-//     const attendedColumns = attendedResult.columns
-//     const attendedRows = attendedResult.rows
-//     const notAttendedColumns = notAttendedResult.columns
-//     const notAttendedRows = notAttendedResult.rows
-
-//     const attendedStudents = attendedRows.map((row) => {
-//       return {
-//         AlumnoID: row[attendedColumns.indexOf('AlumnoID')],
-//         AlumnoNombres: row[attendedColumns.indexOf('AlumnoNombres')],
-//         AlumnoTelefono: row[attendedColumns.indexOf('AlumnoTelefono')],
-//         TipoAsistencia: row[attendedColumns.indexOf('TipoAsistencia')]
-//       }
-//     })
-
-//     const notAttendedStudents = notAttendedRows.map((row) => {
-//       return {
-//         AlumnoID: row[notAttendedColumns.indexOf('AlumnoID')],
-//         AlumnoNombres: row[notAttendedColumns.indexOf('AlumnoNombres')],
-//         AlumnoTelefono: row[notAttendedColumns.indexOf('AlumnoTelefono')]
-//       }
-//     })
-
-//     res.status(200).json({
-//       attendedStudents,
-//       notAttendedStudents
-//     })
-//   } catch (error) {
-//     res.status(500).json({ error: error.message })
-//   }
-// })
-
 // obtener los alumnos que asistieron y no asistieron en una fecha dada y por un tutor
 router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
   try {
@@ -355,6 +287,103 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
+
+// obtener la suma de asistencias por tipo en un mes, año, tutor y modulo
+router.get(
+  '/getAttendanceByMonthAndTutor/:month/:year/:tutorId/:moduloId/:day',
+  async (req, res) => {
+    try {
+      const { month, year, tutorId, moduloId, day } = req.params
+
+      const monthMapping = {
+        enero: 1,
+        febrero: 2,
+        marzo: 3,
+        abril: 4,
+        mayo: 5,
+        junio: 6,
+        julio: 7,
+        agosto: 8,
+        septiembre: 9,
+        octubre: 10,
+        noviembre: 11,
+        diciembre: 12
+      }
+
+      const dayMapping = {
+        lunes: 1,
+        martes: 2,
+        miercoles: 3,
+        jueves: 4,
+        viernes: 5,
+        sabado: 6,
+        domingo: 0
+      }
+
+      const monthNumber = monthMapping[month.toLowerCase()]
+      const dayNumber = dayMapping[day.toLowerCase()]
+
+      if (!monthNumber) {
+        return res.status(400).json({ error: 'Mes inválido' })
+      }
+
+      if (dayNumber === undefined) {
+        return res.status(400).json({ error: 'Día inválido' })
+      }
+
+      const startDate = new Date(year, monthNumber - 1, 1)
+      const endDate = new Date(year, monthNumber, 0)
+
+      // Obtener todas las fechas del día específico en el mes dado
+      const selectedDayDates = []
+      const currentDate = new Date(startDate)
+
+      // eslint-disable-next-line no-unmodified-loop-condition
+      while (currentDate <= endDate) {
+        if (currentDate.getDay() === dayNumber) {
+          selectedDayDates.push(currentDate.toISOString().split('T')[0])
+        }
+        currentDate.setDate(currentDate.getDate() + 1)
+      }
+
+      const result = await turso.execute({
+        sql: `
+        SELECT
+          Alumnos.id AS AlumnoID,
+          Alumnos.nombres AS AlumnoNombres,
+          Alumnos.apellidos AS AlumnoApellidos,
+          COUNT(Asistencias.id) AS CantidadAsistencias
+        FROM Alumnos
+        LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
+        AND Asistencias.fecha IN (${selectedDayDates.map(() => '?').join(', ')})
+        WHERE Alumnos.tutor_id = ? AND Alumnos.modulo_id = ?
+        GROUP BY Alumnos.id
+      `,
+        args: [...selectedDayDates, tutorId, moduloId]
+      })
+
+      const columns = result.columns
+      const rows = result.rows
+
+      const attendanceSummary = rows.map((row) => {
+        const asistencias = row[columns.indexOf('CantidadAsistencias')]
+        const inasistencias = selectedDayDates.length - asistencias
+
+        return {
+          AlumnoID: row[columns.indexOf('AlumnoID')],
+          AlumnoNombres: row[columns.indexOf('AlumnoNombres')],
+          AlumnoApellidos: row[columns.indexOf('AlumnoApellidos')],
+          Asistencias: asistencias,
+          Inasistencias: inasistencias
+        }
+      })
+
+      res.status(200).json(attendanceSummary)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  }
+)
 
 // Obtener sumatoria de asistencias por tipo dado un mes y año
 router.get('/getAttendanceByMonth/:monthYear', async (req, res) => {

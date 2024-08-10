@@ -37,6 +37,7 @@ const InputDebounce = () => {
         if (response.ok) {
           const data = await response.json();
           setResults(data);
+          console.log(data);
           setShowRegister(data.length === 0);
           if (data.length === 0) {
             setShowConfirm(false);
@@ -129,27 +130,29 @@ const InputDebounce = () => {
         className="w-full py-2 px-4 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 dark:bg-neutral-700 dark:text-white dark:placeholder:text-white/60 placeholder:text-black/60 dark:border-neutral-500"
       />
       {loading && valueDebounce.length >= 3 && (
-        <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10 mx-8 sm:mx-0">
+        <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10 mx-8 sm:mx-4">
           <p>Buscando nombre...</p>
         </div>
       )}
       {results.length > 0 && (
-        <ul className="absolute top-12 left-0 right-0 max-h-72 overflow-y-auto border border-gray-300 bg-white dark:bg-neutral-700 dark:border-gray-600 z-10 list-none m-0 mx-8 sm:mx-0">
+        <ul className="absolute top-12 left-0 right-0 max-h-72 overflow-y-auto border border-gray-300 bg-white dark:bg-neutral-700 dark:border-gray-600 z-10 list-none m-0 mx-8 sm:mx-4">
           {results.map((result) => (
             <li
               key={result.id}
               onClick={() => handleSelect(result)}
               className="p-2 cursor-pointer border-b border-gray-300 hover:bg-gray-100 text-black dark:text-white dark:hover:bg-neutral-600"
             >
-              <div className="flex flex-row gap-4 text-black dark:text-white">
-                <span>
+              <div className="flex flex-row gap-2 text-black dark:text-white items-center">
+                <span className="sm:text-base text-[14px]">
                   {result.nombres} {result.apellidos}
                 </span>
-                <span className="font-bold">-</span>
-                <span className="text-black/20 dark:text-white/20">
-                  <span className="hidden sm:inline-flex">Tutor(a):&nbsp;&nbsp;&nbsp;</span>
-                  <span className="inline-flex sm:hidden">T:&nbsp;&nbsp;&nbsp;</span>
-                  {result.tutor_nombres} {result.tutor_apellidos}
+                <span>-</span>
+                <span className="text-black/30 dark:text-white/30 text-[11px] min-w-[120px] max-w-[150px] sm:min-w-[200px] sm:max-w-[250px] flex-wrap">
+                  <span className="text-[11px] block sm:inline-flex">
+                    T:&nbsp;
+                    {result.tutor_nombres} {result.tutor_apellidos}
+                  </span>
+                  <span className="sm:ml-2 text-[11px] block sm:inline-flex">C:&nbsp; {result?.modulo_nombre.replace("Doctrina", "Doc.")}</span>
                 </span>
               </div>
             </li>

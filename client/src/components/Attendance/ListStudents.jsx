@@ -1,14 +1,7 @@
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
 import { useContext, useEffect, useState } from "react";
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,9 +23,7 @@ const columns = [
         <ArrowUpDown className="ml-2 h-4 w-4" />
       </Button>
     ),
-    cell: ({ row }) => (
-      <div className="capitalize">{`${row.original.AlumnoNombres} ${row.original.AlumnoApellidos}`}</div>
-    ),
+    cell: ({ row }) => <div className="capitalize">{`${row.original.AlumnoNombres} ${row.original.AlumnoApellidos}`}</div>,
   },
   {
     accessorKey: "AlumnoTelefono",
@@ -176,15 +167,12 @@ export function ListStudents({ value }) {
           <CardTitle>Listado de alumnos</CardTitle>
           <CardDescription>Mostrar todos los alumnos asignados.</CardDescription>
         </CardHeader>
-        <div
-          className={`w-8/12 m-auto flex justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-4 "}`}
-        >
-          <DropdownAE
-            data={cursos}
-            title="Seleccione un curso"
-            setValueAE={setCursoSeleccionado}
-            disabled={isLoadingAlumnos}
-          />
+        <div className="sm:w-[96%] m-auto h-4 mb-2">
+          <hr />
+        </div>
+        <h2 className="text-xl font-extrabold text-center mb-2">Seleccione un curso para filtrar</h2>
+        <div className={`w-8/12 m-auto flex justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-4 "}`}>
+          <DropdownAE data={cursos} title="Seleccione" setValueAE={setCursoSeleccionado} disabled={isLoadingAlumnos} />
         </div>
         {cursoSeleccionado && (
           <CardContent className="space-y-2">
@@ -207,9 +195,7 @@ export function ListStudents({ value }) {
                         <TableRow key={headerGroup.id}>
                           {headerGroup.headers.map((header) => (
                             <TableHead key={header.id}>
-                              {header.isPlaceholder
-                                ? null
-                                : flexRender(header.column.columnDef.header, header.getContext())}
+                              {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                             </TableHead>
                           ))}
                         </TableRow>
@@ -220,9 +206,7 @@ export function ListStudents({ value }) {
                         table.getRowModel().rows.map((row) => (
                           <TableRow key={row.id}>
                             {row.getVisibleCells().map((cell) => (
-                              <TableCell key={cell.id}>
-                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                              </TableCell>
+                              <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                             ))}
                           </TableRow>
                         ))
@@ -238,20 +222,10 @@ export function ListStudents({ value }) {
                 </div>
                 <div className="flex items-center justify-end space-x-2 py-4">
                   <div className="space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => table.previousPage()}
-                      disabled={!table.getCanPreviousPage()}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
                       Anterior
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => table.nextPage()}
-                      disabled={!table.getCanNextPage()}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
                       Siguiente
                     </Button>
                   </div>

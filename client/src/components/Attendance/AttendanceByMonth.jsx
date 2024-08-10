@@ -30,7 +30,7 @@ export function AttendanceByMonth({ value }) {
   ];
 
   const years = [];
-  for (let i = 2020; i <= 2050; i++) {
+  for (let i = 2024; i <= 2050; i++) {
     years.push({ value: i.toString(), label: i.toString() });
   }
 
@@ -44,14 +44,17 @@ export function AttendanceByMonth({ value }) {
           <CardTitle>Asistencia por mes</CardTitle>
           <CardDescription>Lista de alumnos y su asistencia por mes</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-2 flex flex-wrap">
-          <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-            <h1>Seleccione un mes</h1>
+        <div className="sm:w-[96%] m-auto h-4 mb-2">
+          <hr />
+        </div>
+        <CardContent className="flex sm:flex-row flex-col items-center gap-4 justify-center sm:justify-start flex-wrap">
+          <div className="">
+            <h2 className="text-lg font-extrabold">Seleccione un mes</h2>
             <DropdownAE data={meses} title="Seleccione" setValueAE={setSelectedMonth} />
             {selectedMonth && <p>Seleccionaste el mes de {selectedMonth}</p>}
           </div>
-          <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4">
-            <h1>Seleccione un año</h1>
+          <div className="">
+            <h2 className="text-lg font-extrabold">Seleccione un año</h2>
             <DropdownAE data={years} title="Seleccione" setValueAE={setSelectedYear} />
             {selectedYear && <p>Seleccionaste el año {selectedYear}</p>}
           </div>

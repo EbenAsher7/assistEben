@@ -96,8 +96,11 @@ export function AttendanceByDay({ value }) {
           <CardTitle>Asistencia por día</CardTitle>
           <CardDescription>Lista de alumnos y su asistencia por día</CardDescription>
         </CardHeader>
+        <div className="sm:w-[96%] m-auto h-4 mb-2">
+          <hr />
+        </div>
         <CardContent className="space-y-4">
-          <div className="space-y-1 flex flex-col pt-4 sm:justify-center sm:items-center">
+          <div className="space-y-1 flex flex-col pt-1 sm:justify-center sm:items-center">
             <CalendarAE title="Fecha de asistencia" setDate={setSelectedDate} onlyTuesday={onlyTuesday} size="25px" />
             <label className="flex items-center space-x-2 w-full justify-end sm:justify-center">
               <input

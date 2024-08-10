@@ -185,6 +185,9 @@ export function AddStudent({ value }) {
           <CardTitle>Añadir Alumno</CardTitle>
           <CardDescription>añadir un nuevo alumno</CardDescription>
         </CardHeader>
+        <div className="sm:w-[96%] m-auto h-2 mb-2">
+          <hr />
+        </div>
         <CardContent className="space-y-2 grid grid-cols-1 sm:grid-cols-2 w-full sm:w-[720px] m-auto gap-4 place-content-center justify-center items-center">
           <div className="space-y-1">
             <Label htmlFor="name">Nombres</Label>
@@ -201,12 +204,7 @@ export function AddStudent({ value }) {
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Teléfono</Label>
-            <Input
-              value={phone}
-              placeholder="Ingrese el teléfono"
-              onChange={(e) => setPhone(e.target.value)}
-              type="number"
-            />
+            <Input value={phone} placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Dirección</Label>
@@ -222,18 +220,10 @@ export function AddStudent({ value }) {
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Observaciones</Label>
-            <Input
-              value={observations}
-              placeholder="Ingrese una observacion"
-              onChange={(e) => setObservations(e.target.value)}
-            />
+            <Input value={observations} placeholder="Ingrese una observacion" onChange={(e) => setObservations(e.target.value)} />
           </div>
         </CardContent>
-        <Button
-          className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex"
-          onClick={handleGuardarDatos}
-          disabled={loading}
-        >
+        <Button className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex" onClick={handleGuardarDatos} disabled={loading}>
           {loading ? "Cargando..." : "Guardar"}
         </Button>
       </Card>

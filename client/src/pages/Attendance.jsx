@@ -23,7 +23,7 @@ const Attendance = () => {
         <div className="flex justify-center w-full max-w-[1300px] m-auto">
           <Tabs defaultValue="listado" className="w-full">
             <div className="sticky top-0 left-0 right-0 z-10">
-              <TabsList className="flex overflow-x-auto whitespace-nowrap pl-96 sm:pl-0 ">
+              <TabsList className="flex overflow-x-auto whitespace-nowrap pl-72 sm:pl-0 ">
                 <TabsTrigger value="listado">Listado</TabsTrigger>
                 <TabsTrigger value="AddStudent">Añadir Alumno</TabsTrigger>
                 <TabsTrigger value="asisDia">Asistencia por Día</TabsTrigger>

@@ -120,7 +120,7 @@ const InputDebounce = () => {
   };
 
   return (
-    <div className="relative w-full mt-8">
+    <div className="relative w-full px-8 sm:px-4">
       <input
         value={nombre}
         onChange={handleInputChange}
@@ -129,12 +129,12 @@ const InputDebounce = () => {
         className="w-full py-2 px-4 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 dark:bg-neutral-700 dark:text-white dark:placeholder:text-white/60 placeholder:text-black/60 dark:border-neutral-500"
       />
       {loading && valueDebounce.length >= 3 && (
-        <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10">
+        <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10 mx-8 sm:mx-0">
           <p>Buscando nombre...</p>
         </div>
       )}
       {results.length > 0 && (
-        <ul className="absolute top-12 left-0 right-0 max-h-72 overflow-y-auto border border-gray-300 bg-white dark:bg-neutral-700 dark:border-gray-600 z-10 list-none m-0 p-0">
+        <ul className="absolute top-12 left-0 right-0 max-h-72 overflow-y-auto border border-gray-300 bg-white dark:bg-neutral-700 dark:border-gray-600 z-10 list-none m-0 mx-8 sm:mx-0">
           {results.map((result) => (
             <li
               key={result.id}
@@ -147,6 +147,8 @@ const InputDebounce = () => {
                 </span>
                 <span className="font-bold">-</span>
                 <span className="text-black/20 dark:text-white/20">
+                  <span className="hidden sm:inline-flex">Tutor(a):&nbsp;&nbsp;&nbsp;</span>
+                  <span className="inline-flex sm:hidden">T:&nbsp;&nbsp;&nbsp;</span>
                   {result.tutor_nombres} {result.tutor_apellidos}
                 </span>
               </div>
@@ -155,21 +157,24 @@ const InputDebounce = () => {
         </ul>
       )}
       {showConfirm && selectedResult && valueDebounce?.length >= 3 && (
-        <div className="w-full p-4 mt-12 flex flex-col items-center justify-center">
+        <div className="w-full p-4 flex flex-col items-center justify-center max-h-72 mt-6 -mb-40 dark:bg-white/10 bg-white dark:border-white border-2 shadow-md dark:shadow-white/50 shadow-black/20 rounded-xl">
           <p className="text-xl font-semibold text-center">¿Eres, {selectedResult.nombres + " " + selectedResult.apellidos}?</p>
           <p className="text-black/40 dark:text-white/30 mb-3 mt-1">Tutor: {selectedResult.tutor_nombres + " " + selectedResult.tutor_apellidos}</p>
           <div className="flex flex-row w-1/2 gap-4 items-center justify-center mt-4">
-            <button className="bg-green-500 px-6 py-4 rounded-md font-lg text-white" onClick={() => handleConfirm(true)}>
+            <button
+              className="bg-green-500 hover:bg-green-700 font-bold uppercase px-6 py-4 rounded-md text-white w-20"
+              onClick={() => handleConfirm(true)}
+            >
               Sí
             </button>
-            <button className="bg-red-500 px-6 py-4 rounded-md font-lg text-white" onClick={() => handleConfirm(false)}>
+            <button className="bg-red-600 hover:bg-red-800 font-bold uppercase px-6 py-4 rounded-md text-white w-20" onClick={() => handleConfirm(false)}>
               No
             </button>
           </div>
         </div>
       )}
       {showRegister && (
-        <div className="mt-12 w-full flex flex-col gap-2 justify-center items-center p-4">
+        <div className="w-full flex flex-col gap-2 justify-center items-center max-h-72 mt-16 -mb-40">
           <p className="font-bold text-lg">¿No apareces en la lista?</p>
           <button className="bg-green-500 text-white px-4 py-4 rounded-md w-1/2" onClick={handleRegister}>
             ¡Regístrate aquí!

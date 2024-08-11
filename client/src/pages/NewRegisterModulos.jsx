@@ -75,7 +75,7 @@ const NewRegisterModulos = () => {
                 {modules.map((module) => (
                   <div
                     key={module.id}
-                    className="border border-gray-300 rounded-lg overflow-hidden cursor-pointer shadow-lg p-4"
+                    className="border border-gray-300 rounded-lg overflow-hidden cursor-pointer shadow-lg p-4 hover:scale-[1.01] transition-transform ease-in"
                     onClick={() => handleSelectModule(module)}
                   >
                     <img src={module.foto_url} alt={module.nombre} className="size-36 bg-cover mb-4 m-auto" />

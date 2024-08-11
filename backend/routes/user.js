@@ -201,4 +201,35 @@ router.get('/user/modules', async (req, res) => {
   }
 })
 
+router.get('/user/tutors/:moduleId', async (req, res) => {
+  const { moduleId } = req.params
+
+  try {
+    const result = await turso.execute({
+      sql: 'SELECT * FROM tutores WHERE activo = 1 AND modulo_id = ?',
+      args: [moduleId]
+    })
+
+    const columns = result.columns
+    const rows = result.rows
+
+    const tutors = rows.map((row) => {
+      const tutor = {}
+      columns.forEach((col, index) => {
+        tutor[col] = row[index]
+      })
+      return tutor
+    })
+
+    // Eliminar la contraseña antes de enviar la respuesta
+    tutors.forEach((tutor) => {
+      delete tutor.password
+    })
+
+    res.status(200).json(tutors)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

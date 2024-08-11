@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Profile from "./pages/Profile";
 import Attendance from "./pages/Attendance";
 import RegisterAttendance from "./pages/RegisterAttendance";
+import NewRegister from "./pages/NewRegister";
 
 const App = () => {
   return (
@@ -20,6 +21,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/registerAttendance" element={<RegisterAttendance />} />
+        <Route path="/newRegister" element={<NewRegister />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

@@ -4,6 +4,18 @@ import { useNavigate } from "react-router-dom";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const InputDebounce = () => {
   const [nombre, setNombre] = useState("");
@@ -18,6 +30,8 @@ const InputDebounce = () => {
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const { setAlumnoSeleccionado } = useContext(MainContext);
+
+  const [showAlertDialog, setShowAlertDialog] = useState(false);
 
   useEffect(() => {
     const fetchNombre = async () => {
@@ -104,11 +118,12 @@ const InputDebounce = () => {
   };
 
   const handleRegister = () => {
-    setShowRegister(false);
-    toast({
-      title: "Empieza el registro",
-      duration: 2500,
-    });
+    setShowAlertDialog(true);
+  };
+
+  const handleContinueToRegister = () => {
+    setShowAlertDialog(false);
+    navigate("/newRegister");
   };
 
   const handleInputChange = (e) => {
@@ -179,9 +194,29 @@ const InputDebounce = () => {
       {showRegister && (
         <div className="w-full flex flex-col gap-2 justify-center items-center max-h-72 mt-16 -mb-40">
           <p className="font-bold text-lg">¿No apareces en la lista?</p>
-          <button className="bg-green-500 text-white px-4 py-4 rounded-md w-1/2" onClick={handleRegister}>
-            ¡Regístrate aquí!
-          </button>
+          <AlertDialog open={showAlertDialog} onOpenChange={setShowAlertDialog}>
+            <AlertDialogTrigger asChild>
+              <Button
+                className="dark:bg-green-500 dark:text-white bg-green-500 text-white px-4 py-4 rounded-md w-1/2 dark:hover:bg-green-600 hover:bg-green-600"
+                onClick={handleRegister}
+              >
+                ¡Regístrate aquí!
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-black dark:text-white">¿Estás seguro de que quieres registrarte?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Por favor, revisa bien que hayas escrito correctamente tu nombre. Si no encuentras tu nombre en la lista, puede que necesites
+                  registrarte.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="dark:text-red-500 border-red-500 ">Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleContinueToRegister}>Ya revisé y quiero registrarme</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       )}
     </div>

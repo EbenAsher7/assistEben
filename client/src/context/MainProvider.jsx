@@ -201,6 +201,13 @@ const MainProvider = ({ children }) => {
     // }
   };
 
+  //DATOS PARA EL REGISTRO NUEVO
+  const [nombresNEW, setNombresNEW] = useState("");
+  const [apellidosNEW, setApellidosNEW] = useState("");
+  const [fechaNacimientoNEW, setFechaNacimientoNEW] = useState("");
+  const [telefonoNEW, setTelefonoNEW] = useState("");
+  const [direccionNEW, setDireccionNEW] = useState("");
+
   // RETURN
   return (
     <MainContext.Provider
@@ -215,6 +222,17 @@ const MainProvider = ({ children }) => {
         setAttendanceHistory,
         checkAttendanceStatus,
         fetchModulos,
+        //NUEVO REGISTRO
+        nombresNEW,
+        setNombresNEW,
+        apellidosNEW,
+        setApellidosNEW,
+        fechaNacimientoNEW,
+        setFechaNacimientoNEW,
+        telefonoNEW,
+        setTelefonoNEW,
+        direccionNEW,
+        setDireccionNEW,
       }}
     >
       {children}

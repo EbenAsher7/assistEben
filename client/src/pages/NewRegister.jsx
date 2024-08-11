@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import MainContext from "../context/MainContext";
-import NewRegisterTutores from "./NewRegisterTutores";
+import NewRegisterModulos from "./NewRegisterModulos";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "react-router-dom";
 
@@ -70,7 +70,7 @@ export default function NewRegister() {
   return (
     <>
       {showTutores ? (
-        <NewRegisterTutores />
+        <NewRegisterModulos />
       ) : (
         <div className="container mx-auto p-4 max-w-3xl sm:mt-32">
           <h1 className="text-4xl font-extrabold text-center">Nuevo Registro</h1>

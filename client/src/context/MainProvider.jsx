@@ -207,6 +207,7 @@ const MainProvider = ({ children }) => {
   const [fechaNacimientoNEW, setFechaNacimientoNEW] = useState("");
   const [telefonoNEW, setTelefonoNEW] = useState("");
   const [direccionNEW, setDireccionNEW] = useState("");
+  const [cursoSeleccionadoNEW, setCursoSeleccionadoNEW] = useState(null);
 
   // RETURN
   return (
@@ -233,6 +234,8 @@ const MainProvider = ({ children }) => {
         setTelefonoNEW,
         direccionNEW,
         setDireccionNEW,
+        cursoSeleccionadoNEW,
+        setCursoSeleccionadoNEW,
       }}
     >
       {children}

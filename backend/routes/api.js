@@ -27,7 +27,7 @@ router.get('/modules', async (req, res) => {
 
 router.get('/tutors', async (req, res) => {
   try {
-    const result = await turso.execute('SELECT * FROM tutores')
+    const result = await turso.execute('SELECT * FROM tutores where activo = 1')
 
     const columns = result.columns
     const rows = result.rows

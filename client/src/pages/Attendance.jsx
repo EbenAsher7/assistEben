@@ -20,7 +20,7 @@ const Attendance = () => {
       <Greetings user={user} />
       <div className="flex flex-col w-full px-4 my-3 justify-center">
         <hr className="mb-4" />
-        <div className="flex justify-center w-full max-w-[1300px] m-auto">
+        <div className="flex justify-center w-full max-w-[1300px] m-auto mb-24">
           <Tabs defaultValue="listado" className="w-full">
             <div className="sticky top-0 left-0 right-0 z-10">
               <TabsList className="flex overflow-x-auto whitespace-nowrap pl-72 sm:pl-0 ">

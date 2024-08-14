@@ -6,7 +6,7 @@ dotenv.config()
 
 const router = express.Router()
 
-// actualizar un alumno existente
+// actualizar o "eliminar" (desactivar) un alumno existente
 router.put('/updateStudent/:AlumnoID', async (req, res) => {
   try {
     const { AlumnoID } = req.params
@@ -19,7 +19,7 @@ router.put('/updateStudent/:AlumnoID', async (req, res) => {
       direccion,
       tutor_id,
       modulo_id,
-      activo
+      AlumnoActivo
     } = req.body
 
     // verificar que el AlumnoID esté presente
@@ -77,13 +77,69 @@ router.put('/updateStudent/:AlumnoID', async (req, res) => {
       updateFields.push('modulo_id = ?')
       updateValues.push(modulo_id)
     }
-    if (activo) {
+    if (AlumnoActivo !== undefined) {
       updateFields.push('activo = ?')
-      updateValues.push(activo)
+      updateValues.push(AlumnoActivo)
     }
     if (AlumnoObservaciones) {
       updateFields.push('observaciones = ?')
       updateValues.push(AlumnoObservaciones)
+    }
+
+    // Si no se proporcionó ningún campo a actualizar
+    if (updateFields.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'No se proporcionaron campos para actualizar' })
+    }
+
+    // Agregar el AlumnoID al final de los valores para la cláusula WHERE
+    updateValues.push(AlumnoID)
+
+    // Construir la consulta SQL final
+    const sqlQuery = `UPDATE Alumnos SET ${updateFields.join(
+      ', '
+    )} WHERE id = ?`
+
+    // Ejecutar la consulta
+    const resultado = await turso.execute({
+      sql: sqlQuery,
+      args: updateValues
+    })
+
+    if (resultado.affectedRows === 0) {
+      return res.status(500).json({ error: 'No se pudo actualizar el alumno' })
+    }
+
+    const action = AlumnoActivo === 'Inactivo' ? 'desactivado' : 'actualizado'
+    res.status(200).json({ Success: `Alumno ${action} correctamente` })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// actualizar un alumno existente con observaciones y estado activo
+router.put('/updateStudentPendant/:AlumnoID', async (req, res) => {
+  try {
+    const { AlumnoID } = req.params
+    const { observaciones = '', activo = '' } = req.body
+
+    // verificar que el AlumnoID esté presente
+    if (!AlumnoID) {
+      return res.status(400).json({ error: 'ID del alumno requerido' })
+    }
+
+    // Construir dinámicamente la consulta SQL según los datos proporcionados
+    const updateFields = []
+    const updateValues = []
+
+    if (activo === 'Activo') {
+      updateFields.push('Activo = ?')
+      updateValues.push(activo)
+    }
+    if (observaciones) {
+      updateFields.push('observaciones = ?')
+      updateValues.push(observaciones)
     }
 
     // Si no se proporcionó ningún campo a actualizar

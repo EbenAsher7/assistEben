@@ -1,0 +1,225 @@
+import { TabsContent } from "@/components/ui/tabs";
+import { act, useContext, useEffect, useState } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import LoaderAE from "../LoaderAE";
+import MainContext from "../../context/MainContext";
+import { URL_BASE } from "@/config/config";
+import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
+import { DropdownAE } from "../DropdownAE";
+import PropTypes from "prop-types";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+
+const PendantStudents = ({ value }) => {
+  const [pendingStudents, setPendingStudents] = useState([]);
+  const [isLoadingCursos, setIsLoadingCursos] = useState(true);
+  const [isLoadingStudents, setIsLoadingStudents] = useState(false);
+  const [cursos, setCursos] = useState([]);
+  const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [observations, setObservations] = useState("");
+  const { user, fetchModulos } = useContext(MainContext);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchModulos().then((data) => {
+      setCursos(data);
+      setIsLoadingCursos(false);
+    });
+  }, [fetchModulos]);
+
+  useEffect(() => {
+    const fetchPendingStudents = async () => {
+      if (!cursoSeleccionado) return;
+      setIsLoadingStudents(true);
+      try {
+        const response = await fetch(`${URL_BASE}/get/getStudentsByModuleAndTutorPendants/${cursoSeleccionado}/${user.id}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user.token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setPendingStudents(data);
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los estudiantes pendientes.",
+          duration: 2500,
+        });
+      } finally {
+        setIsLoadingStudents(false);
+      }
+    };
+
+    fetchPendingStudents();
+  }, [cursoSeleccionado, user.id, user.token, toast]);
+
+  const handleAcceptRequest = async () => {
+    if (!selectedStudent) return;
+
+    try {
+      const response = await fetch(`${URL_BASE}/put/updateStudentPendant/${selectedStudent.AlumnoID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+        body: JSON.stringify({
+          observaciones: observations,
+          activo: "Activo",
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          variant: "success",
+          title: "Éxito",
+          description: "Solicitud aceptada correctamente.",
+          duration: 2500,
+        });
+        setObservations("");
+        setSelectedStudent(null);
+        setCursoSeleccionado(null);
+      } else {
+        throw new Error("Failed to accept request");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al aceptar la solicitud.",
+        duration: 2500,
+      });
+    }
+  };
+
+  if (isLoadingCursos) {
+    return (
+      <TabsContent value={value}>
+        <Card>
+          <LoaderAE />
+        </Card>
+      </TabsContent>
+    );
+  }
+
+  return (
+    <TabsContent value={value}>
+      <Card>
+        <CardHeader>
+          <CardTitle>Listado de estudiantes pendientes</CardTitle>
+          <CardDescription>Mostrar todos los estudiantes pendientes.</CardDescription>
+        </CardHeader>
+        <div className="sm:w-[96%] m-auto h-4 mb-2">
+          <hr />
+        </div>
+        <h2 className="text-xl font-extrabold text-center mb-2">Seleccione un curso para filtrar</h2>
+        <div className={`w-8/12 m-auto flex justify-center ${cursoSeleccionado ? "mb-4" : "mb-4"}`}>
+          <DropdownAE data={cursos} title="Seleccione" setValueAE={setCursoSeleccionado} disabled={isLoadingCursos} />
+        </div>
+        {isLoadingStudents ? (
+          <LoaderAE />
+        ) : (
+          cursoSeleccionado &&
+          (pendingStudents.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Teléfono</TableHead>
+                  <TableHead>Fecha de Nacimiento</TableHead>
+                  <TableHead>Observaciones</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {pendingStudents.map((student) => (
+                  <TableRow key={student.AlumnoID}>
+                    <TableCell className="capitalize">{`${student.AlumnoNombres} ${student.AlumnoApellidos}`}</TableCell>
+                    <TableCell>{student.AlumnoTelefono}</TableCell>
+                    <TableCell>{student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd") : "---"}</TableCell>
+                    <TableCell>{student.AlumnoObservaciones}</TableCell>
+                    <TableCell>
+                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button
+                            onClick={() => {
+                              setSelectedStudent(student);
+                              setObservations("");
+                              setIsDialogOpen(true);
+                            }}
+                          >
+                            Aceptar Registro
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
+                          <DialogHeader>
+                            <DialogTitle>
+                              Aceptar solicitud de: {selectedStudent?.AlumnoNombres} {selectedStudent?.AlumnoApellidos}
+                            </DialogTitle>
+                            <DialogDescription>Agregue observaciones si es necesario.</DialogDescription>
+                          </DialogHeader>
+                          <div className="grid gap-4 py-4">
+                            <div className="grid grid-cols-1 items-center gap-4">
+                              <Textarea
+                                placeholder="Escriba sus observaciones aquí."
+                                value={observations}
+                                onChange={(e) => setObservations(e.target.value)}
+                              />
+                            </div>
+                          </div>
+                          <DialogFooter>
+                            <Button
+                              className="text-black dark:text-white"
+                              type="button"
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedStudent(null);
+                                setIsDialogOpen(false);
+                              }}
+                            >
+                              Cancelar
+                            </Button>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                handleAcceptRequest();
+                                setIsDialogOpen(false);
+                              }}
+                            >
+                              Aceptar registro
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <p className="text-center font-bold py-4">"En este curso no hay estudiantes pendientes."</p>
+          ))
+        )}
+      </Card>
+    </TabsContent>
+  );
+};
+
+PendantStudents.propTypes = {
+  value: PropTypes.string.isRequired,
+};
+
+export default PendantStudents;

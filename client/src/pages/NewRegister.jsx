@@ -28,6 +28,7 @@ export default function NewRegister() {
   }, [nombres, apellidos, telefono]);
 
   const handleContinue = () => {
+    console.log(fechaNacimiento);
     if (isValid) {
       context.setNombresNEW(nombres);
       context.setApellidosNEW(apellidos);
@@ -73,7 +74,7 @@ export default function NewRegister() {
         <NewRegisterModulos />
       ) : (
         <div className="container mx-auto p-4 max-w-3xl sm:mt-32">
-          <h1 className="text-4xl font-extrabold text-center">Nuevo Registro</h1>
+          <h1 className="text-4xl font-extrabold text-center mt-12 sm:mt-0">Nuevo Registro</h1>
           <h2 className="text-lg text-center">Llena los datos requeridos para continuar con el registro</h2>
           <h1 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h1>
 
@@ -89,6 +90,7 @@ export default function NewRegister() {
                 placeholder="Ingresa tus nombres"
                 value={nombres}
                 onChange={(e) => setNombres(e.target.value)}
+                autoComplete="off"
               />
             </div>
             <div>
@@ -102,6 +104,7 @@ export default function NewRegister() {
                 placeholder="Ingresa tus apellidos"
                 value={apellidos}
                 onChange={(e) => setApellidos(e.target.value)}
+                autoComplete="off"
               />
             </div>
             <div>
@@ -115,6 +118,7 @@ export default function NewRegister() {
                 placeholder="Ingresa tu teléfono"
                 value={telefono}
                 onChange={(e) => setTelefono(e.target.value)}
+                autoComplete="off"
               />
             </div>
             <div>

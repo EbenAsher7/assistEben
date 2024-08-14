@@ -6,8 +6,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListStudents } from "@/components/Attendance/ListStudents";
 import { AttendanceByDay } from "@/components/Attendance/AttendanceByDay";
 import { AttendanceByMonth } from "@/components/Attendance/AttendanceByMonth";
-import { PendantStudents } from "@/components/Attendance/PendantsStudents";
 import { AddStudent } from "@/components/Attendance/AddStudent";
+import PendantStudents from "@/components/Attendance/PendantStudents";
 
 const Attendance = () => {
   // CONTEXTO

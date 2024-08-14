@@ -2,13 +2,19 @@ import { useContext, useEffect, useState } from "react";
 import MainContext from "../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const NewRegisterTutores = () => {
-  const { cursoSeleccionadoNEW } = useContext(MainContext);
+  const { cursoSeleccionadoNEW, nombresNEW, apellidosNEW, fechaNacimientoNEW, telefonoNEW, direccionNEW } = useContext(MainContext);
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedTutor, setSelectedTutor] = useState(null);
   const { toast } = useToast();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTutors = async () => {
@@ -33,8 +39,53 @@ const NewRegisterTutores = () => {
   }, [toast]);
 
   const handleSelectTutor = (tutor) => {
-    console.log(`Tutor seleccionado: ${tutor.nombres} ${tutor.apellidos}`);
-    console.log(tutor);
+    setSelectedTutor(tutor);
+  };
+
+  const handleAccept = async () => {
+    try {
+      const response = await fetch(`${URL_BASE}/api/user/registerAlumno`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nombres: nombresNEW,
+          apellidos: apellidosNEW,
+          fechaNacimiento: fechaNacimientoNEW,
+          telefono: telefonoNEW,
+          direccion: direccionNEW,
+          tutor: selectedTutor.id,
+          modulo: cursoSeleccionadoNEW.id,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Falló al registrarse");
+      }
+
+      toast({
+        title: "Success",
+        description: "Se ha registrado correctamente.",
+      });
+
+      //Redirigir a "/" usando useNavigate
+      setTimeout(() => {
+        navigate("/");
+      }, 2500);
+
+      setSelectedTutor(null);
+    } catch (error) {
+      toast({ title: "Error", description: error.message });
+    }
+  };
+
+  const handleResetPage = () => {
+    window.location.reload();
+  };
+
+  const handleCancel = () => {
+    setSelectedTutor(null);
   };
 
   return (
@@ -68,6 +119,79 @@ const NewRegisterTutores = () => {
         </div>
       ) : (
         <h1 className="text-center text-2xl font-bold">Por favor, seleccione un módulo primero.</h1>
+      )}
+
+      {selectedTutor && (
+        <Dialog open={selectedTutor !== null} onOpenChange={handleCancel} className="text-black dark:text-white">
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle className="text-black dark:text-white text-2xl font-extrabold">Confirme los Datos</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4 py-4 text-black dark:text-white">
+              <hr />
+              <table className="table-auto w-full text-left">
+                <thead>
+                  <tr>
+                    <th className="text-xl font-bold text-yellow-500" colSpan={2}>
+                      Sus datos:
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td className="font-medium">Nombres:</td>
+                    <td>
+                      {nombresNEW} {apellidosNEW}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="font-medium">Teléfono:</td>
+                    <td>{telefonoNEW}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-medium">Fecha de Nac:</td>
+                    <td>{fechaNacimientoNEW.length > 0 ? fechaNacimientoNEW : "---"}</td>
+                  </tr>
+                  <tr>
+                    <td className="font-medium">Dirección:</td>
+                    <td>{direccionNEW.length > 0 ? direccionNEW : "---"}</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <hr />
+              <div className="text-center mt-4">
+                <h4 className="text-xl font-bold text-yellow-500 mb-4">Datos del Tutor:</h4>
+                <img
+                  src={selectedTutor.foto_url}
+                  alt={`${selectedTutor.nombres} ${selectedTutor.apellidos}`}
+                  className="size-24 object-cover rounded-full mx-auto mb-4"
+                />
+                <p className="text-2xl">
+                  {selectedTutor.nombres} {selectedTutor.apellidos}
+                </p>
+              </div>
+              <hr />
+            </div>
+            <DialogFooter className="gap-3">
+              <Button variant="outline" className="text-black dark:text-white inline-flex sm:hidden" onClick={handleCancel}>
+                Cancelar
+              </Button>
+              <Button className="inline-flex sm:hidden" onClick={handleAccept}>
+                Aceptar
+              </Button>
+              <Button variant="destructive" className="text-black dark:text-white" onClick={handleResetPage}>
+                Reiniciar formulario
+              </Button>
+              <Button variant="outline" className="text-black dark:text-white sm:inline-flex hidden" onClick={handleCancel}>
+                Cancelar
+              </Button>
+              <Button className="sm:inline-flex hidden" onClick={handleAccept}>
+                Aceptar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   );

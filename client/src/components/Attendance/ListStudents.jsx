@@ -25,7 +25,7 @@ function EditStudentDialog({ student, onStudentUpdate }) {
     AlumnoNombres: student.AlumnoNombres,
     AlumnoApellidos: student.AlumnoApellidos,
     AlumnoTelefono: student.AlumnoTelefono,
-    AlumnoFechaNacimiento: format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd"),
+    AlumnoFechaNacimiento: student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd") : "",
     AlumnoObservaciones: student.AlumnoObservaciones,
   });
   const { user } = useContext(MainContext);
@@ -39,10 +39,11 @@ function EditStudentDialog({ student, onStudentUpdate }) {
     e.preventDefault();
     setIsLoading(true);
 
-    // Sumamos un día a la fecha de nacimiento antes de enviarla
-    const newFechaNacimiento = format(addDays(new Date(formData.AlumnoFechaNacimiento), 1), "yyyy-MM-dd");
+    let newFechaNacimiento = formData.AlumnoFechaNacimiento;
+    if (newFechaNacimiento) {
+      newFechaNacimiento = format(addDays(new Date(newFechaNacimiento), 1), "yyyy-MM-dd");
+    }
 
-    // Actualizamos el formData con la nueva fecha de nacimiento
     const updatedFormData = {
       ...formData,
       AlumnoFechaNacimiento: newFechaNacimiento,
@@ -66,11 +67,17 @@ function EditStudentDialog({ student, onStudentUpdate }) {
         });
         setIsOpen(false);
         //sumar 1 dia a la fecha antes de actualizar
-        const fecha = new Date(updatedFormData.AlumnoFechaNacimiento);
+        const fecha = new Date(updatedFormData?.AlumnoFechaNacimiento);
         fecha.setDate(fecha.getDate() + 1);
         updatedFormData.AlumnoFechaNacimiento = fecha;
 
-        onStudentUpdate(updatedFormData); // Llamar a la función de actualización con los datos actualizados
+        if (updatedFormData.AlumnoFechaNacimiento) {
+          const fecha = new Date(updatedFormData.AlumnoFechaNacimiento);
+          fecha.setDate(fecha.getDate() + 1);
+          updatedFormData.AlumnoFechaNacimiento = fecha;
+        }
+
+        onStudentUpdate(updatedFormData);
       } else {
         throw new Error("Falló al actualizar");
       }
@@ -89,8 +96,23 @@ function EditStudentDialog({ student, onStudentUpdate }) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          Editar
+        <Button className="bg-blue-500" size="sm">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-pencil"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+            <path d="M13.5 6.5l4 4" />
+          </svg>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
@@ -142,6 +164,92 @@ function EditStudentDialog({ student, onStudentUpdate }) {
   );
 }
 
+function DeleteStudentDialog({ student, onStudentDelete }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useContext(MainContext);
+  const { toast } = useToast();
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+
+    try {
+      const response = await fetch(`${URL_BASE}/put/updateStudent/${student.AlumnoID}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user.token,
+        },
+        body: JSON.stringify({ AlumnoActivo: "Inactivo" }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Éxito",
+          description: "Estudiante eliminado correctamente.",
+          duration: 2500,
+        });
+        setIsOpen(false);
+        onStudentDelete(student.AlumnoID);
+      } else {
+        throw new Error("Falló al eliminar");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al eliminar el estudiante.",
+        duration: 2500,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="destructive" size="sm">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="icon icon-tabler icons-tabler-outline icon-tabler-trash"
+          >
+            <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+            <path d="M4 7l16 0" />
+            <path d="M10 11l0 6" />
+            <path d="M14 11l0 6" />
+            <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+            <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+          </svg>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
+        <DialogHeader>
+          <DialogTitle>Eliminar estudiante</DialogTitle>
+          <DialogDescription>¿Estás seguro de que deseas eliminar este estudiante?</DialogDescription>
+          <DialogDescription className="text-red-500 font-bold">Esta opción no se puede deshacer</DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancelar
+          </Button>
+          <Button variant="destructive" onClick={handleDelete} disabled={isLoading}>
+            {isLoading ? <LoaderAE /> : "Eliminar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export function ListStudents({ value }) {
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
@@ -158,6 +266,10 @@ export function ListStudents({ value }) {
     setAlumnosCursos((prevAlumnos) =>
       prevAlumnos.map((alumno) => (alumno.AlumnoID === updatedStudent.AlumnoID ? { ...alumno, ...updatedStudent } : alumno))
     );
+  };
+
+  const handleStudentDelete = (studentId) => {
+    setAlumnosCursos((prevAlumnos) => prevAlumnos.filter((alumno) => alumno.AlumnoID !== studentId));
   };
 
   const columns = [
@@ -179,7 +291,10 @@ export function ListStudents({ value }) {
     {
       accessorKey: "AlumnoFechaNacimiento",
       header: "Fecha de Nacimiento",
-      cell: ({ row }) => <div>{format(new Date(row.getValue("AlumnoFechaNacimiento")), "yyyy-MM-dd")}</div>,
+      cell: ({ row }) => {
+        const fechaNacimiento = row.getValue("AlumnoFechaNacimiento");
+        return <div>{fechaNacimiento ? format(new Date(fechaNacimiento), "dd/MM/yyyy") : "No disponible"}</div>;
+      },
     },
     {
       accessorKey: "AlumnoObservaciones",
@@ -193,10 +308,14 @@ export function ListStudents({ value }) {
     },
     {
       id: "actions",
-      cell: ({ row }) => <EditStudentDialog student={row.original} onStudentUpdate={handleStudentUpdate} />,
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <EditStudentDialog student={row.original} onStudentUpdate={handleStudentUpdate} />
+          <DeleteStudentDialog student={row.original} onStudentDelete={handleStudentDelete} />
+        </div>
+      ),
     },
   ];
-
   const table = useReactTable({
     data: alumnosCursos,
     columns,

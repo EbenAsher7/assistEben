@@ -206,7 +206,7 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
 
   try {
     const result = await turso.execute({
-      sql: 'SELECT * FROM tutores WHERE activo = 1 AND modulo_id = ?',
+      sql: 'SELECT id, nombres, apellidos, foto_url, telefono, tipo FROM tutores WHERE activo = 1 AND modulo_id = ?',
       args: [moduleId]
     })
 
@@ -221,12 +221,50 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
       return tutor
     })
 
-    // Eliminar la contraseña antes de enviar la respuesta
-    tutors.forEach((tutor) => {
-      delete tutor.password
+    res.status(200).json(tutors)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Registrar nuevo alumno PENDIENTE
+router.post('/user/registerAlumno', async (req, res) => {
+  try {
+    const {
+      nombres,
+      apellidos,
+      fechaNacimiento,
+      telefono,
+      direccion,
+      tutor,
+      modulo
+    } = req.body
+
+    // Verificar que los datos requeridos estén presentes
+    if (!nombres || !apellidos || !telefono || !tutor || !modulo) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
+    }
+
+    // Insertar el nuevo alumno en la tabla Alumnos
+    const resultado = await turso.execute({
+      sql: `INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, telefono, direccion, tutor_id, modulo_id, activo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, 'Pendiente')`,
+      args: [
+        nombres,
+        apellidos,
+        fechaNacimiento,
+        telefono,
+        direccion,
+        tutor,
+        modulo
+      ]
     })
 
-    res.status(200).json(tutors)
+    if (resultado.affectedRows === 0) {
+      return res.status(500).json({ error: 'No se pudo registrar el alumno' })
+    }
+
+    res.json({ success: 'Alumno registrado correctamente' })
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

@@ -119,7 +119,52 @@ router.get(
             JOIN
               Tutores ON Alumnos.tutor_id = Tutores.id
             WHERE
-              Alumnos.modulo_id = ? AND Tutores.id = ?;`,
+              Alumnos.modulo_id = ? AND Tutores.id = ? AND AlumnoActivo = 'Activo';`,
+        args: [moduleId, tutorId]
+      })
+
+      const columns = result.columns
+      const rows = result.rows
+
+      const students = rows.map((row) => {
+        const student = {}
+        columns.forEach((col, index) => {
+          student[col] = row[index]
+        })
+        return student
+      })
+
+      res.status(200).json(students)
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  }
+)
+
+// obtener todos los alumnos de un modulo y de un tutor PENDIENTES
+router.get(
+  '/getStudentsByModuleAndTutorPendants/:moduleId/:tutorId',
+  async (req, res) => {
+    try {
+      const moduleId = req.params.moduleId
+      const tutorId = req.params.tutorId
+
+      const result = await turso.execute({
+        sql: `SELECT
+              Alumnos.id AS AlumnoID,
+              Alumnos.nombres AS AlumnoNombres,
+              Alumnos.apellidos AS AlumnoApellidos,
+              Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento,
+              Alumnos.telefono AS AlumnoTelefono,
+              Alumnos.direccion AS AlumnoDireccion,
+              Alumnos.activo AS AlumnoActivo,
+              Alumnos.observaciones AS AlumnoObservaciones
+            FROM
+              Alumnos
+            JOIN
+              Tutores ON Alumnos.tutor_id = Tutores.id
+            WHERE
+              Alumnos.modulo_id = ? AND Tutores.id = ? AND AlumnoActivo = 'Pendiente';`,
         args: [moduleId, tutorId]
       })
 
@@ -158,7 +203,7 @@ router.get('/getStudentsByModule/:moduleId', async (req, res) => {
           Alumnos.activo AS AlumnoActivo
         FROM Tutores
         JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
-        WHERE Tutores.modulo_id = ?;
+        WHERE Tutores.modulo_id = ? AND AlumnoActivo = 'Activo';
       `,
       args: [moduleId]
     })

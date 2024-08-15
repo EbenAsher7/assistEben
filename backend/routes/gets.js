@@ -239,17 +239,17 @@ router.get('/getAttendanceByDate/:date', async (req, res) => {
     const result = await turso.execute({
       sql: `
         SELECT
-          Tutores.id AS TutorID,
-          Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
-          COUNT(Asistencias.id) AS TotalAsistencias,
-          SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
-          SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
+            Tutores.id AS TutorID,
+            Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
+            COUNT(Asistencias.id) AS TotalAsistencias,
+            SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
+            SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
         FROM Tutores
         JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
         JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
         WHERE DATE(Asistencias.fecha) = ?
-        GROUP BY Tutores.id, TutorNombres;
-      `,
+        AND Alumnos.activo = 'Activo'
+        GROUP BY Tutores.id, TutorNombres;`,
       args: [date]
     })
 
@@ -297,7 +297,7 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
           Asistencias.pregunta as Pregunta
         FROM Alumnos
         LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id AND Asistencias.fecha = ?
-        WHERE Alumnos.tutor_id = ?;
+        WHERE Alumnos.tutor_id = ? AND Alumnos.activo = 'Activo';
       `,
       args: [date, tutorId]
     })
@@ -394,15 +394,17 @@ router.get(
       const result = await turso.execute({
         sql: `
         SELECT
-          Alumnos.id AS AlumnoID,
-          Alumnos.nombres AS AlumnoNombres,
-          Alumnos.apellidos AS AlumnoApellidos,
-          COUNT(Asistencias.id) AS CantidadAsistencias
+            Alumnos.id AS AlumnoID,
+            Alumnos.nombres AS AlumnoNombres,
+            Alumnos.apellidos AS AlumnoApellidos,
+            COUNT(Asistencias.id) AS CantidadAsistencias
         FROM Alumnos
         LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
         AND Asistencias.fecha IN (${selectedDayDates.map(() => '?').join(', ')})
-        WHERE Alumnos.tutor_id = ? AND Alumnos.modulo_id = ?
-        GROUP BY Alumnos.id
+        WHERE Alumnos.tutor_id = ?
+        AND Alumnos.modulo_id = ?
+        AND Alumnos.activo = 'Activo'
+        GROUP BY Alumnos.id;
       `,
         args: [...selectedDayDates, tutorId, moduloId]
       })
@@ -449,6 +451,7 @@ router.get('/getAttendanceByMonth/:monthYear', async (req, res) => {
         JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
         JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
         WHERE DATE(Asistencias.fecha) BETWEEN ? AND ?
+        AND Alumnos.activo = 'Activo'
         GROUP BY Tutores.id, TutorNombres, Fecha;
       `,
       args: [startDate, endDate]
@@ -505,17 +508,18 @@ router.get(
       const result = await turso.execute({
         sql: `
         SELECT
-          Tutores.id AS TutorID,
-          Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
-          DATE(Asistencias.fecha) AS Fecha,
-          COUNT(Asistencias.id) AS TotalAsistencias,
-          SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
-          SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
+            Tutores.id AS TutorID,
+            Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombres,
+            DATE(Asistencias.fecha) AS Fecha,
+            COUNT(Asistencias.id) AS TotalAsistencias,
+            SUM(CASE WHEN Asistencias.tipo = 'Presencial' THEN 1 ELSE 0 END) AS AsistenciasPresenciales,
+            SUM(CASE WHEN Asistencias.tipo = 'Virtual' THEN 1 ELSE 0 END) AS AsistenciasVirtuales
         FROM Tutores
         JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
         JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id
         WHERE DATE(Asistencias.fecha) BETWEEN ? AND ?
-          AND Tutores.id = ?
+        AND Tutores.id = ?
+        AND Alumnos.activo = 'Activo'
         GROUP BY Tutores.id, TutorNombres, Fecha;
       `,
         args: [startDate, endDate, tutorId]

@@ -25,9 +25,10 @@ router.post('/user/login', async (req, res) => {
 
     // Verificar si el usuario está deshabilitado
     if (user.activo === 0) {
-      return res
-        .status(403)
-        .json({ error: 'El usuario se encuentra Deshabilitado' })
+      return res.status(403).json({
+        error:
+          'El usuario se encuentra Deshabilitado. Contacte con su Administrador'
+      })
     }
 
     // Verificar la contraseña

@@ -41,7 +41,7 @@ const PendantStudents = ({ value }) => {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: user.token,
+            Authorization: user?.token,
           },
         });
 
@@ -74,7 +74,7 @@ const PendantStudents = ({ value }) => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: user.token,
+          Authorization: user?.token,
         },
         body: JSON.stringify({
           observaciones: observations,

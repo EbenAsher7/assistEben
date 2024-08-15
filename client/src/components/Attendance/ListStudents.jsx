@@ -54,7 +54,7 @@ function EditStudentDialog({ student, onStudentUpdate }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: user.token,
+          Authorization: user?.token,
         },
         body: JSON.stringify(updatedFormData),
       });
@@ -178,7 +178,7 @@ function DeleteStudentDialog({ student, onStudentDelete }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: user.token,
+          Authorization: user?.token,
         },
         body: JSON.stringify({ AlumnoActivo: "Inactivo" }),
       });
@@ -347,7 +347,7 @@ export function ListStudents({ value }) {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: user.token,
+              Authorization: user?.token,
             },
           });
 

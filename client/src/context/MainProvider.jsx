@@ -173,7 +173,7 @@ const MainProvider = ({ children }) => {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: user.token,
+          Authorization: user?.token,
         },
       });
 

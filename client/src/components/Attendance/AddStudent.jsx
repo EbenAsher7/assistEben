@@ -73,7 +73,7 @@ export function AddStudent({ value }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: user.token,
+            Authorization: user?.token,
           },
           body: JSON.stringify(dataFinal),
         });
@@ -120,7 +120,7 @@ export function AddStudent({ value }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: user.token,
+            Authorization: user?.token,
           },
         });
 
@@ -140,7 +140,7 @@ export function AddStudent({ value }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: user.token,
+            Authorization: user?.token,
           },
         });
 

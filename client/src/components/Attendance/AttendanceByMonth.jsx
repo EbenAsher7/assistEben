@@ -85,7 +85,7 @@ export function AttendanceByMonth({ value }) {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: user.token,
+            Authorization: user?.token,
           },
         }
       );

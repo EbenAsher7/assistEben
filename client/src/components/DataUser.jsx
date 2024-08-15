@@ -48,7 +48,7 @@ export const DataUser = memo(({ user }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: user.token,
+          Authorization: user?.token,
         },
         body: JSON.stringify({
           id: user.id,
@@ -113,7 +113,7 @@ export const DataUser = memo(({ user }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: user.token,
+          Authorization: user?.token,
         },
         body: JSON.stringify({
           username: user.username,

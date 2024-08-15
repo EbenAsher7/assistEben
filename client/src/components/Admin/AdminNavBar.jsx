@@ -1,5 +1,7 @@
 import { TabPanel, useTabs } from "react-headless-tabs";
 import { TabSelector } from "../Admin/TabsSelector";
+import AdminTutorNavbar from "./AdminTutorNavbar";
+import AdminModuleNavbar from "./AdminModuleNavbar";
 
 const AdminNavBar = () => {
   const [selectedTab, setSelectedTab] = useTabs(["tutores", "modulos"]);
@@ -15,9 +17,13 @@ const AdminNavBar = () => {
           Módulos
         </TabSelector>
       </nav>
-      <div className="p-4 sm:w-[80%] w-full m-auto">
-        <TabPanel hidden={selectedTab !== "tutores"}>Tutores</TabPanel>
-        <TabPanel hidden={selectedTab !== "modulos"}>Módulos</TabPanel>
+      <div className="py-4 sm:w-[80%] w-full m-auto">
+        <TabPanel hidden={selectedTab !== "tutores"}>
+          <AdminTutorNavbar />
+        </TabPanel>
+        <TabPanel hidden={selectedTab !== "modulos"}>
+          <AdminModuleNavbar />
+        </TabPanel>
       </div>
     </>
   );

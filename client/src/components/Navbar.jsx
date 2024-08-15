@@ -1,4 +1,4 @@
-import { useState, useContext, useCallback, useMemo } from "react";
+import { useState, useContext, useCallback, useMemo, useEffect, useRef } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import LOGO from "/logoEbenezer.webp";
 import { Link } from "react-router-dom";
@@ -8,6 +8,7 @@ import { memo } from "react";
 
 const Navbar = memo(() => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
+  const navbarRef = useRef(null);
 
   const { isLogin, setIsLogin, setUser, user } = useContext(MainContext);
 
@@ -90,8 +91,21 @@ const Navbar = memo(() => {
     [isLogin, handleLogout, closeNavbar]
   );
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (navbarRef.current && !navbarRef.current.contains(event.target)) {
+        setIsNavbarOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <nav className="bg-white border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500 fixed top-0 w-full z-50">
+    <nav className="bg-white border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500 fixed top-0 w-full z-50" ref={navbarRef}>
       <div className="w-full flex flex-wrap items-center justify-between p-2 sm:pl-4">
         <Link to="/" className="flex items-center gap-2" onClick={closeNavbar}>
           <img src={LOGO} className="size-10 -mt-2 dark:invert-0 invert" alt="Logo Ministerios Ebenezer" />

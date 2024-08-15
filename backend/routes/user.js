@@ -12,7 +12,6 @@ const router = express.Router()
 router.post('/user/login', async (req, res) => {
   try {
     const { username, password } = req.body
-
     const result = await turso.execute({
       sql: 'SELECT * FROM tutores WHERE username = ?',
       args: [username]
@@ -22,17 +21,21 @@ router.post('/user/login', async (req, res) => {
       return res.status(401).json({ error: 'Usuario no existe' })
     }
 
+    const user = result.rows[0]
+
+    // Verificar si el usuario está deshabilitado
+    if (user.activo === 0) {
+      return res
+        .status(403)
+        .json({ error: 'El usuario se encuentra Deshabilitado' })
+    }
+
     // Verificar la contraseña
-    const userPass = result.rows[0]
-    const hashedPassword = userPass.password
-
+    const hashedPassword = user.password
     const match = await bcrypt.compare(password, hashedPassword)
-
     if (!match) {
       return res.status(401).json({ error: 'Contraseña incorrecta' })
     }
-
-    const user = result.rows[0]
 
     const {
       id,
@@ -84,7 +87,6 @@ router.post('/user/login', async (req, res) => {
         activo,
         token
       }
-      // token
     })
   } catch (error) {
     res.status(500).json({ error: error.message })

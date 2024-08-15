@@ -24,13 +24,18 @@ app.use(cookieParser())
 app.use('/api', user)
 
 // Middleware de autenticación
-app.use(authMiddleware)
+app.use(authMiddleware('Tutor'))
 
 // Usar rutas protegidas
 app.use('/api', api)
 app.use('/get', gets)
 app.use('/post', posts)
 app.use('/put', puts)
+
+// Rutas específicas que requieren tipos de usuarios particulares
+app.use('/admin', authMiddleware('admin'), (req, res) => {
+  res.send('Bienvenido al panel de administración')
+})
 
 // Manejo de errores globales en Express
 app.use((err, req, res, next) => {

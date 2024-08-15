@@ -14,9 +14,9 @@ const authMiddleware = (requiredType) => {
 
         // Verificar si el tipo coincide con el requerido o si es admin
         if (decoded.tipo !== requiredType && decoded.tipo !== ADMINISTRADOR) {
-          return res
-            .status(403)
-            .json({ error: 'Acceso denegado, solo para Administradores' })
+          return res.status(403).json({
+            error: 'Acceso denegado'
+          })
         }
 
         req.user = decoded
@@ -35,9 +35,9 @@ const authMiddleware = (requiredType) => {
 
         // Verificar si el tipo coincide con el requerido o si es admin
         if (decoded.tipo !== requiredType && decoded.tipo !== ADMINISTRADOR) {
-          return res
-            .status(403)
-            .json({ error: 'Acceso denegado, solo para Administradores' })
+          return res.status(403).json({
+            error: 'Acceso denegado'
+          })
         }
 
         req.user = decoded
@@ -45,7 +45,7 @@ const authMiddleware = (requiredType) => {
       } else {
         res.status(401).json({
           error:
-            'No se ha proporcionado un token por cookie ni por authorization'
+            'No se ha proporcionado un Token por Cookies ni por Header Authorization'
         })
       }
     } catch (error) {

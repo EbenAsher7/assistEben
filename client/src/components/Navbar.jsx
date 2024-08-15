@@ -9,7 +9,7 @@ import { memo } from "react";
 const Navbar = memo(() => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
 
-  const { isLogin, setIsLogin, setUser } = useContext(MainContext);
+  const { isLogin, setIsLogin, setUser, user } = useContext(MainContext);
 
   const toggleNavbar = useCallback(() => {
     setIsNavbarOpen((prev) => !prev);
@@ -49,6 +49,17 @@ const Navbar = memo(() => {
         </li>
         {isLogin && (
           <>
+            {user.tipo === "Administrador" && (
+              <li className="flex justify-end text-black dark:text-white items-center">
+                <Link
+                  to="/admin"
+                  className="bg-purple-500 text-white dark:bg-purple-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
+                  onClick={closeNavbar}
+                >
+                  Administración
+                </Link>
+              </li>
+            )}
             <li className="flex justify-end text-black dark:text-white items-center">
               <Link
                 to="/attendance"

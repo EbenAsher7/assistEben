@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Attendance from "./pages/Attendance";
 import RegisterAttendance from "./pages/RegisterAttendance";
 import NewRegister from "./pages/NewRegister";
+import Administration from "./pages/Administration";
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route path="/attendance" element={<Attendance />} />
         <Route path="/registerAttendance" element={<RegisterAttendance />} />
         <Route path="/newRegister" element={<NewRegister />} />
+        <Route path="/admin" element={<Administration />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

@@ -2,6 +2,8 @@ import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 dotenv.config()
 
+const ADMINISTRADOR = 'Administrador'
+
 const authMiddleware = (requiredType) => {
   return (req, res, next) => {
     try {
@@ -10,9 +12,11 @@ const authMiddleware = (requiredType) => {
       if (tokenCookie) {
         const decoded = jwt.verify(tokenCookie, process.env.JWT_SECRET)
 
-        // Verificar si el tipo coincide con el requerido
-        if (decoded.tipo !== requiredType) {
-          return res.status(403).json({ error: 'Acceso denegado' })
+        // Verificar si el tipo coincide con el requerido o si es admin
+        if (decoded.tipo !== requiredType && decoded.tipo !== ADMINISTRADOR) {
+          return res
+            .status(403)
+            .json({ error: 'Acceso denegado, solo para Administradores' })
         }
 
         req.user = decoded
@@ -29,9 +33,11 @@ const authMiddleware = (requiredType) => {
         const token = tokenHeader
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        // Verificar si el tipo coincide con el requerido
-        if (decoded.tipo !== requiredType) {
-          return res.status(403).json({ error: 'Acceso denegado' })
+        // Verificar si el tipo coincide con el requerido o si es admin
+        if (decoded.tipo !== requiredType && decoded.tipo !== ADMINISTRADOR) {
+          return res
+            .status(403)
+            .json({ error: 'Acceso denegado, solo para Administradores' })
         }
 
         req.user = decoded

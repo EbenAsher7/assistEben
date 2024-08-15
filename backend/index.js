@@ -6,6 +6,7 @@ import user from './routes/user.js'
 import gets from './routes/gets.js'
 import posts from './routes/posts.js'
 import puts from './routes/put.js'
+import admin from './routes/admin.js'
 import authMiddleware from './middleware/auth.js'
 
 const app = express()
@@ -33,9 +34,7 @@ app.use('/post', posts)
 app.use('/put', puts)
 
 // Rutas específicas que requieren tipos de usuarios particulares
-app.use('/admin', authMiddleware('admin'), (req, res) => {
-  res.send('Bienvenido al panel de administración')
-})
+app.use('/admin', authMiddleware('Administrador'), admin)
 
 // Manejo de errores globales en Express
 app.use((err, req, res, next) => {

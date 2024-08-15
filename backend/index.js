@@ -58,7 +58,7 @@ process.on('unhandledRejection', (razon, promesa) => {
 process.on('uncaughtException', (error) => {
   console.log('Se produjo una excepción no capturada en el proceso principal')
   console.log('Error:', error)
-  process.exit(1)
+  // process.exit(1)
 })
 
 app.listen(port, () => {

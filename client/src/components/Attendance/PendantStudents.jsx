@@ -134,81 +134,83 @@ const PendantStudents = ({ value }) => {
         ) : (
           cursoSeleccionado &&
           (pendingStudents.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Teléfono</TableHead>
-                  <TableHead>Fecha de Nacimiento</TableHead>
-                  <TableHead>Observaciones</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {pendingStudents.map((student) => (
-                  <TableRow key={student.AlumnoID}>
-                    <TableCell className="capitalize">{`${student.AlumnoNombres} ${student.AlumnoApellidos}`}</TableCell>
-                    <TableCell>{student.AlumnoTelefono}</TableCell>
-                    <TableCell>{student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd") : "---"}</TableCell>
-                    <TableCell>{student.AlumnoObservaciones}</TableCell>
-                    <TableCell>
-                      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                        <DialogTrigger asChild>
-                          <Button
-                            onClick={() => {
-                              setSelectedStudent(student);
-                              setObservations("");
-                              setIsDialogOpen(true);
-                            }}
-                          >
-                            Aceptar Registro
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Aceptar solicitud de: {selectedStudent?.AlumnoNombres} {selectedStudent?.AlumnoApellidos}
-                            </DialogTitle>
-                            <DialogDescription>Agregue observaciones si es necesario.</DialogDescription>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-1 items-center gap-4">
-                              <Textarea
-                                placeholder="Escriba sus observaciones aquí."
-                                value={observations}
-                                onChange={(e) => setObservations(e.target.value)}
-                              />
-                            </div>
-                          </div>
-                          <DialogFooter>
-                            <Button
-                              className="text-black dark:text-white"
-                              type="button"
-                              variant="outline"
-                              onClick={() => {
-                                setSelectedStudent(null);
-                                setIsDialogOpen(false);
-                              }}
-                            >
-                              Cancelar
-                            </Button>
-                            <Button
-                              type="button"
-                              onClick={() => {
-                                handleAcceptRequest();
-                                setIsDialogOpen(false);
-                              }}
-                            >
-                              Aceptar registro
-                            </Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
+            <div className="sm:w-[90%] w-11/12 m-auto justify-center border-[1px] mb-14 rounded-lg">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Teléfono</TableHead>
+                    <TableHead>Fecha de Nacimiento</TableHead>
+                    <TableHead>Observaciones</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {pendingStudents.map((student) => (
+                    <TableRow key={student.AlumnoID}>
+                      <TableCell className="capitalize">{`${student.AlumnoNombres} ${student.AlumnoApellidos}`}</TableCell>
+                      <TableCell>{student.AlumnoTelefono}</TableCell>
+                      <TableCell>{student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd") : "---"}</TableCell>
+                      <TableCell>{student.AlumnoObservaciones}</TableCell>
+                      <TableCell>
+                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button
+                              onClick={() => {
+                                setSelectedStudent(student);
+                                setObservations("");
+                                setIsDialogOpen(true);
+                              }}
+                            >
+                              Aceptar Registro
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
+                            <DialogHeader>
+                              <DialogTitle>
+                                Aceptar solicitud de: {selectedStudent?.AlumnoNombres} {selectedStudent?.AlumnoApellidos}
+                              </DialogTitle>
+                              <DialogDescription>Agregue observaciones si es necesario.</DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <div className="grid grid-cols-1 items-center gap-4">
+                                <Textarea
+                                  placeholder="Escriba sus observaciones aquí."
+                                  value={observations}
+                                  onChange={(e) => setObservations(e.target.value)}
+                                />
+                              </div>
+                            </div>
+                            <DialogFooter>
+                              <Button
+                                className="text-black dark:text-white"
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedStudent(null);
+                                  setIsDialogOpen(false);
+                                }}
+                              >
+                                Cancelar
+                              </Button>
+                              <Button
+                                type="button"
+                                onClick={() => {
+                                  handleAcceptRequest();
+                                  setIsDialogOpen(false);
+                                }}
+                              >
+                                Aceptar registro
+                              </Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           ) : (
             <p className="text-center font-bold py-4">"En este curso no hay estudiantes pendientes."</p>
           ))

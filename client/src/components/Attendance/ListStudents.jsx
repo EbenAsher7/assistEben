@@ -332,7 +332,7 @@ export function ListStudents({ value }) {
   });
 
   useEffect(() => {
-    fetchModulos().then((data) => {
+    fetchModulos(user.modulo_id).then((data) => {
       setCursos(data);
       setIsLoadingCursos(false);
     });

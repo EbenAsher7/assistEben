@@ -25,6 +25,38 @@ router.get('/modules', async (req, res) => {
   }
 })
 
+// Obtener modulos dependiendo el ID del tutor
+router.get('/modulesByTutor/:tutorID', async (req, res) => {
+  const { tutorID } = req.params
+
+  console.log('tutorID:', tutorID)
+
+  try {
+    const result = await turso.execute({
+      sql: 'SELECT * FROM modulos WHERE encargado_id = ?',
+      args: [tutorID]
+    })
+
+    console.log('resultado: ', result)
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const modules = rows.map((row) => {
+      const module = {}
+      columns.forEach((col, index) => {
+        module[col] = row[index]
+      })
+      return module
+    })
+
+    res.status(200).json(modules)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 router.get('/tutors', async (req, res) => {
   try {
     const result = await turso.execute('SELECT * FROM tutores where activo = 1')

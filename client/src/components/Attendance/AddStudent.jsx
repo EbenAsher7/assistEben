@@ -52,7 +52,6 @@ export function AddStudent({ value }) {
 
   // Función para guardar los datos
   const handleGuardarDatos = async () => {
-    console.log(user.id);
     if (validateForm()) {
       setLoading(true);
       try {

@@ -28,7 +28,6 @@ export default function NewRegister() {
   }, [nombres, apellidos, telefono]);
 
   const handleContinue = () => {
-    console.log(fechaNacimiento);
     if (isValid) {
       context.setNombresNEW(nombres);
       context.setApellidosNEW(apellidos);

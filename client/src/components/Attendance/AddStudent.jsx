@@ -52,6 +52,7 @@ export function AddStudent({ value }) {
 
   // Función para guardar los datos
   const handleGuardarDatos = async () => {
+    console.log(user.id);
     if (validateForm()) {
       setLoading(true);
       try {
@@ -63,7 +64,7 @@ export function AddStudent({ value }) {
           fecha_nacimiento: formattedDate ?? "",
           telefono: phone,
           direccion: address ?? "",
-          tutor_id: parseInt(tutorSelected),
+          tutor_id: parseInt(user?.id),
           modulo_id: parseInt(cursoSelected),
           activo: activo,
           observaciones: observations ?? "",
@@ -116,7 +117,7 @@ export function AddStudent({ value }) {
       setLoadingData(true);
       try {
         // cargar cursos
-        const response = await fetch(`${URL_BASE}/api/modules`, {
+        const response = await fetch(`${URL_BASE}/api/modulesByTutor/${user.modulo_id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -131,26 +132,6 @@ export function AddStudent({ value }) {
             label: curso.nombre,
           }));
           setCursos(formattedData);
-        } else {
-          throw new Error("Failed to fetch");
-        }
-
-        // cargar tutores
-        const responseTutors = await fetch(`${URL_BASE}/api/tutors`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user?.token,
-          },
-        });
-
-        if (responseTutors.ok) {
-          const dataTutors = await responseTutors.json();
-          const formattedDataTutors = dataTutors.map((tutor) => ({
-            value: tutor.id.toString(),
-            label: tutor.nombres + " " + tutor.apellidos,
-          }));
-          setTutors(formattedDataTutors);
         } else {
           throw new Error("Failed to fetch");
         }
@@ -185,18 +166,21 @@ export function AddStudent({ value }) {
         <CardHeader>
           <CardTitle>Añadir Alumno</CardTitle>
           <CardDescription>añadir un nuevo alumno</CardDescription>
+          <h1 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h1>
         </CardHeader>
         <div className="sm:w-[96%] m-auto h-2 mb-2">
           <hr />
         </div>
         <CardContent className="space-y-2 grid grid-cols-1 sm:grid-cols-2 w-full sm:w-[720px] m-auto gap-4 place-content-center justify-center items-center">
           <div className="space-y-1">
-            <Label htmlFor="name">Nombres</Label>
+            <Label htmlFor="name">
+              Nombres<span className="text-red-500">*</span>
+            </Label>
             <Input value={name} placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name" className="-mt-1">
-              Apellidos
+              Apellidos<span className="text-red-500">*</span>
             </Label>
             <Input value={lastName} placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
           </div>
@@ -204,7 +188,9 @@ export function AddStudent({ value }) {
             <CalendarAE title="Fecha de Nacimiento" setDate={setSelectedDate} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="name">Teléfono</Label>
+            <Label htmlFor="name">
+              Teléfono<span className="text-red-500">*</span>
+            </Label>
             <Input value={phone} placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" />
           </div>
           <div className="space-y-1">
@@ -213,10 +199,18 @@ export function AddStudent({ value }) {
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="name">Tutor</Label>
-            <DropdownAE data={tutors} title="Seleccione un tutor" setValueAE={setTutorSelected} />
+            <DropdownAE
+              data={tutors}
+              title="Seleccione un tutor"
+              setValueAE={setTutorSelected}
+              disable
+              defaultValue={user?.nombres + " " + user?.apellidos}
+            />
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="name">Curso</Label>
+            <Label htmlFor="name">
+              Curso<span className="text-red-500">*</span>
+            </Label>
             <DropdownAE data={cursos} title="Seleccione un curso" setValueAE={setCursoSelected} />
           </div>
           <div className="space-y-1">

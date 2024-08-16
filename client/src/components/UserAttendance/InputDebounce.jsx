@@ -51,7 +51,6 @@ const InputDebounce = () => {
         if (response.ok) {
           const data = await response.json();
           setResults(data);
-          console.log(data);
           setShowRegister(data.length === 0);
           if (data.length === 0) {
             setShowConfirm(false);

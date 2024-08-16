@@ -2,29 +2,41 @@ import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import PropTypes from "prop-types";
 
-export function DropdownAE({ data, title, setValueAE }) {
+export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable = false }) {
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = React.useState(defaultValue);
 
   React.useEffect(() => {
     setValueAE(value);
   }, [value, setValueAE]);
 
+  // Si hay un valor por defecto, mostrar un Input deshabilitado
+  if (defaultValue) {
+    setValueAE(defaultValue);
+    return <Input value={defaultValue} disabled className="w-full m-auto sm:w-[330px] text-black dark:text-white" />;
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" role="combobox" aria-expanded={open} className="w-full m-auto sm:w-[330px] justify-between">
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={open}
+          disabled={disable}
+          className={cn("w-full m-auto sm:w-[330px] justify-between", disable && "cursor-not-allowed opacity-50")}
+        >
           {value ? data.find((item) => item.value === value)?.label : title}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[60vw] m-auto sm:w-[330px] p-0">
         <Command>
-          {/* <CommandInput onC placeholder={`Buscar ${title.toLowerCase()}...`} /> */}
           <CommandList>
             <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
             <CommandGroup>
@@ -48,8 +60,11 @@ export function DropdownAE({ data, title, setValueAE }) {
     </Popover>
   );
 }
+
 DropdownAE.propTypes = {
   data: PropTypes.array.isRequired,
   title: PropTypes.string.isRequired,
   setValueAE: PropTypes.func.isRequired,
+  defaultValue: PropTypes.string,
+  disable: PropTypes.bool,
 };

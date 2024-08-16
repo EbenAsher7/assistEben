@@ -29,15 +29,11 @@ router.get('/modules', async (req, res) => {
 router.get('/modulesByTutor/:tutorID', async (req, res) => {
   const { tutorID } = req.params
 
-  console.log('tutorID:', tutorID)
-
   try {
     const result = await turso.execute({
       sql: 'SELECT * FROM modulos WHERE encargado_id = ?',
       args: [tutorID]
     })
-
-    console.log('resultado: ', result)
 
     // Transformar los datos en el formato deseado
     const columns = result.columns

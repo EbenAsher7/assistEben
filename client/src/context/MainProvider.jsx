@@ -180,7 +180,6 @@ const MainProvider = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
-          console.log(data);
           // Transformar los datos
           const formattedData = data.map((curso) => ({
             value: curso.id.toString(),

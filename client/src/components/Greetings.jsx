@@ -20,7 +20,7 @@ const Greetings = ({ user }) => {
   return (
     <div className="w-full flex flex-col items-center justify-center pt-5">
       <Avatar>
-        <AvatarImage src={user.foto_url} />
+        <AvatarImage src={user.foto_url} className="object-cover" />
         <AvatarFallback>{user?.nombres?.substring(0, 2) ?? "??"}</AvatarFallback>
       </Avatar>
       <h1 className="text-center font-semibold text-xl px-5 my-3">{`¡${greeting}, ${user?.nombres} ${user?.apellidos}!`}</h1>

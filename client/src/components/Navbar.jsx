@@ -41,33 +41,33 @@ const Navbar = memo(() => {
 
   const renderNavLinks = useMemo(
     () => (
-      <ul className="font-medium flex flex-col gap-3 p-2 bg-white sm:flex-row dark:bg-neutral-800">
+      <ul className="font-medium flex flex-col gap-3 p-2 bg-white sm:flex-row dark:bg-neutral-800 sm:space-x-2">
         {isLogin && (
           <>
             {user.tipo === "Administrador" && (
-              <li className="flex justify-end text-black dark:text-white items-center">
+              <li className="text-black dark:text-white flex justify-center items-center">
                 <Link
                   to="/admin"
-                  className="bg-purple-500 text-white dark:bg-purple-700 w-[175px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
+                  className="bg-purple-500 text-white dark:bg-purple-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
                   onClick={closeNavbar}
                 >
                   Administración
                 </Link>
               </li>
             )}
-            <li className="flex justify-end text-black dark:text-white items-center">
+            <li className="text-black dark:text-white flex justify-center items-center">
               <Link
                 to="/attendance"
-                className="bg-green-500 text-white dark:bg-green-700 w-[175px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-green-300 dark:border-green-800"
+                className="bg-green-500 text-white dark:bg-green-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md border-[1px] border-green-300 dark:border-green-800"
                 onClick={closeNavbar}
               >
                 Control asistencias
               </Link>
             </li>
-            <li className="flex justify-end text-black dark:text-white items-center">
+            <li className="text-black dark:text-white flex justify-center items-center">
               <Link
                 to="/profile"
-                className="bg-blue-500 text-white dark:bg-blue-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-800"
+                className="bg-blue-500 text-white dark:bg-blue-700 w-full sm:w-auto px-10 py-2 flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-800"
                 onClick={closeNavbar}
               >
                 Ajustes
@@ -75,13 +75,13 @@ const Navbar = memo(() => {
             </li>
           </>
         )}
-        <li className="flex justify-end text-black dark:text-white items-center">
+        <li className="text-black dark:text-white flex justify-center items-center">
           {isLogin ? (
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
                   variant="destructive"
-                  className="bg-red-500 text-white dark:bg-red-800 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-red-300 dark:border-red-700"
+                  className="bg-red-500 text-white dark:bg-red-800 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md border-[1px] border-red-300 dark:border-red-700"
                 >
                   Cerrar Sesión
                 </Button>
@@ -107,7 +107,7 @@ const Navbar = memo(() => {
           ) : (
             <Link
               to="/login"
-              className="bg-blue-500 text-white dark:bg-blue-800 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-700"
+              className="bg-blue-500 text-white dark:bg-blue-800 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-700"
               onClick={closeNavbar}
             >
               Iniciar Sesión
@@ -115,7 +115,7 @@ const Navbar = memo(() => {
           )}
         </li>
         <li>
-          <span className="flex justify-end text-black dark:text-white">
+          <span className="flex justify-center text-black dark:text-white">
             <ThemeToggle />
           </span>
         </li>
@@ -141,7 +141,7 @@ const Navbar = memo(() => {
     <nav className="bg-white border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500 fixed top-0 w-full z-50" ref={navbarRef}>
       <div className="w-full flex flex-wrap items-center justify-between p-2 sm:pl-4">
         <Link to="/" className="flex items-center gap-2" onClick={closeNavbar}>
-          <img src={LOGO} className="size-10 -mt-2 dark:invert-0 invert" alt="Logo Ministerios Ebenezer" />
+          <img src={LOGO} className="h-10 dark:invert-0 invert" alt="Logo Ministerios Ebenezer" />
           <span className="self-center text-md sm:text-xl font-semibold whitespace-nowrap dark:text-white">Ministerios Ebenezer</span>
         </Link>
         <button
@@ -157,8 +157,8 @@ const Navbar = memo(() => {
             <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 1h15M1 7h15M1 13h15" />
           </svg>
         </button>
-        <div className={`${isNavbarOpen ? "block" : "hidden"} w-1/2 sm:flex sm:justify-end`} id="navbar-default">
-          <div className="flex w-[90vw] sm:w-full justify-center">{renderNavLinks}</div>
+        <div className={`${isNavbarOpen ? "block" : "hidden"} w-full md:flex md:w-auto`} id="navbar-default">
+          <div className="flex w-full sm:w-auto justify-center">{renderNavLinks}</div>
         </div>
       </div>
     </nav>

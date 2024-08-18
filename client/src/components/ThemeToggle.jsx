@@ -10,7 +10,9 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Button variant="outline" className="flex items-center justify-between w-full sm:max-w-[300px]">
-          <span>Tema</span>
+          <span className="hidden sm:inline-flex">Tema</span>
+          <span className="sm:hidden inline-flex px-3">Cambiar Tema</span>
+
           {theme === "light" ? (
             <Sun className="ml-2 h-[1.2rem] w-[1.2rem] transition-all" />
           ) : (

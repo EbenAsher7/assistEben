@@ -11,8 +11,9 @@ const Administration = () => {
 
   // Verificar si el usuario es administrador
   useEffect(() => {
-    const CheckPermision = async () => {
-      if (user.tipo !== "Administrador") {
+    console.log(user);
+    const CheckPermision = () => {
+      if (user?.tipo !== "Administrador") {
         setAccessDenied(true); // Mostrar el mensaje de acceso denegado
         const intervalId = setInterval(() => {
           setCountdown((prevCountdown) => prevCountdown - 1);
@@ -24,6 +25,7 @@ const Administration = () => {
         }, 5000);
       }
     };
+
     CheckPermision();
   }, [user, navigate]);
 

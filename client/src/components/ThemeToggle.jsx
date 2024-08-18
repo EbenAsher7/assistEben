@@ -1,11 +1,6 @@
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/context/ThemeProvider";
 
 export function ThemeToggle() {
@@ -15,7 +10,7 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Button variant="outline" className="flex items-center justify-between w-full sm:max-w-[300px]">
-          <span>Cambiar tema</span>
+          <span>Tema</span>
           {theme === "light" ? (
             <Sun className="ml-2 h-[1.2rem] w-[1.2rem] transition-all" />
           ) : (

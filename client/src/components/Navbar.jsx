@@ -6,6 +6,19 @@ import MainContext from "../context/MainContext";
 import "flowbite";
 import { memo } from "react";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+
 const Navbar = memo(() => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const navbarRef = useRef(null);
@@ -29,32 +42,13 @@ const Navbar = memo(() => {
   const renderNavLinks = useMemo(
     () => (
       <ul className="font-medium flex flex-col gap-3 p-2 bg-white sm:flex-row dark:bg-neutral-800">
-        <li className="flex justify-end text-black dark:text-white items-center">
-          {isLogin ? (
-            <Link
-              to="/login"
-              className="bg-red-500 text-white dark:bg-red-800 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-red-300 dark:border-red-700"
-              onClick={handleLogout}
-            >
-              Cerrar Sesión
-            </Link>
-          ) : (
-            <Link
-              to="/login"
-              className="bg-blue-500 text-white dark:bg-blue-800 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-700"
-              onClick={closeNavbar}
-            >
-              Iniciar Sesión
-            </Link>
-          )}
-        </li>
         {isLogin && (
           <>
             {user.tipo === "Administrador" && (
               <li className="flex justify-end text-black dark:text-white items-center">
                 <Link
                   to="/admin"
-                  className="bg-purple-500 text-white dark:bg-purple-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
+                  className="bg-purple-500 text-white dark:bg-purple-700 w-[175px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
                   onClick={closeNavbar}
                 >
                   Administración
@@ -64,10 +58,10 @@ const Navbar = memo(() => {
             <li className="flex justify-end text-black dark:text-white items-center">
               <Link
                 to="/attendance"
-                className="bg-green-500 text-white dark:bg-green-700 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-green-300 dark:border-green-800"
+                className="bg-green-500 text-white dark:bg-green-700 w-[175px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-green-300 dark:border-green-800"
                 onClick={closeNavbar}
               >
-                Perfil
+                Control asistencias
               </Link>
             </li>
             <li className="flex justify-end text-black dark:text-white items-center">
@@ -81,6 +75,45 @@ const Navbar = memo(() => {
             </li>
           </>
         )}
+        <li className="flex justify-end text-black dark:text-white items-center">
+          {isLogin ? (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="destructive"
+                  className="bg-red-500 text-white dark:bg-red-800 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-red-300 dark:border-red-700"
+                >
+                  Cerrar Sesión
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="text-black dark:text-white">
+                <AlertDialogHeader>
+                  <AlertDialogTitle>¿Estás seguro de cerrar sesión?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Esta acción cerrará tu sesión y no podrás acceder nuevamente hasta iniciar sesión de nuevo.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleLogout}
+                    className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:text-white dark:hover:bg-red-700"
+                  >
+                    Cerrar Sesión
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          ) : (
+            <Link
+              to="/login"
+              className="bg-blue-500 text-white dark:bg-blue-800 w-[150px] px-4 py-[5px] flex justify-center rounded-md border-[1px] border-blue-300 dark:border-blue-700"
+              onClick={closeNavbar}
+            >
+              Iniciar Sesión
+            </Link>
+          )}
+        </li>
         <li>
           <span className="flex justify-end text-black dark:text-white">
             <ThemeToggle />

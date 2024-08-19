@@ -37,9 +37,9 @@ const ImagenCloud = ({ url, rounded, upload, setURLUpload, size = "128" }) => {
           let width = img.width;
           let height = img.height;
 
-          if (height > 1000) {
-            width = Math.round((1000 * img.width) / img.height);
-            height = 1000;
+          if (height > 700) {
+            width = Math.round((700 * img.width) / img.height);
+            height = 700;
           }
 
           canvas.width = width;

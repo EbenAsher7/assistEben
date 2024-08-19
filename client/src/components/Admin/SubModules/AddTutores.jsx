@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DropdownAE from "../../DropdownAE"; // Asegúrate de que la ruta sea correcta
+import ImagenCloud from "@/components/ImagenCloud";
 
 function generateUsername(nombres, apellidos) {
   return `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
@@ -75,68 +76,74 @@ const AddTutores = () => {
   }, [nombres, apellidos]);
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label>Nombres</label>
-        <Input type="text" name="nombres" value={nombres} onChange={(e) => setNombres(e.target.value)} required placeholder="Nombres" />
+    <div className="px-8 border-[1px] rounded-md mt-2 pt-2 pb-8 mb-4">
+      <h1 className="text-2xl text-center font-extrabold my-4">Añadir nuevo tutor</h1>
+      <h2 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h2>
+      <div className="my-4">
+        <ImagenCloud setURLUpload={setFotoUrl} upload size="200" />
       </div>
-
-      <div>
-        <label>Apellidos</label>
-        <Input type="text" name="apellidos" value={apellidos} onChange={(e) => setApellidos(e.target.value)} required placeholder="Apellidos" />
-      </div>
-
-      <div>
-        <label>Username</label>
-        <Input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
-      </div>
-
-      <div>
-        <label>Password</label>
-        <Input type="text" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </div>
-
-      <div>
-        <label>Fecha de Nacimiento</label>
-        <Input type="date" name="fecha_nacimiento" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} required />
-      </div>
-
-      <div>
-        <label>Foto URL</label>
-        <Input type="text" name="foto_url" value={fotoUrl} onChange={(e) => setFotoUrl(e.target.value)} placeholder="URL de la foto" />
-      </div>
-
-      <div>
-        <label>Teléfono</label>
-        <Input type="text" name="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" />
-      </div>
-
-      <div>
-        <label>Dirección</label>
-        <Input type="text" name="direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Dirección" />
-      </div>
-
-      <div>
-        <label>Tipo de Usuario</label>
-        <DropdownAE data={tipoData} title="Seleccionar tipo" setValueAE={setTipo} />
-      </div>
-
-      <div>
-        <label>Módulo</label>
-        <DropdownAE data={modulosData} title="Seleccionar módulo" setValueAE={setModuloId} />
-      </div>
-
-      <div className="md:col-span-2">
-        <label>Observaciones</label>
-        <Input type="text" name="observaciones" value={observaciones} onChange={(e) => setObservaciones(e.target.value)} placeholder="Observaciones" />
-      </div>
-
-      <div className="md:col-span-2">
-        <Button type="submit" className="w-full">
-          Guardar
-        </Button>
-      </div>
-    </form>
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label>
+            Nombres<span className="text-red-500">*</span>
+          </label>
+          <Input type="text" name="nombres" value={nombres} onChange={(e) => setNombres(e.target.value)} required placeholder="Nombres" />
+        </div>
+        <div>
+          <label>
+            Apellidos<span className="text-red-500">*</span>
+          </label>
+          <Input type="text" name="apellidos" value={apellidos} onChange={(e) => setApellidos(e.target.value)} required placeholder="Apellidos" />
+        </div>
+        <div>
+          <label>
+            Nombre de usuario<span className="text-red-500">*</span>
+          </label>
+          <Input type="text" name="username" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" />
+        </div>
+        <div>
+          <label>
+            Contraseña<span className="text-red-500">*</span>
+          </label>
+          <Input type="text" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <div>
+          <label>Fecha de Nacimiento</label>
+          <Input type="date" name="fecha_nacimiento" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} required />
+        </div>
+        <div>
+          <label>
+            Teléfono<span className="text-red-500">*</span>
+          </label>
+          <Input type="text" name="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" />
+        </div>
+        <div>
+          <label>Dirección</label>
+          <Input type="text" name="direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Dirección" />
+        </div>
+        <div>
+          <label>Observaciones</label>
+          <Input type="text" name="observaciones" value={observaciones} onChange={(e) => setObservaciones(e.target.value)} placeholder="Observaciones" />
+        </div>
+        <div>
+          <label>
+            Tipo de Usuario<span className="text-red-500">*</span>
+          </label>
+          <DropdownAE data={tipoData} title="Seleccionar tipo" setValueAE={setTipo} />
+        </div>
+        <div>
+          <label>
+            Seleccione Módulo<span className="text-red-500">*</span>
+          </label>
+          <DropdownAE data={modulosData} title="Seleccionar módulo" setValueAE={setModuloId} />
+        </div>
+        <div className="md:col-span-2">
+          <Button type="submit" className="w-full mt-4">
+            Guardar
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

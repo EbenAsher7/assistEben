@@ -48,3 +48,5 @@ CalendarAE.propTypes = {
   onlyTuesday: PropTypes.bool,
   size: PropTypes.string,
 };
+
+export default CalendarAE;

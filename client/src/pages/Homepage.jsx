@@ -1,10 +1,7 @@
 import InputDebounce from "@/components/UserAttendance/InputDebounce";
 import "./Homepage.css";
-import ImagenCloud from "@/components/ImagenCloud";
-import { useState } from "react";
 
 const Homepage = () => {
-  const [urlNueva, setURLNueva] = useState(null);
   return (
     <div>
       {/* Fondo animaod para el homepage */}

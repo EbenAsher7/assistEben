@@ -41,7 +41,6 @@ router.get('/allTutorsByModule', async (req, res) => {
         t.foto_url AS tutorFotoUrl,
         t.telefono AS tutorTelefono,
         t.direccion AS tutorDireccion,
-        t.username AS tutorUsername,
         t.tipo AS tutorTipo,
         t.observaciones AS tutorObservaciones
       FROM Modulos m
@@ -77,7 +76,6 @@ router.get('/allTutorsByModule', async (req, res) => {
           foto_url: row[columns.indexOf('tutorFotoUrl')],
           telefono: row[columns.indexOf('tutorTelefono')],
           direccion: row[columns.indexOf('tutorDireccion')],
-          username: row[columns.indexOf('tutorUsername')],
           tipo: row[columns.indexOf('tutorTipo')],
           observaciones: row[columns.indexOf('tutorObservaciones')]
         }

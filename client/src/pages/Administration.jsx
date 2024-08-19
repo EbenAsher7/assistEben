@@ -11,7 +11,6 @@ const Administration = () => {
 
   // Verificar si el usuario es administrador
   useEffect(() => {
-    console.log(user);
     const CheckPermision = () => {
       if (user?.tipo !== "Administrador") {
         setAccessDenied(true); // Mostrar el mensaje de acceso denegado

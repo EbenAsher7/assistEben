@@ -45,6 +45,7 @@ router.get('/allTutorsByModule', async (req, res) => {
         t.observaciones AS tutorObservaciones
       FROM Modulos m
       LEFT JOIN Tutores t ON m.id = t.modulo_id
+      WHERE t.activo = 1
     `)
 
     // Transformar los datos en el formato deseado

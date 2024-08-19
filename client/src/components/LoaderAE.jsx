@@ -1,5 +1,5 @@
 // Loader component
-const LoaderAE = () => (
+const LoaderAE = ({ texto = "Cargando..." }) => (
   <div className="w-full overflow-hidden flex flex-col gap-2 justify-center items-center">
     <div className="flex justify-center items-center h-full">
       <div className="loader"></div>
@@ -23,7 +23,7 @@ const LoaderAE = () => (
         }
       `}</style>
     </div>
-    <h1>Cargando...</h1>
+    {texto !== "" && <h1>{texto}</h1>}
   </div>
 );
 

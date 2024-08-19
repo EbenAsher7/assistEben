@@ -1,7 +1,10 @@
 import InputDebounce from "@/components/UserAttendance/InputDebounce";
 import "./Homepage.css";
+import ImagenCloud from "@/components/ImagenCloud";
+import { useState } from "react";
 
 const Homepage = () => {
+  const [urlNueva, setURLNueva] = useState(null);
   return (
     <div>
       {/* Fondo animaod para el homepage */}
@@ -24,6 +27,14 @@ const Homepage = () => {
         <div className="flex flex-col gap-3 sm:-mt-24">
           <div className="sm:min-w-[300px] sm:max-w-[700px] w-full">
             <div className="sm:mb-5 px-5 sm:px-0">
+              <ImagenCloud
+                rounded
+                url="https://admin.mridul.tech/wp-content/uploads/2024/01/React-Hooks-Cheatsheet.webp"
+                upload
+                setURLUpload={setURLNueva}
+                size={128}
+              />
+              Nueva URL: {urlNueva}
               <h1 className="text-center font-serif font-extrabold text-4xl sm:text-6xl mb-2">Registrar asistencia</h1>
               <h2 className="text-center text-sm sm:text-xl font-bold mb-1">Escribe tu nombre y asegúrate que sea el correcto</h2>
               <h3 className="text-center text-xs sm:text-md opacity-40 italic mb-3">*Si hay varios nombres iguales, puedes basarte en el tutor.</h3>

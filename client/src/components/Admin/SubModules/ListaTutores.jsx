@@ -30,6 +30,7 @@ const ListaTutores = () => {
   const [selectedTipoTutorEdit, setSelectedTipoTutorEdit] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTutorId, setCurrentTutorId] = useState(null);
+  const [newImageProfile, setNewImageProfile] = useState("");
 
   const { toast } = useToast();
   const { user } = useContext(MainContext);
@@ -105,6 +106,7 @@ const ListaTutores = () => {
       telefono: document.getElementById("phone").value,
       direccion: document.getElementById("address").value,
       tipo: selectedTipoTutorEdit,
+      foto_url: newImageProfile === "" ? selectedTutor.foto_url : newImageProfile,
     };
 
     if (
@@ -112,7 +114,8 @@ const ListaTutores = () => {
       updatedTutor.apellidos === selectedTutor.apellidos &&
       updatedTutor.telefono === selectedTutor.telefono &&
       updatedTutor.direccion === selectedTutor.direccion &&
-      updatedTutor.tipo === selectedTutor.tipo
+      updatedTutor.tipo === selectedTutor.tipo &&
+      updatedTutor.foto_url === selectedTutor.foto_url
     ) {
       toast({
         variant: "success",
@@ -120,6 +123,7 @@ const ListaTutores = () => {
         description: "Guardado sin cambios.",
         duration: 2500,
       });
+      handleCloseModal();
       return;
     }
 
@@ -144,7 +148,7 @@ const ListaTutores = () => {
         setTutorsByModule((prevTutorsByModule) =>
           prevTutorsByModule.map((module) => ({
             ...module,
-            Tutores: module.Tutores.map((tutor) => (tutor.id === selectedTutor.id ? { ...updatedTutor, idModulo: tutor.idModulo } : tutor)),
+            Tutores: module.Tutores.map((tutor) => (tutor.id === selectedTutor.id ? { ...tutor, ...updatedTutor } : tutor)),
           }))
         );
 
@@ -275,7 +279,7 @@ const ListaTutores = () => {
                             <DialogDescription>Realiza los cambios necesarios y guarda.</DialogDescription>
                           </DialogHeader>
                           <div className="grid gap-4 py-4 text-black dark:text-white">
-                            <ImagenCloud url={tutor.foto_url} rounded />
+                            <ImagenCloud url={tutor.foto_url} rounded setURLUpload={setNewImageProfile} upload />
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="name" className="text-right">
                                 Nombre

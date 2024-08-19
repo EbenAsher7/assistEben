@@ -7,26 +7,49 @@ const Administration = () => {
   const { user } = useContext(MainContext);
   const navigate = useNavigate();
   const [accessDenied, setAccessDenied] = useState(false);
-  const [countdown, setCountdown] = useState(5); // Inicializa el contador en 5 segundos
+  const [countdown, setCountdown] = useState(5);
+  const [timeoutId, setTimeoutId] = useState(null);
 
-  // Verificar si el usuario es administrador
   useEffect(() => {
-    const CheckPermision = () => {
-      if (user?.tipo !== "Administrador") {
-        setAccessDenied(true); // Mostrar el mensaje de acceso denegado
+    if (user) {
+      const timeoutId = setTimeout(() => {
+        if (!user.tipo) {
+          setAccessDenied(true);
+          const intervalId = setInterval(() => {
+            setCountdown((prevCountdown) => prevCountdown - 1);
+          }, 1000);
+
+          setTimeout(() => {
+            clearInterval(intervalId);
+            navigate("/");
+          }, 5000);
+        }
+      }, 1000); // Espera 1 segundo
+
+      setTimeoutId(timeoutId);
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (user && user.tipo) {
+      clearTimeout(timeoutId);
+      if (user.tipo !== "Administrador") {
+        setAccessDenied(true);
         const intervalId = setInterval(() => {
           setCountdown((prevCountdown) => prevCountdown - 1);
         }, 1000);
 
         setTimeout(() => {
-          clearInterval(intervalId); // Limpia el intervalo
-          navigate("/"); // Redirige a la página de inicio
+          clearInterval(intervalId);
+          navigate("/");
         }, 5000);
       }
-    };
-
-    CheckPermision();
-  }, [user, navigate]);
+    }
+  }, [user, navigate, timeoutId]);
 
   if (accessDenied) {
     return (

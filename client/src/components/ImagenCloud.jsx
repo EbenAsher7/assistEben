@@ -90,12 +90,6 @@ const ImagenCloud = ({ url, rounded, upload, setURLUpload, size = "128" }) => {
             alt="Uploaded"
             className={`object-cover ${rounded ? "rounded-full border-2 border-black dark:border-white" : ""}`}
             style={{ width: size + "px", height: size + "px" }}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-              e.target.className = `bg-gray-300 ${rounded ? "rounded-full border-2 border-black dark:border-white" : ""}`;
-              e.target.style = { width: size, height: size };
-            }}
           />
         ) : (
           <div

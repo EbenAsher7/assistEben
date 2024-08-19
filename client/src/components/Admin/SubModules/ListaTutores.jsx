@@ -21,14 +21,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import LoaderAE from "@/components/LoaderAE";
 import { DropdownAE } from "../../DropdownAE";
+import ImagenCloud from "@/components/ImagenCloud";
 
 const ListaTutores = () => {
   const [isLoadingTutors, setIsLoadingTutors] = useState(false);
   const [tutorsByModule, setTutorsByModule] = useState([]);
   const [selectedTutor, setSelectedTutor] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [selectedTipoTutorEdit, setSelectedTipoTutorEdit] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentTutorId, setCurrentTutorId] = useState(null);
 
   const { toast } = useToast();
   const { user } = useContext(MainContext);
@@ -70,7 +71,15 @@ const ListaTutores = () => {
 
   const handleEdit = (tutor) => {
     setSelectedTutor(tutor);
+    setCurrentTutorId(tutor.id);
     setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedTutor(null);
+    setCurrentTutorId(null);
+    setSelectedTipoTutorEdit(null);
   };
 
   const handleSaveChanges = async () => {
@@ -139,10 +148,7 @@ const ListaTutores = () => {
           }))
         );
 
-        // Limpia los estados seleccionados y cierra el modal
-        setSelectedTutor(null);
-        setSelectedTipoTutorEdit(null);
-        setIsModalOpen(false);
+        handleCloseModal();
       } else {
         throw new Error("Failed to update");
       }
@@ -154,6 +160,7 @@ const ListaTutores = () => {
         duration: 2500,
       });
     }
+    handleCloseModal();
   };
 
   const handleDelete = async (tutorId) => {
@@ -189,6 +196,7 @@ const ListaTutores = () => {
             Tutores: module.Tutores.filter((tutor) => tutor.id !== tutorId),
           }))
         );
+        handleCloseModal();
       } else {
         throw new Error("Failed to delete");
       }
@@ -200,6 +208,7 @@ const ListaTutores = () => {
         duration: 2500,
       });
     }
+    handleCloseModal();
   };
 
   if (isLoadingTutors) {
@@ -239,7 +248,7 @@ const ListaTutores = () => {
                     <TableCell>{tutor.direccion}</TableCell>
                     <TableCell>{tutor.tipo}</TableCell>
                     <TableCell>
-                      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                      <Dialog open={isModalOpen && currentTutorId === tutor.id}>
                         <DialogTrigger asChild>
                           <Button className="bg-blue-500" onClick={() => handleEdit(tutor)}>
                             <svg
@@ -266,6 +275,7 @@ const ListaTutores = () => {
                             <DialogDescription>Realiza los cambios necesarios y guarda.</DialogDescription>
                           </DialogHeader>
                           <div className="grid gap-4 py-4 text-black dark:text-white">
+                            <ImagenCloud url={tutor.foto_url} rounded />
                             <div className="grid grid-cols-4 items-center gap-4">
                               <Label htmlFor="name" className="text-right">
                                 Nombre
@@ -299,8 +309,11 @@ const ListaTutores = () => {
                               </div>
                             </div>
                           </div>
-                          <DialogFooter>
-                            <Button type="submit" onClick={handleSaveChanges}>
+                          <DialogFooter className="gap-2">
+                            <Button variant="outline" className="bg-red-500 text-white dark:bg-red-500" onClick={handleCloseModal}>
+                              Cancelar
+                            </Button>
+                            <Button type="submit" className="bg-green-500 text-white dark:bg-green-500" onClick={handleSaveChanges}>
                               Guardar cambios
                             </Button>
                           </DialogFooter>

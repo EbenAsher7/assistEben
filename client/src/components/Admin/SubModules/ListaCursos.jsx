@@ -18,6 +18,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import LoaderAE from "@/components/LoaderAE";
+import { CalendarIcon, PencilIcon, TrashIcon, ClockIcon } from "@/components/Iconos";
 
 const ListaCursos = () => {
   const [cursos, setCursos] = useState([]);
@@ -172,25 +173,27 @@ const ListaCursos = () => {
           <div className="border-[1px] rounded-xl p-4 bg-white dark:bg-gray-800 text-black dark:text-white relative isolate overflow-hidden">
             <div className="relative z-10">
               <div className="flex justify-between">
-                <div>
-                  <h2 className="text-lg font-bold">{curso.nombre}</h2>
-                  <p>{curso.descripcion}</p>
-                  <p>Fecha: {curso.fecha_inicio}</p>
-                  <p>Fecha Fin: {curso.fecha_fin}</p>
-                  <p>Horario Inicio: {curso.horarioInicio}</p>
-                  <p>Horario Fin: {curso.horarioFin}</p>
+                <div className="flex flex-col gap-2 mr-2">
+                  <h2 className="text-xl font-extrabold">{curso.nombre}</h2>
+                  <p className="text-lg mb-2">{curso.descripcion}</p>
+                  <p className="flex gap-2">
+                    <CalendarIcon /> {curso.fecha_inicio} - {curso.fecha_fin}
+                  </p>
+                  <p className="flex gap-2">
+                    <ClockIcon /> {curso.horarioInicio}-{curso.horarioFin}
+                  </p>
                 </div>
                 <div className="items-center gap-2 flex flex-col justify-center ">
                   <Button
                     className="bg-blue-500 dark:bg-blue-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2"
                     onClick={() => handleEdit(curso)}
                   >
-                    Editar
+                    <PencilIcon />
                   </Button>
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <Button className="bg-red-500 dark:bg-red-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2">
-                        Eliminar
+                        <TrashIcon />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>

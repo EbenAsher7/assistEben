@@ -15,7 +15,6 @@ export function AttendanceByMonth({ value }) {
   const [selectedYear, setSelectedYear] = useState(null);
   const [selectedDay, setSelectedDay] = useState(null);
   const [selectedCurso, setSelectedCurso] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [attendedStudents, setAttendedStudents] = useState([]);
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
   const [allData, setAllData] = useState([]);
@@ -68,7 +67,6 @@ export function AttendanceByMonth({ value }) {
   const handleCargarDatos = async () => {
     // Lógica para manejar el clic en el botón "Mostrar"
     try {
-      setLoading(true);
       if (!selectedMonth || !selectedYear || !selectedCurso || !selectedDay) {
         toast({
           variant: "destructive",
@@ -122,8 +120,6 @@ export function AttendanceByMonth({ value }) {
         description: "Ocurrió un error al consultar las asistencias por mes.",
         duration: 2500,
       });
-    } finally {
-      setLoading(false);
     }
   };
 

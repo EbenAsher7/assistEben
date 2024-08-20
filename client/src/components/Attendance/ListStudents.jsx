@@ -465,3 +465,13 @@ export function ListStudents({ value }) {
 ListStudents.propTypes = {
   value: PropTypes.string.isRequired,
 };
+
+EditStudentDialog.propTypes = {
+  student: PropTypes.object.isRequired,
+  onStudentUpdate: PropTypes.func.isRequired,
+};
+
+DeleteStudentDialog.propTypes = {
+  student: PropTypes.object.isRequired,
+  onStudentDelete: PropTypes.func.isRequired,
+};

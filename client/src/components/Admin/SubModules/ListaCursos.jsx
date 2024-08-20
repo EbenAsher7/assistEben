@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import MainContext from "@/context/MainContext";

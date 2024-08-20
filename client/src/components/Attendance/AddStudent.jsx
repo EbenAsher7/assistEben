@@ -16,7 +16,6 @@ import { format, addDays } from "date-fns"; // Importa addDays
 export function AddStudent({ value }) {
   const [loadingData, setLoadingData] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [tutors, setTutors] = useState([]);
   const [cursos, setCursos] = useState([]);
   const [cursoSelected, setCursoSelected] = useState(null);
   const [tutorSelected, setTutorSelected] = useState(null);
@@ -198,13 +197,7 @@ export function AddStudent({ value }) {
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="name">Tutor</Label>
-            <DropdownAE
-              data={tutors}
-              title="Seleccione un tutor"
-              setValueAE={setTutorSelected}
-              disable
-              defaultValue={user?.nombres + " " + user?.apellidos}
-            />
+            <DropdownAE data={[]} title="Seleccione un tutor" setValueAE={setTutorSelected} disable defaultValue={user?.nombres + " " + user?.apellidos} />
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="name">

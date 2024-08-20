@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 // Loader component
 const LoaderAE = ({ texto = "Cargando..." }) => (
   <div className="w-full overflow-hidden flex flex-col gap-2 justify-center items-center">
@@ -28,3 +30,7 @@ const LoaderAE = ({ texto = "Cargando..." }) => (
 );
 
 export default LoaderAE;
+
+LoaderAE.propTypes = {
+  texto: PropTypes.string,
+};

@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import MainContext from "../context/MainContext";
 import NewRegisterModulos from "./NewRegisterModulos";

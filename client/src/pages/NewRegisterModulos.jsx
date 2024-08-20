@@ -6,7 +6,7 @@ import NewRegisterTutores from "./NewRegisterTutores"; // Importa el componente 
 import { format, addDays } from "date-fns";
 
 const NewRegisterModulos = () => {
-  const { nombresNEW, apellidosNEW, telefonoNEW, cursoSeleccionadoNEW, setCursoSeleccionadoNEW } = useContext(MainContext);
+  const { nombresNEW, apellidosNEW, telefonoNEW, setCursoSeleccionadoNEW } = useContext(MainContext);
   const [modules, setModules] = useState([]);
   const [showTutores, setShowTutores] = useState(false); // Estado para controlar la visualización del componente NewRegisterTutores
   const [isLoading, setIsLoading] = useState(true); // Estado para manejar la carga

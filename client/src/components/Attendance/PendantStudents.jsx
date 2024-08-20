@@ -1,5 +1,5 @@
 import { TabsContent } from "@/components/ui/tabs";
-import { act, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import LoaderAE from "../LoaderAE";
@@ -212,7 +212,7 @@ const PendantStudents = ({ value }) => {
               </Table>
             </div>
           ) : (
-            <p className="text-center font-bold py-4">"En este curso no hay estudiantes pendientes."</p>
+            <p className="text-center font-bold py-4">&quot;En este curso no hay estudiantes pendientes.&quot;</p>
           ))
         )}
       </Card>

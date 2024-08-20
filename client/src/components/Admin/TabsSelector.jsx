@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from "prop-types";
 
 export const TabSelector = ({ isActive, children, onClick }) => (
   <button
@@ -15,3 +15,9 @@ export const TabSelector = ({ isActive, children, onClick }) => (
     {children}
   </button>
 );
+
+TabSelector.propTypes = {
+  isActive: PropTypes.bool.isRequired,
+  children: PropTypes.node.isRequired,
+  onClick: PropTypes.func.isRequired,
+};

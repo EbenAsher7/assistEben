@@ -1,12 +1,22 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types";
 import LoaderAE from "./LoaderAE";
 
-const ImagenCloud = ({ url, rounded, upload, setURLUpload, size = "128" }) => {
+const ImagenCloud = ({ url, rounded, upload, setURLUpload, size = "128", reset }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [localUrl, setLocalUrl] = useState(url);
   const fileInputRef = useRef(null);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // Este efecto se ejecutará cada vez que el prop 'reset' cambie
+    setLocalUrl(url);
+    setIsUploading(false);
+    setError(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }, [reset, url]);
 
   const handleImageUpload = async (event) => {
     const file = event.target.files[0];
@@ -171,6 +181,7 @@ ImagenCloud.propTypes = {
   upload: PropTypes.bool,
   setURLUpload: PropTypes.func,
   size: PropTypes.string,
+  reset: PropTypes.bool,
 };
 
 export default ImagenCloud;

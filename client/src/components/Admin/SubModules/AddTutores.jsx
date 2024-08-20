@@ -1,11 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import DropdownAE from "../../DropdownAE"; // Asegúrate de que la ruta sea correcta
 import ImagenCloud from "@/components/ImagenCloud";
+import MainContext from "@/context/MainContext";
 
 function generateUsername(nombres, apellidos) {
-  return `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
+  const userNameNew = `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
+  const userName = userNameNew.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return userName;
 }
 
 function generatePassword() {
@@ -31,10 +34,9 @@ const AddTutores = () => {
   const [observaciones, setObservaciones] = useState("");
   const [activo] = useState(true);
 
-  const modulosData = [
-    { value: 1, label: "Modulo 1" },
-    { value: 2, label: "Modulo 2" },
-  ];
+  const { fetchAllModulos } = useContext(MainContext);
+
+  const [modulosData, setModulosData] = useState([]);
 
   const tipoData = [
     { value: "Tutor", label: "Tutor" },
@@ -74,6 +76,14 @@ const AddTutores = () => {
       setUsername("");
     }
   }, [nombres, apellidos]);
+
+  // Cargar los módulos
+  //cargar la lista de cursos
+  useEffect(() => {
+    fetchAllModulos().then((data) => {
+      setModulosData(data);
+    });
+  }, [fetchAllModulos]);
 
   return (
     <div className="px-8 border-[1px] rounded-md mt-2 pt-2 pb-8 mb-4">

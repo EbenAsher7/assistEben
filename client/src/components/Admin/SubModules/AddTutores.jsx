@@ -131,7 +131,7 @@ const AddTutores = () => {
         setModulosData(data);
       });
     }
-  }, [fetchAllModulos, user]);
+  }, [user]);
 
   if (!user || (user && user.tipo !== "Administrador")) {
     navigate("/");

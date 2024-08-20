@@ -36,6 +36,8 @@ const AddTutores = () => {
   const [observaciones, setObservaciones] = useState("");
   const [activo] = useState(true);
 
+  const [resetForm, setResetForm] = useState(false);
+
   const { fetchAllModulos, user } = useContext(MainContext);
 
   const [modulosData, setModulosData] = useState([]);
@@ -94,6 +96,7 @@ const AddTutores = () => {
         setTipo("Normal");
         setObservaciones("");
         setModuloId(null);
+        setResetForm(!resetForm);
       } else {
         throw new Error("Failed to fetch");
       }
@@ -131,7 +134,7 @@ const AddTutores = () => {
       <h1 className="text-2xl text-center font-extrabold my-4">Añadir nuevo tutor</h1>
       <h2 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h2>
       <div className="mb-8">
-        <ImagenCloud setURLUpload={setFotoUrl} upload size="200" />
+        <ImagenCloud setURLUpload={setFotoUrl} upload size="200" reset={resetForm} />
       </div>
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>

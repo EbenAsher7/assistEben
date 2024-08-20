@@ -48,7 +48,8 @@ const AddTutores = () => {
     { value: "Normal", label: "Normal" },
   ];
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     const dataToSubmit = {
       nombres,
       apellidos,

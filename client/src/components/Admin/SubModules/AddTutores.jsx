@@ -79,7 +79,7 @@ const AddTutores = () => {
     <div className="px-8 border-[1px] rounded-md mt-2 pt-2 pb-8 mb-4">
       <h1 className="text-2xl text-center font-extrabold my-4">Añadir nuevo tutor</h1>
       <h2 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h2>
-      <div className="my-4">
+      <div className="mb-8">
         <ImagenCloud setURLUpload={setFotoUrl} upload size="200" />
       </div>
       <form onSubmit={handleSubmit} className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -26,7 +26,7 @@ const PendantStudents = ({ value }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchModulos().then((data) => {
+    fetchModulos(user.modulo_id).then((data) => {
       setCursos(data);
       setIsLoadingCursos(false);
     });

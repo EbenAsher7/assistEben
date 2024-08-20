@@ -170,7 +170,10 @@ const ListaCursos = () => {
     <>
       <div className="grid grid-cols-1 gap-4 mt-2">
         {cursos.map((curso) => (
-          <div className="border-[1px] rounded-xl p-4 bg-white dark:bg-gray-800 text-black dark:text-white relative isolate overflow-hidden">
+          <div
+            key={curso.id}
+            className="border-[1px] rounded-xl p-4 bg-white dark:bg-gray-800 text-black dark:text-white relative isolate overflow-hidden"
+          >
             <div className="relative z-10">
               <div className="flex justify-between">
                 <div className="flex flex-col gap-2 mr-2">

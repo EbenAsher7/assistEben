@@ -177,10 +177,32 @@ const ListaCursos = () => {
                   <h2 className="text-xl font-extrabold">{curso.nombre}</h2>
                   <p className="text-lg mb-2">{curso.descripcion}</p>
                   <p className="flex gap-2">
-                    <CalendarIcon /> {curso.fecha_inicio} - {curso.fecha_fin}
+                    <CalendarIcon />
+                    {new Date(new Date(curso.fecha_inicio).getTime() + 86400000).toLocaleDateString("es-ES", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}{" "}
+                    al{" "}
+                    {new Date(new Date(curso.fecha_fin).getTime() + 86400000).toLocaleDateString("es-ES", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })}
                   </p>
                   <p className="flex gap-2">
-                    <ClockIcon /> {curso.horarioInicio}-{curso.horarioFin}
+                    <ClockIcon />
+                    {new Date(`2000-01-01T${curso.horarioInicio}`).toLocaleTimeString("es-ES", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                    {" - "}
+                    {new Date(`2000-01-01T${curso.horarioFin}`).toLocaleTimeString("es-ES", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
                   </p>
                 </div>
                 <div className="items-center gap-2 flex flex-col justify-center ">

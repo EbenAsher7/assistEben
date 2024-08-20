@@ -6,6 +6,7 @@ import ImagenCloud from "@/components/ImagenCloud";
 import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 function generateUsername(nombres, apellidos) {
   const userNameNew = `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
@@ -39,6 +40,8 @@ const AddTutores = () => {
   const [resetForm, setResetForm] = useState(false);
 
   const { fetchAllModulos, user } = useContext(MainContext);
+
+  const navigate = useNavigate();
 
   const [modulosData, setModulosData] = useState([]);
 
@@ -121,13 +124,19 @@ const AddTutores = () => {
     }
   }, [nombres, apellidos]);
 
-  // Cargar los módulos
   //cargar la lista de cursos
   useEffect(() => {
-    fetchAllModulos().then((data) => {
-      setModulosData(data);
-    });
-  }, [fetchAllModulos]);
+    if (user || user?.tipo === "Administrador") {
+      fetchAllModulos().then((data) => {
+        setModulosData(data);
+      });
+    }
+  }, [fetchAllModulos, user]);
+
+  if (!user || (user && user.tipo !== "Administrador")) {
+    navigate("/");
+    return;
+  }
 
   return (
     <div className="px-8 border-[1px] rounded-md mt-2 pt-2 pb-8 mb-4">
@@ -183,13 +192,13 @@ const AddTutores = () => {
           <label>
             Tipo de Usuario<span className="text-red-500">*</span>
           </label>
-          <DropdownAE data={tipoData} title="Seleccionar tipo" setValueAE={setTipo} />
+          {tipoData && <DropdownAE data={tipoData} title="Seleccionar tipo" setValueAE={setTipo} />}
         </div>
         <div>
           <label>
             Seleccione Módulo<span className="text-red-500">*</span>
           </label>
-          <DropdownAE data={modulosData} title="Seleccionar módulo" setValueAE={setModuloId} />
+          {modulosData && <DropdownAE data={modulosData} title="Seleccionar módulo" setValueAE={setModuloId} />}
         </div>
         <div className="md:col-span-2">
           <Button type="submit" className="w-full mt-4">

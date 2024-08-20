@@ -8,48 +8,32 @@ const Administration = () => {
   const navigate = useNavigate();
   const [accessDenied, setAccessDenied] = useState(false);
   const [countdown, setCountdown] = useState(5);
-  const [timeoutId, setTimeoutId] = useState(null);
+  const [initialCheck, setInitialCheck] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      const timeoutId = setTimeout(() => {
-        if (!user.tipo) {
-          setAccessDenied(true);
-          const intervalId = setInterval(() => {
-            setCountdown((prevCountdown) => prevCountdown - 1);
-          }, 1000);
-
-          setTimeout(() => {
-            clearInterval(intervalId);
-            navigate("/");
-          }, 5000);
-        }
-      }, 1000); // Espera 1 segundo
-
-      setTimeoutId(timeoutId);
-
-      return () => {
-        clearTimeout(timeoutId);
-      };
-    }
-  }, [user, navigate]);
-
-  useEffect(() => {
-    if (user && user.tipo) {
-      clearTimeout(timeoutId);
-      if (user.tipo !== "Administrador") {
+    if (initialCheck) {
+      if (!user || (user && user.tipo !== "Administrador")) {
         setAccessDenied(true);
         const intervalId = setInterval(() => {
-          setCountdown((prevCountdown) => prevCountdown - 1);
+          setCountdown((prevCountdown) => {
+            if (prevCountdown <= 1) {
+              clearInterval(intervalId);
+              navigate("/");
+              return 0;
+            }
+            return prevCountdown - 1;
+          });
         }, 1000);
 
-        setTimeout(() => {
-          clearInterval(intervalId);
-          navigate("/");
-        }, 5000);
+        return () => clearInterval(intervalId);
+      }
+      setInitialCheck(false);
+    } else {
+      if (!user) {
+        navigate("/");
       }
     }
-  }, [user, navigate, timeoutId]);
+  }, [user, navigate, initialCheck]);
 
   if (accessDenied) {
     return (

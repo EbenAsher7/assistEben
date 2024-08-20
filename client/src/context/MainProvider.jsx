@@ -11,8 +11,6 @@ const MainProvider = ({ children }) => {
   const [user, setUser] = useState({});
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
 
-  const { nombres, apellidos, id } = alumnoSeleccionado || {};
-
   // Estado para guardar el historial de asistencias
   const [attendanceHistory, setAttendanceHistory] = useState({});
   // Estado para guardar el último registro de asistencia
@@ -122,7 +120,7 @@ const MainProvider = ({ children }) => {
               apellidos: alumnoSeleccionado.apellidos,
               fecha: fechaActual,
             };
-            setAttendanceHistory((prevHistory) => {
+            setAttendanceHistory(() => {
               const storedHistory = JSON.parse(localStorage.getItem("attendanceHistory")) || {};
               if (!isWithinLastMonth(fechaActual)) {
                 localStorage.removeItem("attendanceHistory");

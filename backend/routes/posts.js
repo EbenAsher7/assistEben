@@ -39,7 +39,7 @@ router.post('/addTutor', async (req, res) => {
 
     // Verificar que no exista un tutor con el mismo username
     const tutor = await turso.execute({
-      sql: 'SELECT * FROM Tutores WHERE username = ? AND activo = 1',
+      sql: 'SELECT * FROM Tutores WHERE username = ?',
       args: [username]
     })
 
@@ -82,7 +82,7 @@ router.post('/addTutor', async (req, res) => {
     }
 
     res.json({
-      Success: 'Usuario agregado correctamente',
+      Success: 'Tutor agregado correctamente',
       idTutor: resultado.lastInsertRowid.toString()
     })
   } catch (error) {

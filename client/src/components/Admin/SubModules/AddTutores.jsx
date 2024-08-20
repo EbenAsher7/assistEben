@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import DropdownAE from "../../DropdownAE"; // Asegúrate de que la ruta sea correcta
 import ImagenCloud from "@/components/ImagenCloud";
 import MainContext from "@/context/MainContext";
+import { URL_BASE } from "@/config/config";
+import { useToast } from "@/components/ui/use-toast";
 
 function generateUsername(nombres, apellidos) {
   const userNameNew = `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
@@ -34,9 +36,11 @@ const AddTutores = () => {
   const [observaciones, setObservaciones] = useState("");
   const [activo] = useState(true);
 
-  const { fetchAllModulos } = useContext(MainContext);
+  const { fetchAllModulos, user } = useContext(MainContext);
 
   const [modulosData, setModulosData] = useState([]);
+
+  const { toast } = useToast();
 
   const tipoData = [
     { value: "Tutor", label: "Tutor" },
@@ -44,9 +48,7 @@ const AddTutores = () => {
     { value: "Normal", label: "Normal" },
   ];
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     const dataToSubmit = {
       nombres,
       apellidos,
@@ -62,8 +64,46 @@ const AddTutores = () => {
       activo,
     };
 
-    // Aquí iría la lógica para enviar el formulario (POST, PUT, etc.)
-    console.log("Formulario enviado:", dataToSubmit);
+    try {
+      const response = await fetch(`${URL_BASE}/post/addTutor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user?.token,
+        },
+        body: JSON.stringify(dataToSubmit),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Éxito",
+          description: "El Tutor ha sido registrado correctamente.",
+          duration: 2500,
+        });
+
+        // reset formulario
+        setNombres("");
+        setApellidos("");
+        setUsername("");
+        setPassword(generatePassword());
+        setFechaNacimiento("");
+        setFotoUrl("");
+        setTelefono("");
+        setDireccion("");
+        setTipo("Normal");
+        setObservaciones("");
+        setModuloId(null);
+      } else {
+        throw new Error("Failed to fetch");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al guardar los datos." + error,
+        duration: 2500,
+      });
+    }
   };
 
   //si nombre o apellido cambian y son mas de 3 set username

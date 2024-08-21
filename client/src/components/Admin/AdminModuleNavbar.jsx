@@ -3,7 +3,7 @@ import { TabSelectorNested } from "../Admin/TabsSelectorNested";
 import ListaCursos from "./SubModules/ListaCursos";
 
 const AdminModuleNavbar = () => {
-  const [selectedTab, setSelectedTab] = useTabs(["listModules", "newModule"]);
+  const [selectedTab, setSelectedTab] = useTabs(["listModules", "newModule", "deletedModules"]);
 
   return (
     <>
@@ -12,7 +12,10 @@ const AdminModuleNavbar = () => {
           Módulos
         </TabSelectorNested>
         <TabSelectorNested isActive={selectedTab === "newModule"} onClick={() => setSelectedTab("newModule")}>
-          Agregar Módulo
+          Agregar Mód.
+        </TabSelectorNested>
+        <TabSelectorNested isActive={selectedTab === "deletedModules"} onClick={() => setSelectedTab("deletedModules")}>
+          Mód. Eliminados
         </TabSelectorNested>
       </nav>
       <div className="p-4 w-full m-auto">
@@ -20,6 +23,7 @@ const AdminModuleNavbar = () => {
           <ListaCursos />
         </TabPanel>
         <TabPanel hidden={selectedTab !== "newModule"}>Agregar Módulo</TabPanel>
+        <TabPanel hidden={selectedTab !== "deletedModules"}>Módulos Eliminados</TabPanel>
       </div>
     </>
   );

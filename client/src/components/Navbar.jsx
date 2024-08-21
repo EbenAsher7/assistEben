@@ -36,7 +36,7 @@ const Navbar = memo(() => {
   }, []);
 
   const handleLogout = useCallback(() => {
-    navigate("/");
+    navigate("/login");
     setIsLogin(false);
     setUser({});
     setIsNavbarOpen(false);

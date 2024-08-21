@@ -26,27 +26,31 @@ router.get('/modules', async (req, res) => {
   }
 })
 
-// Obtener todos los tutores agrupados por módulo
-router.get('/allTutorsByModule', async (req, res) => {
+// Obtener todos los tutores agrupados por módulo, excluyendo un tutor específico
+router.get('/allTutorsByModule/:tutorID', async (req, res) => {
+  const { tutorID } = req.params // Obtener el ID del tutor desde los parámetros de la URL
+
   try {
-    // Consulta para obtener todos los módulos con sus respectivos tutores
-    const result = await turso.execute(`
-      SELECT
-        m.id AS idModulo,
-        m.nombre AS nombreModulo,
-        t.id AS tutorId,
-        t.nombres AS tutorNombres,
-        t.apellidos AS tutorApellidos,
-        t.fecha_nacimiento AS tutorFechaNacimiento,
-        t.foto_url AS tutorFotoUrl,
-        t.telefono AS tutorTelefono,
-        t.direccion AS tutorDireccion,
-        t.tipo AS tutorTipo,
-        t.observaciones AS tutorObservaciones
+    // Consulta para obtener todos los módulos con sus respectivos tutores, excluyendo el tutor con el ID dado
+    const result = await turso.execute({
+      sql: `SELECT
+      m.id AS idModulo,
+      m.nombre AS nombreModulo,
+      t.id AS tutorId,
+      t.nombres AS tutorNombres,
+      t.apellidos AS tutorApellidos,
+      t.fecha_nacimiento AS tutorFechaNacimiento,
+      t.foto_url AS tutorFotoUrl,
+      t.telefono AS tutorTelefono,
+      t.direccion AS tutorDireccion,
+      t.tipo AS tutorTipo,
+      t.observaciones AS tutorObservaciones
       FROM Modulos m
       LEFT JOIN Tutores t ON m.id = t.modulo_id
       WHERE t.activo = 1
-    `)
+      AND t.id != ?`,
+      args: [tutorID]
+    })
 
     // Transformar los datos en el formato deseado
     const columns = result.columns

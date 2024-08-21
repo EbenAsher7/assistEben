@@ -40,7 +40,7 @@ const ListaTutores = () => {
       const fetchData = async () => {
         setIsLoadingTutors(true);
         try {
-          const response = await fetch(`${URL_BASE}/admin/allTutorsByModule`, {
+          const response = await fetch(`${URL_BASE}/admin/allTutorsByModule/${user.id}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",

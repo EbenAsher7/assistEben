@@ -7,6 +7,7 @@ import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
+import LoaderAE from "@/components/LoaderAE";
 
 function generateUsername(nombres, apellidos) {
   const userNameNew = `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
@@ -37,6 +38,8 @@ const AddTutores = () => {
   const [observaciones, setObservaciones] = useState("");
   const [activo] = useState(true);
 
+  const [loading, setLoading] = useState(false);
+
   const [resetForm, setResetForm] = useState(false);
 
   const { fetchAllModulos, user } = useContext(MainContext);
@@ -54,6 +57,7 @@ const AddTutores = () => {
   ];
 
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const dataToSubmit = {
       nombres,
@@ -100,10 +104,12 @@ const AddTutores = () => {
         setObservaciones("");
         setModuloId(null);
         setResetForm(!resetForm);
+        setLoading(false);
       } else {
         throw new Error("Failed to fetch");
       }
     } catch (error) {
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Error",
@@ -140,6 +146,11 @@ const AddTutores = () => {
 
   return (
     <div className="px-8 border-[1px] rounded-md mt-2 pt-2 pb-8 mb-4">
+      {loading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <LoaderAE texto="Guardando módulo..." />
+        </div>
+      )}
       <h1 className="text-2xl text-center font-extrabold my-4">Añadir nuevo tutor</h1>
       <h2 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h2>
       <div className="mb-8">

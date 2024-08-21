@@ -12,7 +12,7 @@ const AdminTutorNavbar = () => {
         <TabSelector isActive={selectedTab === "listTutors"} onClick={() => setSelectedTab("listTutors")} color="orange">
           Lista Tutores
         </TabSelector>
-        <TabSelector isActive={selectedTab === "newTutor"} onClick={() => setSelectedTab("newTutor")} color="orange">
+        <TabSelector isActive={selectedTab === "newTutor"} onClick={() => setSelectedTab("newTutor")} color="green">
           Agregar Tutor
         </TabSelector>
       </nav>

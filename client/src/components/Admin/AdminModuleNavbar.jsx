@@ -13,11 +13,11 @@ const AdminModuleNavbar = () => {
         <TabSelector isActive={selectedTab === "listModules"} onClick={() => setSelectedTab("listModules")} color="purple">
           Módulos
         </TabSelector>
-        <TabSelector isActive={selectedTab === "newModule"} onClick={() => setSelectedTab("newModule")} color="purple">
+        <TabSelector isActive={selectedTab === "newModule"} onClick={() => setSelectedTab("newModule")} color="green">
           Agregar Mód<span className="hidden sm:inline-flex">ulos</span>
           <span className="inline-flex sm:hidden">.</span>
         </TabSelector>
-        <TabSelector isActive={selectedTab === "deletedModules"} onClick={() => setSelectedTab("deletedModules")} color="purple">
+        <TabSelector isActive={selectedTab === "deletedModules"} onClick={() => setSelectedTab("deletedModules")} color="red">
           Mód<span className="hidden sm:inline-flex">ulos&nbsp;</span>
           <span className="inline-flex sm:hidden">.&nbsp;</span>Eliminados
         </TabSelector>

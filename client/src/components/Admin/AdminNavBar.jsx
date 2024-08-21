@@ -10,13 +10,13 @@ const AdminNavBar = () => {
     <>
       <h1 className="text-center text-xl font-extrabold mt-24 sm:mt-32 mb-2">PANEL ADMINISTRATIVO</h1>
       <nav className="pl-4 sm:pl-0 flex border-b border-gray-300 sm:w-[80%] w-full m-auto justify-center items-center">
-        <TabSelector isActive={selectedTab === "tutores"} onClick={() => setSelectedTab("tutores")}>
+        <TabSelector isActive={selectedTab === "tutores"} onClick={() => setSelectedTab("tutores")} color="yellow">
           Tutores
         </TabSelector>
-        <TabSelector isActive={selectedTab === "modulos"} onClick={() => setSelectedTab("modulos")}>
+        <TabSelector isActive={selectedTab === "modulos"} onClick={() => setSelectedTab("modulos")} color="indigo">
           Cursos
         </TabSelector>
-        <TabSelector isActive={selectedTab === "analytics"} onClick={() => setSelectedTab("analytics")}>
+        <TabSelector isActive={selectedTab === "analytics"} onClick={() => setSelectedTab("analytics")} color="green">
           Gráficas
         </TabSelector>
       </nav>

@@ -1,7 +1,7 @@
 import { TabPanel, useTabs } from "react-headless-tabs";
-import { TabSelectorNested } from "../Admin/TabsSelectorNested";
 import ListaTutores from "./SubModules/ListaTutores";
 import AddTutores from "./SubModules/AddTutores";
+import { TabSelector } from "./TabsSelector";
 
 const AdminTutorNavbar = () => {
   const [selectedTab, setSelectedTab] = useTabs(["listTutors", "newTutor"]);
@@ -9,12 +9,12 @@ const AdminTutorNavbar = () => {
   return (
     <>
       <nav className="flex border-b border-gray-300 w-full m-auto justify-center">
-        <TabSelectorNested isActive={selectedTab === "listTutors"} onClick={() => setSelectedTab("listTutors")}>
+        <TabSelector isActive={selectedTab === "listTutors"} onClick={() => setSelectedTab("listTutors")} color="orange">
           Lista Tutores
-        </TabSelectorNested>
-        <TabSelectorNested isActive={selectedTab === "newTutor"} onClick={() => setSelectedTab("newTutor")}>
+        </TabSelector>
+        <TabSelector isActive={selectedTab === "newTutor"} onClick={() => setSelectedTab("newTutor")} color="orange">
           Agregar Tutor
-        </TabSelectorNested>
+        </TabSelector>
       </nav>
       <div className="p-4 w-full m-auto">
         <TabPanel render="lazy" hidden={selectedTab !== "listTutors"}>

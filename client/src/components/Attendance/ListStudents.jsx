@@ -260,7 +260,7 @@ export function ListStudents({ value }) {
   const [isLoadingCursos, setIsLoadingCursos] = useState(true);
   const { toast } = useToast();
 
-  const { user, fetchModulos } = useContext(MainContext);
+  const { user, fetchModulos, fetchAllModulos } = useContext(MainContext);
 
   const handleStudentUpdate = (updatedStudent) => {
     setAlumnosCursos((prevAlumnos) =>
@@ -332,11 +332,18 @@ export function ListStudents({ value }) {
   });
 
   useEffect(() => {
-    fetchModulos(user.id).then((data) => {
-      setCursos(data);
-      setIsLoadingCursos(false);
-    });
-  }, [fetchModulos]);
+    if (user.tipo === "Administrador") {
+      fetchAllModulos(user.id).then((data) => {
+        setCursos(data);
+        setIsLoadingCursos(false);
+      });
+    } else if (user.tipo === "Tutor") {
+      fetchModulos(user.id).then((data) => {
+        setCursos(data);
+        setIsLoadingCursos(false);
+      });
+    }
+  }, [fetchModulos, user.id, fetchAllModulos, user.tipo]);
 
   useEffect(() => {
     if (cursoSeleccionado) {

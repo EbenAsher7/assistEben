@@ -31,7 +31,7 @@ export function AddStudent({ value }) {
   const [activo, setActivo] = useState("Activo");
 
   // CONTEXTO
-  const { user } = useContext(MainContext);
+  const { user, fetchModulos, fetchAllModulos } = useContext(MainContext);
 
   // Verificar que nombre, apellidos y teléfono no estén vacíos
   const validateForm = () => {
@@ -110,43 +110,57 @@ export function AddStudent({ value }) {
   };
 
   // useEffect para cargar ambos datos
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     setLoadingData(true);
+  //     try {
+  //       // cargar cursos
+  //       const response = await fetch(`${URL_BASE}/api/modulesByTutor/${user.id}`, {
+  //         method: "GET",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: user?.token,
+  //         },
+  //       });
+
+  //       if (response.ok) {
+  //         const data = await response.json();
+  //         const formattedData = data.map((curso) => ({
+  //           value: curso.id.toString(),
+  //           label: curso.nombre,
+  //         }));
+  //         setCursos(formattedData);
+  //       } else {
+  //         throw new Error("Failed to fetch");
+  //       }
+  //     } catch (error) {
+  //       toast({
+  //         variant: "destructive",
+  //         title: "Error",
+  //         description: "Ocurrió un error al consultar los datos disponibles.",
+  //         duration: 2500,
+  //       });
+  //     } finally {
+  //       setLoadingData(false);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
   useEffect(() => {
-    const fetchData = async () => {
-      setLoadingData(true);
-      try {
-        // cargar cursos
-        const response = await fetch(`${URL_BASE}/api/modulesByTutor/${user.id}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user?.token,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const formattedData = data.map((curso) => ({
-            value: curso.id.toString(),
-            label: curso.nombre,
-          }));
-          setCursos(formattedData);
-        } else {
-          throw new Error("Failed to fetch");
-        }
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Ocurrió un error al consultar los datos disponibles.",
-          duration: 2500,
-        });
-      } finally {
+    if (user.tipo === "Administrador") {
+      fetchAllModulos(user.id).then((data) => {
+        setCursos(data);
         setLoadingData(false);
-      }
-    };
-
-    fetchData();
-  }, []);
+      });
+    } else if (user.tipo === "Tutor") {
+      fetchModulos(user.id).then((data) => {
+        setCursos(data);
+        setLoadingData(false);
+      });
+    }
+  }, [fetchModulos, user.id, fetchAllModulos, user.tipo]);
 
   if (loadingData) {
     return (

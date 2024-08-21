@@ -261,6 +261,35 @@ const MainProvider = ({ children }) => {
     }
   };
 
+  //Cargar lista de modulos
+  const fetchAllModulosCompleteDataDeleted = async () => {
+    if (user) {
+      try {
+        const response = await fetch(`${URL_BASE}/api/modulesDeleted`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los módulos disponibles.",
+          duration: 2500,
+        });
+      }
+    }
+  };
+
   //DATOS PARA EL REGISTRO NUEVO
   const [nombresNEW, setNombresNEW] = useState("");
   const [apellidosNEW, setApellidosNEW] = useState("");
@@ -285,6 +314,7 @@ const MainProvider = ({ children }) => {
         fetchModulos,
         fetchAllModulos,
         fetchAllModulosCompleteData,
+        fetchAllModulosCompleteDataDeleted,
         //NUEVO REGISTRO
         nombresNEW,
         setNombresNEW,

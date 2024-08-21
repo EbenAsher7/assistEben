@@ -25,6 +25,28 @@ router.get('/modules', async (req, res) => {
   }
 })
 
+router.get('/modulesDeleted', async (req, res) => {
+  try {
+    const result = await turso.execute('SELECT * FROM modulos WHERE activo = 0')
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const modules = rows.map((row) => {
+      const module = {}
+      columns.forEach((col, index) => {
+        module[col] = row[index]
+      })
+      return module
+    })
+
+    res.status(200).json(modules)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Obtener modulos dependiendo el ID del tutor
 router.get('/modulesByTutor/:tutorID', async (req, res) => {
   const { tutorID } = req.params

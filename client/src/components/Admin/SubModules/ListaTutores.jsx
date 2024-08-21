@@ -226,7 +226,7 @@ const ListaTutores = () => {
   ];
 
   return (
-    <Accordion type="multiple">
+    <Accordion type="multiple" className="w-full sm:w-[60%] m-auto">
       {tutorsByModule.map((module) => (
         <AccordionItem key={module.idModulo} value={`item-${module.idModulo}`}>
           <AccordionTrigger className="bg-purple-300 dark:bg-indigo-700 px-4">{module.nombreModulo}</AccordionTrigger>

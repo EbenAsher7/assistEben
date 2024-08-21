@@ -2,6 +2,7 @@ import { TabPanel, useTabs } from "react-headless-tabs";
 import { TabSelectorNested } from "../Admin/TabsSelectorNested";
 import ListaCursos from "./SubModules/ListaCursos";
 import AddCurso from "./SubModules/AddCurso";
+import RecoverCurso from "./SubModules/RecoverCurso";
 
 const AdminModuleNavbar = () => {
   const [selectedTab, setSelectedTab] = useTabs(["listModules", "newModule", "deletedModules"]);
@@ -27,7 +28,7 @@ const AdminModuleNavbar = () => {
           <AddCurso />
         </TabPanel>
         <TabPanel render="lazy" hidden={selectedTab !== "deletedModules"}>
-          Módulos Eliminados
+          <RecoverCurso />
         </TabPanel>
       </div>
     </>

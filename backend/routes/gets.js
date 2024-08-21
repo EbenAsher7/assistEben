@@ -333,7 +333,7 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
   }
 })
 
-// obtener la suma de asistencias por tipo en un mes, año, tutor y modulo
+// obtener la suma de asistencias por tipo en un mes, año, tutor, dmodulo
 router.get(
   '/getAttendanceByMonthAndTutor/:month/:year/:tutorId/:moduloId/:day',
   async (req, res) => {

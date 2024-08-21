@@ -58,7 +58,7 @@ export function AttendanceByMonth({ value }) {
 
   //cargar la lista de cursos
   useEffect(() => {
-    fetchModulos(user.modulo_id).then((data) => {
+    fetchModulos(user.id).then((data) => {
       setCursos(data);
     });
   }, [fetchModulos]);

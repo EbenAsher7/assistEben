@@ -115,7 +115,7 @@ export function AddStudent({ value }) {
       setLoadingData(true);
       try {
         // cargar cursos
-        const response = await fetch(`${URL_BASE}/api/modulesByTutor/${user.modulo_id}`, {
+        const response = await fetch(`${URL_BASE}/api/modulesByTutor/${user.id}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.get('/modules', async (req, res) => {
   try {
-    const result = await turso.execute('SELECT * FROM modulos')
+    const result = await turso.execute('SELECT * FROM modulos WHERE activo = 1')
 
     // Transformar los datos en el formato deseado
     const columns = result.columns

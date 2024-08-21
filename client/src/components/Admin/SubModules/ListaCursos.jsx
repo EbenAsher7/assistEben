@@ -20,6 +20,7 @@ import {
 import LoaderAE from "@/components/LoaderAE";
 import { CalendarIcon, PencilIcon, TrashIcon, ClockIcon } from "@/components/Iconos";
 import { useNavigate } from "react-router-dom";
+import ImagenCloud from "@/components/ImagenCloud";
 
 const ListaCursos = () => {
   const [cursos, setCursos] = useState([]);
@@ -30,7 +31,8 @@ const ListaCursos = () => {
   const [isLoadingCursos, setIsLoadingCursos] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentCursoId, setCurrentCursoId] = useState(null);
+
+  const [nuevaImagen, setNuevaImagen] = useState(null);
 
   const { toast } = useToast();
 
@@ -40,22 +42,22 @@ const ListaCursos = () => {
     }
 
     if (user || user?.tipo === "Administrador") {
+      setIsLoadingCursos(true);
       fetchAllModulosCompleteData().then((data) => {
         setCursos(data);
+        setIsLoadingCursos(false);
       });
     }
   }, [user, fetchAllModulosCompleteData, navigate]);
 
   const handleEdit = (curso) => {
     setCursoSeleccionado(curso);
-    setCurrentCursoId(curso.id);
     setIsModalOpen(true);
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setCursoSeleccionado(null);
-    setCurrentCursoId(null);
   };
 
   const handleSaveChanges = async () => {
@@ -71,6 +73,7 @@ const ListaCursos = () => {
       fecha_fin: document.getElementById("fecha_fin").value,
       horarioInicio: document.getElementById("horarioInicio").value,
       horarioFin: document.getElementById("horarioFin").value,
+      foto_url: nuevaImagen ?? cursoSeleccionado.foto_url,
     };
 
     if (
@@ -79,7 +82,8 @@ const ListaCursos = () => {
       updatedCurso.fecha_inicio === cursoSeleccionado.fecha_inicio &&
       updatedCurso.fecha_fin === cursoSeleccionado.fecha_fin &&
       updatedCurso.horarioInicio === cursoSeleccionado.horarioInicio &&
-      updatedCurso.horarioFin === cursoSeleccionado.horarioFin
+      updatedCurso.horarioFin === cursoSeleccionado.horarioFin &&
+      updatedCurso.foto_url === cursoSeleccionado.foto_url
     ) {
       toast({
         variant: "success",
@@ -91,6 +95,7 @@ const ListaCursos = () => {
       return;
     }
 
+    console.log(updatedCurso);
     try {
       const response = await fetch(`${URL_BASE}/put/updateCurso/${cursoSeleccionado.id}`, {
         method: "PUT",
@@ -110,12 +115,13 @@ const ListaCursos = () => {
 
         // Actualiza el estado de cursos con el curso actualizado
         setCursos((prevCursos) => prevCursos.map((curso) => (curso.id === cursoSeleccionado.id ? { ...curso, ...updatedCurso } : curso)));
-
+        setNuevaImagen(null);
         handleCloseModal();
       } else {
         throw new Error("Failed to update");
       }
     } catch (error) {
+      setNuevaImagen(null);
       toast({
         variant: "destructive",
         title: "Error",
@@ -267,6 +273,7 @@ const ListaCursos = () => {
               <DialogDescription>Modifique los campos necesarios y guarde los cambios.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 text-black dark:text-white">
+              <ImagenCloud url={cursoSeleccionado.foto_url} setURLUpload={setNuevaImagen} upload />
               <Label htmlFor="nombre">Nombre</Label>
               <Input id="nombre" defaultValue={cursoSeleccionado.nombre} />
               <Label htmlFor="descripcion">Descripción</Label>

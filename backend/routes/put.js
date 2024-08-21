@@ -276,4 +276,97 @@ router.put('/updateTutor/:TutorID', async (req, res) => {
   }
 })
 
+// Ruta para actualizar un curso existente en la tabla Modulos
+router.put('/updateCurso/:CursoID', async (req, res) => {
+  try {
+    const { CursoID } = req.params
+    const {
+      nombre = '',
+      fecha_inicio = '',
+      fecha_fin = '',
+      horarioInicio = '',
+      horarioFin = '',
+      encargado_id = '',
+      descripcion = '',
+      foto_url = '',
+      activo = ''
+    } = req.body
+
+    // Verificar que el CursoID esté presente
+    if (!CursoID) {
+      return res.status(400).json({ error: 'ID del curso requerido' })
+    }
+
+    // Construir dinámicamente la consulta SQL según los datos proporcionados
+    const updateFields = []
+    const updateValues = []
+
+    if (nombre) {
+      updateFields.push('nombre = ?')
+      updateValues.push(nombre)
+    }
+    if (fecha_inicio) {
+      updateFields.push('fecha_inicio = ?')
+      updateValues.push(fecha_inicio)
+    }
+    if (fecha_fin) {
+      updateFields.push('fecha_fin = ?')
+      updateValues.push(fecha_fin)
+    }
+    if (horarioInicio) {
+      updateFields.push('horarioInicio = ?')
+      updateValues.push(horarioInicio)
+    }
+    if (horarioFin) {
+      updateFields.push('horarioFin = ?')
+      updateValues.push(horarioFin)
+    }
+    if (encargado_id) {
+      updateFields.push('encargado_id = ?')
+      updateValues.push(encargado_id)
+    }
+    if (descripcion) {
+      updateFields.push('descripcion = ?')
+      updateValues.push(descripcion)
+    }
+    if (foto_url) {
+      updateFields.push('foto_url = ?')
+      updateValues.push(foto_url)
+    }
+    if (activo !== '') {
+      updateFields.push('activo = ?')
+      updateValues.push(activo)
+    }
+
+    // Si no se proporcionó ningún campo para actualizar
+    if (updateFields.length === 0) {
+      return res
+        .status(400)
+        .json({ error: 'No se proporcionaron campos para actualizar' })
+    }
+
+    // Agregar el CursoID al final de los valores para la cláusula WHERE
+    updateValues.push(CursoID)
+
+    // Construir la consulta SQL final
+    const sqlQuery = `UPDATE Modulos SET ${updateFields.join(
+      ', '
+    )} WHERE id = ?`
+
+    // Ejecutar la consulta
+    const resultado = await turso.execute({
+      sql: sqlQuery,
+      args: updateValues
+    })
+
+    if (resultado.affectedRows === 0) {
+      return res.status(500).json({ error: 'No se pudo actualizar el curso' })
+    }
+
+    res.status(200).json({ Success: 'Curso actualizado correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

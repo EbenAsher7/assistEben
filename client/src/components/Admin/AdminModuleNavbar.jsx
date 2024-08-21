@@ -14,10 +14,12 @@ const AdminModuleNavbar = () => {
           Módulos
         </TabSelectorNested>
         <TabSelectorNested isActive={selectedTab === "newModule"} onClick={() => setSelectedTab("newModule")}>
-          Agregar Mód.
+          Agregar Mód<span className="hidden sm:inline-flex">ulos</span>
+          <span className="inline-flex sm:hidden">.</span>
         </TabSelectorNested>
         <TabSelectorNested isActive={selectedTab === "deletedModules"} onClick={() => setSelectedTab("deletedModules")}>
-          Mód. Eliminados
+          Mód<span className="hidden sm:inline-flex">ulos&nbsp;</span>
+          <span className="inline-flex sm:hidden">.&nbsp;</span>Eliminados
         </TabSelectorNested>
       </nav>
       <div className="p-4 w-full m-auto">

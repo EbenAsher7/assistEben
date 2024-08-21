@@ -30,22 +30,39 @@ export function AddStudent({ value }) {
   const [observations, setObservations] = useState("");
   const [activo, setActivo] = useState("Activo");
 
+  const [tutores, setTutores] = useState([]);
+
   // CONTEXTO
-  const { user, fetchModulos, fetchAllModulos } = useContext(MainContext);
+  const { user, fetchModulos, fetchAllModulos, fetchTutores } = useContext(MainContext);
 
   // Verificar que nombre, apellidos y teléfono no estén vacíos
   const validateForm = () => {
-    if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Los campos de nombres, apellidos, teléfono, curso y tutor son obligatorios.",
-        duration: 2500,
-      });
-      return false;
-    } else {
-      setActivo("Activo");
-      return true;
+    if (user.tipo === "Tutor") {
+      if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Los campos de nombres, apellidos, teléfono, curso y tutor son obligatorios.",
+          duration: 2500,
+        });
+        return false;
+      } else {
+        setActivo("Activo");
+        return true;
+      }
+    } else if (user.tipo === "Administrador") {
+      if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Los campos de nombres, apellidos, teléfono, curso y tutor son obligatorios.",
+          duration: 2500,
+        });
+        return false;
+      } else {
+        setActivo("Activo");
+        return true;
+      }
     }
   };
 
@@ -109,49 +126,14 @@ export function AddStudent({ value }) {
     }
   };
 
-  // useEffect para cargar ambos datos
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     setLoadingData(true);
-  //     try {
-  //       // cargar cursos
-  //       const response = await fetch(`${URL_BASE}/api/modulesByTutor/${user.id}`, {
-  //         method: "GET",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: user?.token,
-  //         },
-  //       });
-
-  //       if (response.ok) {
-  //         const data = await response.json();
-  //         const formattedData = data.map((curso) => ({
-  //           value: curso.id.toString(),
-  //           label: curso.nombre,
-  //         }));
-  //         setCursos(formattedData);
-  //       } else {
-  //         throw new Error("Failed to fetch");
-  //       }
-  //     } catch (error) {
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Error",
-  //         description: "Ocurrió un error al consultar los datos disponibles.",
-  //         duration: 2500,
-  //       });
-  //     } finally {
-  //       setLoadingData(false);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-
   useEffect(() => {
     if (user.tipo === "Administrador") {
       fetchAllModulos(user.id).then((data) => {
         setCursos(data);
+      });
+
+      fetchTutores().then((data) => {
+        setTutores(data);
         setLoadingData(false);
       });
     } else if (user.tipo === "Tutor") {
@@ -210,8 +192,20 @@ export function AddStudent({ value }) {
             <Input value={address} placeholder="Ingrese la dirección" onChange={(e) => setAddress(e.target.value)} />
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="name">Tutor</Label>
-            <DropdownAE data={[]} title="Seleccione un tutor" setValueAE={setTutorSelected} disable defaultValue={user?.nombres + " " + user?.apellidos} />
+            <Label htmlFor="name">
+              Tutor<span className="text-red-500">*</span>
+            </Label>
+            {user.tipo === "Tutor" ? (
+              <DropdownAE
+                data={[]}
+                title="Seleccione un tutor"
+                setValueAE={setTutorSelected}
+                disable
+                defaultValue={user?.nombres + " " + user?.apellidos}
+              />
+            ) : (
+              <DropdownAE data={tutores} title="Seleccione un tutor" setValueAE={setTutorSelected} />
+            )}
           </div>
           <div className="space-y-1 flex flex-col">
             <Label htmlFor="name">

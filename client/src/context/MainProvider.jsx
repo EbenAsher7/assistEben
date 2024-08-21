@@ -164,6 +164,38 @@ const MainProvider = ({ children }) => {
     }
   }, []);
 
+  //Cargar lista de Tutores
+  const fetchTutores = async () => {
+    try {
+      const response = await fetch(`${URL_BASE}/api/tutors`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Transformar los datos
+        const formattedData = data.map((tutor) => ({
+          value: tutor.id.toString(),
+          label: tutor.nombres + " " + tutor.apellidos,
+        }));
+        return formattedData;
+      } else {
+        throw new Error("Failed to fetch");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al consultar los módulos disponibles.",
+        duration: 2500,
+      });
+    }
+  };
+
   //Cargar lista de modulos
   const fetchModulos = async (tutorID) => {
     if (tutorID) {
@@ -311,6 +343,7 @@ const MainProvider = ({ children }) => {
         attendanceHistory,
         setAttendanceHistory,
         checkAttendanceStatus,
+        fetchTutores,
         fetchModulos,
         fetchAllModulos,
         fetchAllModulosCompleteData,

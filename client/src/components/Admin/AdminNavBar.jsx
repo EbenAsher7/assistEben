@@ -24,16 +24,16 @@ const AdminNavBar = () => {
         </TabSelector>
       </nav>
       <div className="py-4 sm:w-[80%] w-full m-auto">
-        <TabPanel hidden={selectedTab !== "tutores"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "tutores"}>
           <AdminTutorNavbar />
         </TabPanel>
-        <TabPanel hidden={selectedTab !== "modulos"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "modulos"}>
           <AdminModuleNavbar />
         </TabPanel>
-        <TabPanel hidden={selectedTab !== "listStudens"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "listStudens"}>
           <h1>Lista de Estudiantes</h1>
         </TabPanel>
-        <TabPanel hidden={selectedTab !== "analytics"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "analytics"}>
           <h1>Estadísticas</h1>
         </TabPanel>
       </div>

@@ -19,11 +19,15 @@ const AdminModuleNavbar = () => {
         </TabSelectorNested>
       </nav>
       <div className="p-4 w-full m-auto">
-        <TabPanel hidden={selectedTab !== "listModules"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "listModules"}>
           <ListaCursos />
         </TabPanel>
-        <TabPanel hidden={selectedTab !== "newModule"}>Agregar Módulo</TabPanel>
-        <TabPanel hidden={selectedTab !== "deletedModules"}>Módulos Eliminados</TabPanel>
+        <TabPanel render="lazy" hidden={selectedTab !== "newModule"}>
+          Agregar Módulo
+        </TabPanel>
+        <TabPanel render="lazy" hidden={selectedTab !== "deletedModules"}>
+          Módulos Eliminados
+        </TabPanel>
       </div>
     </>
   );

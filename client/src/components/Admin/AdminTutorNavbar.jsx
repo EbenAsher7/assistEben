@@ -17,10 +17,10 @@ const AdminTutorNavbar = () => {
         </TabSelectorNested>
       </nav>
       <div className="p-4 w-full m-auto">
-        <TabPanel hidden={selectedTab !== "listTutors"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "listTutors"}>
           <ListaTutores />
         </TabPanel>
-        <TabPanel hidden={selectedTab !== "newTutor"}>
+        <TabPanel render="lazy" hidden={selectedTab !== "newTutor"}>
           <AddTutores />
         </TabPanel>
       </div>

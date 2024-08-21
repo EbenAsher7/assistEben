@@ -200,60 +200,64 @@ const MainProvider = ({ children }) => {
 
   //Cargar lista de modulos
   const fetchAllModulos = async () => {
-    try {
-      const response = await fetch(`${URL_BASE}/api/modules`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
-      });
+    if (user) {
+      try {
+        const response = await fetch(`${URL_BASE}/api/modules`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        // Transformar los datos
-        const formattedData = data.map((curso) => ({
-          value: curso.id.toString(),
-          label: curso.nombre,
-        }));
-        return formattedData;
-      } else {
-        throw new Error("Failed to fetch");
+        if (response.ok) {
+          const data = await response.json();
+          // Transformar los datos
+          const formattedData = data.map((curso) => ({
+            value: curso.id.toString(),
+            label: curso.nombre,
+          }));
+          return formattedData;
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los módulos disponibles.",
+          duration: 2500,
+        });
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al consultar los módulos disponibles.",
-        duration: 2500,
-      });
     }
   };
 
   //Cargar lista de modulos
   const fetchAllModulosCompleteData = async () => {
-    try {
-      const response = await fetch(`${URL_BASE}/api/modules`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
-      });
+    if (user) {
+      try {
+        const response = await fetch(`${URL_BASE}/api/modules`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        return data;
-      } else {
-        throw new Error("Failed to fetch");
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los módulos disponibles.",
+          duration: 2500,
+        });
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al consultar los módulos disponibles.",
-        duration: 2500,
-      });
     }
   };
 

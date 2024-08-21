@@ -133,7 +133,7 @@ const AddTutores = () => {
     }
   }, [user]);
 
-  if (!user || (user && user.tipo !== "Administrador")) {
+  if (!user) {
     navigate("/");
     return;
   }

@@ -1,7 +1,7 @@
 import { useState, useContext, useCallback, useMemo, useEffect, useRef } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import LOGO from "/logoEbenezer.webp";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MainContext from "../context/MainContext";
 import "flowbite";
 import { memo } from "react";
@@ -23,6 +23,8 @@ const Navbar = memo(() => {
   const [isNavbarOpen, setIsNavbarOpen] = useState(false);
   const navbarRef = useRef(null);
 
+  const navigate = useNavigate();
+
   const { isLogin, setIsLogin, setUser, user } = useContext(MainContext);
 
   const toggleNavbar = useCallback(() => {
@@ -34,10 +36,11 @@ const Navbar = memo(() => {
   }, []);
 
   const handleLogout = useCallback(() => {
+    navigate("/");
     setIsLogin(false);
     setUser({});
     setIsNavbarOpen(false);
-  }, [setIsLogin, setUser]);
+  }, [setIsLogin, setUser, navigate]);
 
   const renderNavLinks = useMemo(
     () => (

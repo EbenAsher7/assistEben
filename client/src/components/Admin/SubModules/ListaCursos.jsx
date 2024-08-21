@@ -19,10 +19,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import LoaderAE from "@/components/LoaderAE";
 import { CalendarIcon, PencilIcon, TrashIcon, ClockIcon } from "@/components/Iconos";
+import { useNavigate } from "react-router-dom";
 
 const ListaCursos = () => {
   const [cursos, setCursos] = useState([]);
   const { user, fetchAllModulosCompleteData } = useContext(MainContext);
+
+  const navigate = useNavigate();
 
   const [isLoadingCursos, setIsLoadingCursos] = useState(false);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
@@ -32,12 +35,16 @@ const ListaCursos = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+
     if (user || user?.tipo === "Administrador") {
       fetchAllModulosCompleteData().then((data) => {
         setCursos(data);
       });
     }
-  }, [user]);
+  }, [user, fetchAllModulosCompleteData, navigate]);
 
   const handleEdit = (curso) => {
     setCursoSeleccionado(curso);
@@ -169,84 +176,87 @@ const ListaCursos = () => {
   return (
     <>
       <div className="grid grid-cols-1 gap-4 mt-2">
-        {cursos.map((curso) => (
-          <div
-            key={curso.id}
-            className="border-[1px] rounded-xl p-4 bg-white dark:bg-gray-800 text-black dark:text-white relative isolate overflow-hidden"
-          >
-            <div className="relative z-10">
-              <div className="flex justify-between">
-                <div className="flex flex-col gap-2 mr-2">
-                  <h2 className="text-xl font-extrabold">{curso.nombre}</h2>
-                  <p className="text-lg mb-2">{curso.descripcion}</p>
-                  <p className="flex gap-2">
-                    <CalendarIcon />
-                    {new Date(new Date(curso.fecha_inicio).getTime() + 86400000).toLocaleDateString("es-ES", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}{" "}
-                    al{" "}
-                    {new Date(new Date(curso.fecha_fin).getTime() + 86400000).toLocaleDateString("es-ES", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                    })}
-                  </p>
-                  <p className="flex gap-2">
-                    <ClockIcon />
-                    {new Date(`2000-01-01T${curso.horarioInicio}`).toLocaleTimeString("es-ES", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                      hour12: true,
-                    })}
-                    {" - "}
-                    {new Date(`2000-01-01T${curso.horarioFin}`).toLocaleTimeString("es-ES", {
-                      hour: "numeric",
-                      minute: "2-digit",
-                      hour12: true,
-                    })}
-                  </p>
-                </div>
-                <div className="items-center gap-2 flex flex-col justify-center ">
-                  <Button
-                    className="bg-blue-500 dark:bg-blue-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2"
-                    onClick={() => handleEdit(curso)}
-                  >
-                    <PencilIcon />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button className="bg-red-500 dark:bg-red-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2">
-                        <TrashIcon />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmar eliminación</AlertDialogTitle>
-                        <AlertDialogDescription>¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel className="text-black dark:text-white">Cancelar</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(curso.id)}>Eliminar</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+        {cursos &&
+          cursos.map((curso) => (
+            <div
+              key={curso.id}
+              className="border-[1px] rounded-xl p-4 bg-white dark:bg-gray-800 text-black dark:text-white relative isolate overflow-hidden"
+            >
+              <div className="relative z-10">
+                <div className="flex justify-between">
+                  <div className="flex flex-col gap-2 mr-2">
+                    <h2 className="text-xl font-extrabold">{curso.nombre}</h2>
+                    <p className="text-lg mb-2">{curso.descripcion}</p>
+                    <p className="flex gap-2">
+                      <CalendarIcon />
+                      {new Date(new Date(curso.fecha_inicio).getTime() + 86400000).toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}{" "}
+                      al{" "}
+                      {new Date(new Date(curso.fecha_fin).getTime() + 86400000).toLocaleDateString("es-ES", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })}
+                    </p>
+                    <p className="flex gap-2">
+                      <ClockIcon />
+                      {new Date(`2000-01-01T${curso.horarioInicio}`).toLocaleTimeString("es-ES", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                      {" - "}
+                      {new Date(`2000-01-01T${curso.horarioFin}`).toLocaleTimeString("es-ES", {
+                        hour: "numeric",
+                        minute: "2-digit",
+                        hour12: true,
+                      })}
+                    </p>
+                  </div>
+                  <div className="items-center gap-2 flex flex-col justify-center ">
+                    <Button
+                      className="bg-blue-500 dark:bg-blue-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2"
+                      onClick={() => handleEdit(curso)}
+                    >
+                      <PencilIcon />
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button className="bg-red-500 dark:bg-red-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2">
+                          <TrashIcon />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Confirmar eliminación</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            ¿Estás seguro de que deseas eliminar este curso? Esta acción no se puede deshacer.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel className="text-black dark:text-white">Cancelar</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(curso.id)}>Eliminar</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
                 </div>
               </div>
+              <div
+                className="absolute inset-y-0 right-0 w-1/2 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(${curso.foto_url})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white dark:to-gray-800"></div>
+              </div>
             </div>
-            <div
-              className="absolute inset-y-0 right-0 w-1/2 bg-cover bg-center"
-              style={{
-                backgroundImage: `url(${curso.foto_url})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white dark:to-gray-800"></div>
-            </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       {cursoSeleccionado && (

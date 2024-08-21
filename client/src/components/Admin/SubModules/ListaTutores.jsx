@@ -68,7 +68,7 @@ const ListaTutores = () => {
 
       fetchData();
     }
-  }, [user?.token, user?.tipo, toast]);
+  }, [user?.token, user?.tipo, toast, user]);
 
   const handleEdit = (tutor) => {
     setSelectedTutor(tutor);

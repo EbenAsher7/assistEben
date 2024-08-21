@@ -1,5 +1,5 @@
-import React from "react";
-import './LoadingTexto.css'; // Importa el archivo CSS
+import "./LoadingTexto.css";
+import PropTypes from "prop-types";
 
 const LoadingTexto = ({ texto }) => {
   const letras = texto.split("");
@@ -7,12 +7,8 @@ const LoadingTexto = ({ texto }) => {
   return (
     <div className="loading-texto-container">
       {letras.map((letra, index) => (
-        <span
-          key={index}
-          className="loading-texto-letra"
-          style={{ animationDelay: `${index * 0.1}s` }}
-        >
-          {letra}
+        <span key={index} className="loading-texto-letra" style={{ animationDelay: `${index * 0.2}s` }}>
+          {letra === " " ? "\u00A0" : letra}
         </span>
       ))}
     </div>
@@ -20,3 +16,7 @@ const LoadingTexto = ({ texto }) => {
 };
 
 export default LoadingTexto;
+
+LoadingTexto.propTypes = {
+  texto: PropTypes.string.isRequired,
+};

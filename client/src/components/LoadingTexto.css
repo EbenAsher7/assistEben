@@ -1,0 +1,24 @@
+.loading-texto-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .loading-texto-letra {
+    display: inline-block;
+    font-size: 0.7rem;
+    margin: 0 2px;
+    animation: wave 1s ease-in-out infinite;
+  }
+  
+  @keyframes wave {
+    0%, 60%, 100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-5px);
+    }
+  }
+  

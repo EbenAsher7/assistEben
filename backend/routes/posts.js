@@ -423,4 +423,57 @@ router.post('/changeStudentData', async (req, res) => {
   }
 })
 
+// Añadir nuevo modulo
+router.post('/addModulo', async (req, res) => {
+  try {
+    const {
+      nombre,
+      fecha_inicio,
+      fecha_fin,
+      horario_inicio,
+      horario_fin,
+      encargado_id,
+      descripcion,
+      foto_url,
+      activo
+    } = req.body
+
+    // Verificar que los datos requeridos estén presentes
+    if (
+      !nombre ||
+      !fecha_inicio ||
+      !fecha_fin ||
+      !horario_inicio ||
+      !horario_fin ||
+      !activo
+    ) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
+    }
+
+    // Agregar el módulo, permitiendo que encargado_id sea null
+    const resultado = await turso.execute({
+      sql: 'INSERT INTO Modulos (nombre, fecha_inicio, fecha_fin, horarioInicio, horarioFin, encargado_id, descripcion, foto_url, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      args: [
+        nombre,
+        fecha_inicio || null,
+        fecha_fin || null,
+        horario_inicio || null,
+        horario_fin || null,
+        encargado_id || null,
+        descripcion || null,
+        foto_url || null,
+        activo
+      ]
+    })
+
+    if (resultado.affectedRows === 0) {
+      return res.status(500).json({ error: 'No se pudo agregar el módulo' })
+    }
+
+    res.status(200).json({ Success: 'Módulo agregado correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

@@ -153,21 +153,24 @@ const RecoverCurso = () => {
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel className="text-black dark:text-white">Cancelar</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(curso.id)}>Recuperar</AlertDialogAction>
+                          <AlertDialogAction onClick={() => handleDelete(curso.id)} className="bg-green-500 dark:bg-green-500 text-white dark:text-white">
+                            Recuperar
+                          </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
                   </div>
                 </div>
               </div>
-              <div
-                className="absolute inset-y-0 right-0 w-1/2 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(${curso.foto_url})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                }}
-              >
+              <div className="absolute inset-y-0 right-0 w-1/2">
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(${curso.foto_url})`,
+                    backgroundSize: "95%",
+                    backgroundPosition: "center",
+                  }}
+                ></div>
                 <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white dark:to-gray-800"></div>
               </div>
             </div>

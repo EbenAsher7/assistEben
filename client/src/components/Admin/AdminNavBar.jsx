@@ -4,7 +4,7 @@ import AdminTutorNavbar from "./AdminTutorNavbar";
 import AdminModuleNavbar from "./AdminModuleNavbar";
 
 const AdminNavBar = () => {
-  const [selectedTab, setSelectedTab] = useTabs(["tutores", "modulos", "listStudens", "analytics"]);
+  const [selectedTab, setSelectedTab] = useTabs(["tutores", "modulos", "analytics"]);
 
   return (
     <>
@@ -16,9 +16,6 @@ const AdminNavBar = () => {
         <TabSelector isActive={selectedTab === "modulos"} onClick={() => setSelectedTab("modulos")}>
           Cursos
         </TabSelector>
-        <TabSelector isActive={selectedTab === "listStudens"} onClick={() => setSelectedTab("listStudens")}>
-          Alumnos
-        </TabSelector>
         <TabSelector isActive={selectedTab === "analytics"} onClick={() => setSelectedTab("analytics")}>
           Gráficas
         </TabSelector>
@@ -29,9 +26,6 @@ const AdminNavBar = () => {
         </TabPanel>
         <TabPanel render="lazy" hidden={selectedTab !== "modulos"}>
           <AdminModuleNavbar />
-        </TabPanel>
-        <TabPanel render="lazy" hidden={selectedTab !== "listStudens"}>
-          <h1>Lista de Estudiantes</h1>
         </TabPanel>
         <TabPanel render="lazy" hidden={selectedTab !== "analytics"}>
           <h1>Estadísticas</h1>

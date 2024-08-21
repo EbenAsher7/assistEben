@@ -223,15 +223,12 @@ const ListaCursos = () => {
                     </p>
                   </div>
                   <div className="items-center gap-2 flex flex-col justify-center ">
-                    <Button
-                      className="bg-blue-500 dark:bg-blue-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2"
-                      onClick={() => handleEdit(curso)}
-                    >
+                    <Button className="bg-blue-500 dark:bg-blue-700 text-white dark:text-white px-4" onClick={() => handleEdit(curso)}>
                       <PencilIcon />
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button className="bg-red-500 dark:bg-red-700 min-w-[80px] max-w-[100px] sm:max-w-[120px] text-white dark:text-white px-2">
+                        <Button className="bg-red-500 dark:bg-red-700 text-white dark:text-white px-4">
                           <TrashIcon />
                         </Button>
                       </AlertDialogTrigger>

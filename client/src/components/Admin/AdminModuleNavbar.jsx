@@ -13,7 +13,7 @@ const AdminModuleNavbar = () => {
         <TabSelector isActive={selectedTab === "listModules"} onClick={() => setSelectedTab("listModules")} color="purple">
           Módulos
         </TabSelector>
-        <TabSelector isActive={selectedTab === "newModule"} onClick={() => setSelectedTab("newModule")} color="green">
+        <TabSelector isActive={selectedTab === "newModule"} onClick={() => setSelectedTab("newModule")} color="purple">
           Agregar Mód<span className="hidden sm:inline-flex">ulos</span>
           <span className="inline-flex sm:hidden">.</span>
         </TabSelector>

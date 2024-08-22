@@ -97,4 +97,218 @@ router.get('/allTutorsByModule/:tutorID', async (req, res) => {
   }
 })
 
+// Obtener la cantidad de alumnos asignados a un tutor por módulo
+router.get('/alumnosModulo', async (req, res) => {
+  try {
+    const query = `
+      SELECT
+          t.nombres || ' ' || t.apellidos AS tutor_nombre,
+          m.nombre AS modulo_nombre,
+          COUNT(a.id) AS cantidad_alumnos
+      FROM
+          Alumnos a
+      JOIN
+          TutoresModulos tm ON a.modulo_id = tm.modulo_id AND a.tutor_id = tm.tutor_id
+      JOIN
+          Tutores t ON tm.tutor_id = t.id
+      JOIN
+          Modulos m ON tm.modulo_id = m.id
+      GROUP BY
+          t.id, m.id
+      ORDER BY
+          tutor_nombre, modulo_nombre;
+    `
+
+    const result = await turso.execute(query)
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const data = rows.map((row) => {
+      const item = {}
+      columns.forEach((col, index) => {
+        item[col] = row[index]
+      })
+      return item
+    })
+
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener la cantidad de preguntas enviadas a un tutor por módulo
+router.get('/preguntasModulo', async (req, res) => {
+  try {
+    const query = `
+      SELECT
+          t.nombres || ' ' || t.apellidos AS tutor_nombre,
+          m.nombre AS modulo_nombre,
+          COUNT(a.pregunta) AS cantidad_preguntas
+      FROM
+          Asistencias a
+      JOIN
+          Alumnos al ON a.alumno_id = al.id
+      JOIN
+          TutoresModulos tm ON al.modulo_id = tm.modulo_id AND al.tutor_id = tm.tutor_id
+      JOIN
+          Tutores t ON tm.tutor_id = t.id
+      JOIN
+          Modulos m ON tm.modulo_id = m.id
+      WHERE
+          a.pregunta IS NOT NULL
+      GROUP BY
+          t.id, m.id
+      ORDER BY
+          tutor_nombre, modulo_nombre;
+    `
+
+    const result = await turso.execute(query)
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const data = rows.map((row) => {
+      const item = {}
+      columns.forEach((col, index) => {
+        item[col] = row[index]
+      })
+      return item
+    })
+
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener la cantidad de asistencias virtuales y presenciales por módulo
+router.get('/asistenciasModulo', async (req, res) => {
+  try {
+    const query = `
+      SELECT
+          t.nombres || ' ' || t.apellidos AS tutor_nombre,
+          m.nombre AS modulo_nombre,
+          SUM(CASE WHEN a.tipo = 'Virtual' THEN 1 ELSE 0 END) AS cantidad_virtuales,
+          SUM(CASE WHEN a.tipo = 'Presencial' THEN 1 ELSE 0 END) AS cantidad_presenciales
+      FROM
+          Asistencias a
+      JOIN
+          Alumnos al ON a.alumno_id = al.id
+      JOIN
+          TutoresModulos tm ON al.modulo_id = tm.modulo_id AND al.tutor_id = tm.tutor_id
+      JOIN
+          Tutores t ON tm.tutor_id = t.id
+      JOIN
+          Modulos m ON tm.modulo_id = m.id
+      GROUP BY
+          t.id, m.id
+      ORDER BY
+          tutor_nombre, modulo_nombre;
+    `
+
+    const result = await turso.execute(query)
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const data = rows.map((row) => {
+      const item = {}
+      columns.forEach((col, index) => {
+        item[col] = row[index]
+      })
+      return item
+    })
+
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener la cantidad de alumnos pendientes totales por módulo
+router.get('/alumnosPendientesModulo', async (req, res) => {
+  try {
+    const query = `
+      SELECT
+          m.nombre AS modulo_nombre,
+          COUNT(a.id) AS cantidad_alumnos_pendientes
+      FROM
+          Alumnos a
+      JOIN
+          Modulos m ON a.modulo_id = m.id
+      WHERE
+          a.activo = 'Pendiente'
+      GROUP BY
+          m.id
+      ORDER BY
+          modulo_nombre;
+    `
+
+    const result = await turso.execute(query)
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const data = rows.map((row) => {
+      const item = {}
+      columns.forEach((col, index) => {
+        item[col] = row[index]
+      })
+      return item
+    })
+
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener la cantidad de preguntas según asistencia virtual o presencial por módulo
+router.get('/preguntasTipoAsistencia', async (req, res) => {
+  try {
+    const query = `
+      SELECT
+          m.nombre AS modulo_nombre,
+          a.tipo AS tipo_asistencia,
+          COUNT(a.pregunta) AS cantidad_preguntas
+      FROM
+          Asistencias a
+      JOIN
+          Alumnos al ON a.alumno_id = al.id
+      JOIN
+          Modulos m ON al.modulo_id = m.id
+      WHERE
+          a.pregunta IS NOT NULL
+      GROUP BY
+          m.id, a.tipo
+      ORDER BY
+          modulo_nombre, tipo_asistencia;
+    `
+
+    const result = await turso.execute(query)
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const data = rows.map((row) => {
+      const item = {}
+      columns.forEach((col, index) => {
+        item[col] = row[index]
+      })
+      return item
+    })
+
+    res.status(200).json(data)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

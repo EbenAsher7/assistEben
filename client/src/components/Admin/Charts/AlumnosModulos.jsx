@@ -83,7 +83,7 @@ const AlumnosModulos = () => {
     <Card>
       <CardHeader>
         <CardTitle>Alumnos por Módulo</CardTitle>
-        <CardDescription>Distribución de alumnos por módulo para cada tutor.</CardDescription>
+        <CardDescription>Cantidad de Alumnos que tiene cada tutor en cada módulo asignado.</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (

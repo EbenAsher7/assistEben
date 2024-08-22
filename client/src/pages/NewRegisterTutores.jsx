@@ -108,7 +108,7 @@ const NewRegisterTutores = () => {
                   <img src={tutor.foto_url} alt={`${tutor.nombres} ${tutor.apellidos}`} className="size-44 object-cover mx-auto mb-4" />
                   <div className="space-y-2">
                     <h4 className="text-2xl font-extrabold text-center">{`${tutor.nombres} ${tutor.apellidos}`}</h4>
-                    <p className="text-center">Tipo: {tutor.tipo === "Tutor" ? "Tutor(a)" : tutor.tipo}</p>
+                    <p className="text-center">Tipo: {tutor.tipo === "Tutor" ? "Tutor(a)" : "Tutor(a)"}</p>
                   </div>
                 </div>
               ))}

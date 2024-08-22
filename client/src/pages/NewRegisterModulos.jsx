@@ -4,6 +4,7 @@ import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import NewRegisterTutores from "./NewRegisterTutores"; // Importa el componente NewRegisterTutores
 import { format, addDays } from "date-fns";
+import IMAGENDEFAULT from "/cropped-favicon.png";
 
 const NewRegisterModulos = () => {
   const { nombresNEW, apellidosNEW, telefonoNEW, setCursoSeleccionadoNEW } = useContext(MainContext);
@@ -78,7 +79,7 @@ const NewRegisterModulos = () => {
                     className="border border-gray-300 rounded-lg overflow-hidden cursor-pointer shadow-lg p-4 hover:scale-[1.01] transition-transform ease-in"
                     onClick={() => handleSelectModule(module)}
                   >
-                    <img src={module.foto_url} alt={module.nombre} className="size-36 bg-cover mb-4 m-auto" />
+                    <img src={module.foto_url ?? IMAGENDEFAULT} alt={module.nombre} className="size-36 bg-cover mb-4 m-auto" />
                     <div className="space-y-2">
                       <h4 className="text-2xl font-extrabold text-center">{module.nombre}</h4>
                       <p>{module.descripcion}</p>

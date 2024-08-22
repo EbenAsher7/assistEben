@@ -252,14 +252,14 @@ const ListaCursos = () => {
               </div>
               <div className="absolute inset-y-0 right-0 w-1/2">
                 <div
-                  className="absolute inset-0 bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center repeat-0 scale-x-95"
                   style={{
                     backgroundImage: `url(${curso.foto_url})`,
-                    backgroundSize: "95%",
-                    backgroundPosition: "center",
+                    backgroundSize: "100%",
+                    objectFit: "cover",
                   }}
                 ></div>
-                <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white dark:to-gray-800"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-white from-0% via-white via-10% dark:from-gray-800 scale-105"></div>
               </div>
             </div>
           ))}

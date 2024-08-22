@@ -2,6 +2,7 @@ import { TabPanel, useTabs } from "react-headless-tabs";
 import { TabSelector } from "../Admin/TabsSelector";
 import AdminTutorNavbar from "./AdminTutorNavbar";
 import AdminModuleNavbar from "./AdminModuleNavbar";
+import ChartsModuleNavbar from "./ChartsModuleNavbar";
 
 const AdminNavBar = () => {
   const [selectedTab, setSelectedTab] = useTabs(["tutores", "modulos", "analytics"]);
@@ -28,7 +29,7 @@ const AdminNavBar = () => {
           <AdminModuleNavbar />
         </TabPanel>
         <TabPanel render="lazy" hidden={selectedTab !== "analytics"}>
-          <h1>Estadísticas</h1>
+          <ChartsModuleNavbar />
         </TabPanel>
       </div>
     </>

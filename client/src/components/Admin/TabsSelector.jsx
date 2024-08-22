@@ -32,10 +32,10 @@ export const TabSelector = ({ isActive, children, onClick, color = "orange" }) =
         "from-red-400 to-red-600 hover:from-red-500 hover:to-red-700 dark:from-red-500 dark:to-red-700 dark:hover:from-red-600 dark:hover:to-red-800",
       hoverText: "hover:text-red-700 dark:hover:text-red-300",
     },
-    beige: {
+    lime: {
       gradient:
-        "from-beige-400 to-beige-600 hover:from-beige-500 hover:to-beige-700 dark:from-beige-500 dark:to-beige-700 dark:hover:from-beige-600 dark:hover:to-beige-800",
-      hoverText: "hover:text-beige-700 dark:hover:text-beige-300",
+        "from-lime-400 to-lime-600 hover:from-lime-500 hover:to-lime-700 dark:from-lime-500 dark:to-lime-700 dark:hover:from-lime-600 dark:hover:to-lime-800",
+      hoverText: "hover:text-lime-700 dark:hover:text-lime-300",
     },
     violet: {
       gradient:
@@ -72,5 +72,5 @@ TabSelector.propTypes = {
   isActive: PropTypes.bool.isRequired,
   children: PropTypes.node.isRequired,
   onClick: PropTypes.func.isRequired,
-  color: PropTypes.oneOf(["orange", "purple", "indigo", "green", "blue", "red", "beige", "violet", "yellow"]),
+  color: PropTypes.oneOf(["orange", "purple", "indigo", "green", "blue", "red", "lime", "violet", "yellow"]),
 };

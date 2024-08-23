@@ -16,6 +16,9 @@ const NewRegisterTutores = () => {
 
   const navigate = useNavigate();
 
+  // importar los set para reiniciar formulario
+  const { setNombresNEW, setApellidosNEW, setFechaNacimientoNEW, setTelefonoNEW, setDireccionNEW, setCursoSeleccionadoNEW } = useContext(MainContext);
+
   useEffect(() => {
     const fetchTutors = async () => {
       setLoading(true);
@@ -67,13 +70,21 @@ const NewRegisterTutores = () => {
       toast({
         duration: 2500,
         title: "Success",
+        variant: "success",
         description: "Se ha registrado correctamente.",
       });
 
       navigate("/");
-
       setSelectedTutor(null);
       navegarPaso(-100);
+
+      // Reiniciar formulario
+      setNombresNEW("");
+      setApellidosNEW("");
+      setFechaNacimientoNEW("");
+      setTelefonoNEW("");
+      setDireccionNEW("");
+      setCursoSeleccionadoNEW(null);
     } catch (error) {
       toast({ title: "Error", description: error.message, duration: 2500 });
     }
@@ -115,9 +126,11 @@ const NewRegisterTutores = () => {
                   </div>
                 </div>
               ))}
-              <Button onClick={handlePrevious} className="px-8 py-6 transition-opacity duration-300 bg-blue-500 text-white hover:bg-blue-600">
-                Anterior
-              </Button>
+              <div className="flex justify-center mt-6 gap-2">
+                <Button onClick={handlePrevious} className="px-8 py-6 transition-opacity duration-300 bg-blue-500 text-white hover:bg-blue-600">
+                  Anterior
+                </Button>
+              </div>
             </div>
           ) : (
             <p>No hay tutores disponibles.</p>

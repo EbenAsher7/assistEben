@@ -106,7 +106,10 @@ const NewRegisterTutores = () => {
     <div className="px-2">
       {cursoSeleccionadoNEW ? (
         <div>
-          <h3 className="text-3xl font-extrabold text-center pb-8">Seleccione al Tutor que le asignaron</h3>
+          <h3 className="text-xl font-extrabold text-center pb-2 px-4">Seleccione el tutor que le asignaron.</h3>
+          <h2 className="text-sm italic font-semibold text-center pb-6 px-4 text-red-500">
+            *** Si aún no tiene un tutor, solicite uno y luego regrese aquí para seleccionarlo. ***
+          </h2>
           {loading ? (
             <p className="text-center text-lg">Cargando...</p>
           ) : error ? (
@@ -126,7 +129,7 @@ const NewRegisterTutores = () => {
                   </div>
                 </div>
               ))}
-              <div className="flex justify-center mt-6 gap-2">
+              <div className="flex justify-center my-4 gap-2">
                 <Button onClick={handlePrevious} className="px-8 py-6 transition-opacity duration-300 bg-blue-500 text-white hover:bg-blue-600">
                   Anterior
                 </Button>

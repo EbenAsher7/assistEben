@@ -48,7 +48,8 @@ export default function NewRegister() {
 
   return (
     <div className="w-full justify-center flex items-center sm:-mt-24">
-      <div className="container mx-auto px-4 pb-8 sm:mt-32 rounded-md">
+      <div className="container mx-auto px-4 mb-6 sm:mt-32 rounded-md">
+        <h3 className="text-xl font-extrabold text-center pb-6 px-4">Llene los siguiente campos para continuar.</h3>
         <h1 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -13,8 +13,8 @@ const RegistroPagina = () => {
 
   const pasos = [
     { label: "1. Datos Personales", component: <NewRegister /> },
-    { label: "2. Seleccionar Módulos", component: <NewRegisterModulos /> },
-    { label: "3. Seleccionar Tutores", component: <NewRegisterTutores /> },
+    { label: "2. Módulos", component: <NewRegisterModulos /> },
+    { label: "3. Tutores", component: <NewRegisterTutores /> },
   ];
 
   // CAMBIAR ESTILO SEGUN TAMAÑO DE PANTALLA
@@ -42,8 +42,8 @@ const RegistroPagina = () => {
             >
               <h3
                 className={`
-                ${esEscritorio ? "text-sm" : "text-lg font-medium"}
-                ${index === pasoActual ? "text-blue-600" : "text-gray-600"}
+                ${esEscritorio ? "text-base" : "text-2xl font-medium"}
+                ${index === pasoActual ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-500 text-lg"}
               `}
               >
                 {paso.label}

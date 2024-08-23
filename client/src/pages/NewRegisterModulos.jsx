@@ -71,7 +71,7 @@ const NewRegisterModulos = () => {
   return (
     <div className="px-2">
       <div>
-        <h3 className="text-3xl font-extrabold text-center pb-8">Seleccione su módulo</h3>
+        <h3 className="text-xl font-extrabold text-center pb-6 px-4">Seleccione el módulo en el que se encuentra.</h3>
         {isLoading ? (
           <p>Cargando módulos...</p>
         ) : error ? (
@@ -112,7 +112,7 @@ const NewRegisterModulos = () => {
         ) : (
           <p>No hay módulos disponibles.</p>
         )}
-        <div className="flex justify-center mt-6 gap-2">
+        <div className="flex justify-center mb-4 mt-8 gap-2">
           <Button onClick={handlePrevious} className="px-8 py-6 transition-opacity duration-300 bg-blue-500 text-white hover:bg-blue-600">
             Anterior
           </Button>

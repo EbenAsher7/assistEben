@@ -1,4 +1,4 @@
-import { useContext, useState, useCallback, useMemo } from "react";
+import { useContext, useState, useCallback, useMemo, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Eye, EyeOff } from "lucide-react";
 import LOGO from "/logoEbenezer.webp";
@@ -15,7 +15,14 @@ const Login = memo(() => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const { setIsLogin, setUser } = useContext(MainContext);
+  const { setIsLogin, setUser, user } = useContext(MainContext);
+
+  // SI USUARIO ESTA LOGUEADO, REDIRECCIONAR A ASISTENCIA
+  useEffect(() => {
+    if (user) {
+      navigate("/attendance");
+    }
+  }, [user, navigate]);
 
   const handleLogin = useCallback(async () => {
     if (!userLogin || !pass) {

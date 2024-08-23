@@ -2,21 +2,23 @@ import { useState, useContext, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import MainContext from "../context/MainContext";
 import { Button } from "@/components/ui/button";
-import { useLocation } from "react-router-dom";
 
 export default function NewRegister() {
-  const [nombres, setNombres] = useState("");
-  const [apellidos, setApellidos] = useState("");
-  const [fechaNacimiento, setFechaNacimiento] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
-
   const [isValid, setIsValid] = useState(false);
 
-  const context = useContext(MainContext);
-  const location = useLocation();
-
-  const { navegarPaso } = useContext(MainContext);
+  const {
+    navegarPaso,
+    nombresNEW,
+    apellidosNEW,
+    fechaNacimientoNEW,
+    telefonoNEW,
+    direccionNEW,
+    setNombresNEW,
+    setApellidosNEW,
+    setFechaNacimientoNEW,
+    setTelefonoNEW,
+    setDireccionNEW,
+  } = useContext(MainContext);
 
   //useEffect para iniciar siempre en el paso 0
   useEffect(() => {
@@ -25,52 +27,24 @@ export default function NewRegister() {
 
   // Validar formulario en tiempo real
   useEffect(() => {
-    const isNombresValid = nombres.length >= 3;
-    const isApellidosValid = apellidos.length >= 3;
-    const isTelefonoValid = /^\d{7,}$/.test(telefono);
+    const isNombresValid = nombresNEW.length >= 3;
+    const isApellidosValid = apellidosNEW.length >= 3;
+    const isTelefonoValid = /^\d{7,}$/.test(telefonoNEW);
 
     setIsValid(isNombresValid && isApellidosValid && isTelefonoValid);
-  }, [nombres, apellidos, telefono]);
+  }, [nombresNEW, apellidosNEW, telefonoNEW]);
 
   const handleContinue = () => {
     if (isValid) {
-      context.setNombresNEW(nombres);
-      context.setApellidosNEW(apellidos);
-      context.setFechaNacimientoNEW(fechaNacimiento);
-      context.setTelefonoNEW(telefono);
-      context.setDireccionNEW(direccion);
+      setNombresNEW(nombresNEW);
+      setApellidosNEW(apellidosNEW);
+      setFechaNacimientoNEW(fechaNacimientoNEW);
+      setTelefonoNEW(telefonoNEW);
+      setDireccionNEW(direccionNEW);
 
       navegarPaso(1);
     }
   };
-
-  // Manejar la advertencia de navegación
-  const isFormDirty = nombres || apellidos || telefono || direccion || fechaNacimiento;
-
-  useEffect(() => {
-    const handleBeforeUnload = (event) => {
-      if (isFormDirty) {
-        event.preventDefault();
-        event.returnValue = "¿Estás seguro de que quieres salir? Los datos no guardados se perderán.";
-        return event.returnValue;
-      }
-    };
-
-    const handlePopState = () => {
-      if (isFormDirty && !window.confirm("¿Estás seguro de que quieres salir? Los datos no guardados se perderán.")) {
-        window.history.pushState(null, "", location.pathname);
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-    window.addEventListener("popstate", handlePopState);
-    window.history.pushState(null, "", location.pathname);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [isFormDirty, location.pathname]);
 
   return (
     <div className="w-full justify-center flex items-center sm:-mt-24">
@@ -87,8 +61,8 @@ export default function NewRegister() {
               id="nombres"
               name="nombres"
               placeholder="Ingresa tus nombres"
-              value={nombres}
-              onChange={(e) => setNombres(e.target.value)}
+              value={nombresNEW}
+              onChange={(e) => setNombresNEW(e.target.value)}
               autoComplete="off"
             />
           </div>
@@ -101,8 +75,8 @@ export default function NewRegister() {
               id="apellidos"
               name="apellidos"
               placeholder="Ingresa tus apellidos"
-              value={apellidos}
-              onChange={(e) => setApellidos(e.target.value)}
+              value={apellidosNEW}
+              onChange={(e) => setApellidosNEW(e.target.value)}
               autoComplete="off"
             />
           </div>
@@ -111,13 +85,13 @@ export default function NewRegister() {
               Teléfono <span className="text-red-500">*</span>
             </label>
             <Input
-              type="text"
               id="telefono"
               name="telefono"
               placeholder="Ingresa tu teléfono"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value)}
+              value={telefonoNEW}
+              onChange={(e) => setTelefonoNEW(e.target.value)}
               autoComplete="off"
+              type="number"
             />
           </div>
           <div>
@@ -129,8 +103,8 @@ export default function NewRegister() {
               id="fechaNacimiento"
               name="fechaNacimiento"
               placeholder="Fecha de Nacimiento"
-              value={fechaNacimiento}
-              onChange={(e) => setFechaNacimiento(e.target.value)}
+              value={fechaNacimientoNEW}
+              onChange={(e) => setFechaNacimientoNEW(e.target.value)}
             />
           </div>
 
@@ -143,8 +117,8 @@ export default function NewRegister() {
               id="direccion"
               name="direccion"
               placeholder="Ingresa tu dirección"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
+              value={direccionNEW}
+              onChange={(e) => setDireccionNEW(e.target.value)}
             />
           </div>
         </div>

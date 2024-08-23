@@ -30,6 +30,7 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "flowbite": "^2.4.1",
+    "headless-stepper": "^1.11.0",
     "lucide-react": "^0.411.0",
     "react": "^18.3.1",
     "react-confetti-explosion": "^2.1.2",

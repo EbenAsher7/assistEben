@@ -22,7 +22,7 @@ export default function NewRegister() {
 
   //useEffect para iniciar siempre en el paso 0
   useEffect(() => {
-    navegarPaso(-1);
+    navegarPaso(-100);
   }, []);
 
   // Validar formulario en tiempo real

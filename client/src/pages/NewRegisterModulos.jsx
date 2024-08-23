@@ -7,11 +7,10 @@ import IMAGENDEFAULT from "/cropped-favicon.png";
 import { Button } from "@/components/ui/button";
 
 const NewRegisterModulos = () => {
-  const { setCursoSeleccionadoNEW, navegarPaso } = useContext(MainContext);
+  const { setCursoSeleccionadoNEW, navegarPaso, cursoSeleccionadoNEW } = useContext(MainContext);
   const [modules, setModules] = useState([]);
   const [isLoading, setIsLoading] = useState(true); // Estado para manejar la carga
   const [error, setError] = useState(null); // Estado para manejar el error
-  const [selectedModule, setSelectedModule] = useState(null); // Estado para manejar el módulo seleccionado
   const { toast } = useToast();
 
   useEffect(() => {
@@ -37,12 +36,12 @@ const NewRegisterModulos = () => {
   }, [toast]);
 
   const handleSelectModule = (module) => {
-    setSelectedModule(module);
+    setCursoSeleccionadoNEW(module);
   };
 
   const handleContinue = () => {
-    if (selectedModule) {
-      setCursoSeleccionadoNEW(selectedModule);
+    if (cursoSeleccionadoNEW) {
+      setCursoSeleccionadoNEW(cursoSeleccionadoNEW);
       navegarPaso(1);
     }
   };
@@ -83,7 +82,7 @@ const NewRegisterModulos = () => {
               <div
                 key={module.id}
                 className={`border border-gray-300 rounded-lg overflow-hidden cursor-pointer shadow-lg p-4 transition-transform ease-in ${
-                  selectedModule?.id === module.id ? "bg-blue-100 border-blue-400" : ""
+                  cursoSeleccionadoNEW?.id === module.id ? "bg-blue-100 border-blue-400" : ""
                 }`}
                 onClick={() => handleSelectModule(module)}
               >
@@ -119,9 +118,9 @@ const NewRegisterModulos = () => {
           </Button>
           <Button
             onClick={handleContinue}
-            disabled={!selectedModule}
+            disabled={!cursoSeleccionadoNEW}
             className={`px-8 py-6 transition-opacity duration-300 ${
-              selectedModule ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-300 text-white cursor-not-allowed"
+              cursoSeleccionadoNEW ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-300 text-white cursor-not-allowed"
             }`}
           >
             Siguiente

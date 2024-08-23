@@ -73,7 +73,7 @@ const NewRegisterTutores = () => {
       navigate("/");
 
       setSelectedTutor(null);
-      navegarPaso(-1);
+      navegarPaso(-100);
     } catch (error) {
       toast({ title: "Error", description: error.message, duration: 2500 });
     }
@@ -85,6 +85,10 @@ const NewRegisterTutores = () => {
 
   const handleCancel = () => {
     setSelectedTutor(null);
+  };
+
+  const handlePrevious = () => {
+    navegarPaso(-1);
   };
 
   return (
@@ -111,6 +115,9 @@ const NewRegisterTutores = () => {
                   </div>
                 </div>
               ))}
+              <Button onClick={handlePrevious} className="px-8 py-6 transition-opacity duration-300 bg-blue-500 text-white hover:bg-blue-600">
+                Anterior
+              </Button>
             </div>
           ) : (
             <p>No hay tutores disponibles.</p>

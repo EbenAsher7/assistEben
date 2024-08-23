@@ -116,7 +116,7 @@ const Login = memo(() => {
                   type="text"
                   autoComplete="off"
                   value={userLogin}
-                  onChange={(e) => setUserLogin(e.target.value)}
+                  onChange={(e) => setUserLogin(e.target.value.toLowerCase())} // Convertir a minúsculas aquí
                   onKeyPress={handleKeyPress}
                   className={inputClassName}
                   placeholder="Ej. joselopez"

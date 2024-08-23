@@ -69,7 +69,7 @@ export const DataUser = memo(({ user }) => {
         });
         setTimeout(() => {
           setIsLogin(false);
-          setUser({});
+          setUser(null);
         }, 2500);
       } else {
         throw new Error("Ocurrió un error al guardar los cambios.");
@@ -130,7 +130,7 @@ export const DataUser = memo(({ user }) => {
         });
         setTimeout(() => {
           setIsLogin(false);
-          setUser({});
+          setUser(null);
         }, 2500);
       } else {
         throw new Error("Ocurrió un error al cambiar la contraseña.");

@@ -17,9 +17,9 @@ const Login = memo(() => {
 
   const { setIsLogin, setUser, user } = useContext(MainContext);
 
-  // SI USUARIO ESTA LOGUEADO, REDIRECCIONAR A ASISTENCIA
   useEffect(() => {
-    if (user) {
+    if (user !== null) {
+      console.log("user: ", user);
       navigate("/attendance");
     }
   }, [user, navigate]);

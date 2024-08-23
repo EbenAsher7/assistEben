@@ -8,7 +8,7 @@ const MainProvider = ({ children }) => {
   const { toast } = useToast();
   // Variables de estado
   const [isLogin, setIsLogin] = useState(false);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
 
   // Estado para guardar el historial de asistencias
@@ -43,7 +43,7 @@ const MainProvider = ({ children }) => {
         localStorage.removeItem("loginExpiration");
         alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
         setIsLogin(false);
-        setUser({});
+        setUser(null);
         // Puedes redirigir al usuario a la página de inicio de sesión aquí si es necesario
       }
     }
@@ -51,7 +51,7 @@ const MainProvider = ({ children }) => {
 
   // Actualizar localStorage cuando setUser cambie
   useEffect(() => {
-    if (Object.keys(user).length === 0) {
+    if (user === null || user === undefined) {
       // Si user es un objeto vacío, limpiar timestamps y isLogin
       localStorage.removeItem("loginTimestamp");
       localStorage.removeItem("loginExpiration");

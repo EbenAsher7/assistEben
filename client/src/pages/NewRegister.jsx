@@ -20,11 +20,6 @@ export default function NewRegister() {
     setDireccionNEW,
   } = useContext(MainContext);
 
-  //useEffect para iniciar siempre en el paso 0
-  useEffect(() => {
-    navegarPaso(-100);
-  }, []);
-
   // Validar formulario en tiempo real
   useEffect(() => {
     const isNombresValid = nombresNEW.length >= 3;

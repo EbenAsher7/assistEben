@@ -5,6 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import LoaderAE from "@/components/LoaderAE";
 
 const NewRegisterTutores = () => {
   const { cursoSeleccionadoNEW, nombresNEW, apellidosNEW, fechaNacimientoNEW, telefonoNEW, direccionNEW, navegarPaso } = useContext(MainContext);
@@ -111,7 +112,9 @@ const NewRegisterTutores = () => {
             *** Si aún no tiene un tutor, solicite uno y luego regrese aquí para seleccionarlo. ***
           </h2>
           {loading ? (
-            <p className="text-center text-lg">Cargando...</p>
+            <p className="text-center text-lg">
+              <LoaderAE texto="Cargando tutores..." />
+            </p>
           ) : error ? (
             <p className="text-center text-lg text-red-500">{error}</p>
           ) : tutors.length > 0 ? (

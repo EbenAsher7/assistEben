@@ -9,13 +9,18 @@ const NewRegisterModulos = lazy(() => import("./NewRegisterModulos"));
 const RegistroPagina = () => {
   const [esEscritorio, setEsEscritorio] = useState(window.innerWidth > 768);
 
-  const { pasoActual } = useContext(MainContext);
+  const { pasoActual, navegarPaso } = useContext(MainContext);
 
   const pasos = [
     { label: "1. Datos Personales", component: <NewRegister /> },
     { label: "2. Módulos", component: <NewRegisterModulos /> },
     { label: "3. Tutores", component: <NewRegisterTutores /> },
   ];
+
+  //useEffect para iniciar siempre en el paso 0
+  useEffect(() => {
+    navegarPaso(-100);
+  }, []);
 
   // CAMBIAR ESTILO SEGUN TAMAÑO DE PANTALLA
   useEffect(() => {

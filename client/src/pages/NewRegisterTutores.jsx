@@ -116,7 +116,13 @@ const NewRegisterTutores = () => {
               <LoaderAE texto="Cargando tutores..." />
             </p>
           ) : error ? (
-            <p className="text-center text-lg text-red-500">{error}</p>
+            <p className="text-center text-lg text-red-500">
+              <div className="flex justify-center my-4 gap-2">
+                <Button onClick={handlePrevious} className="px-8 py-6 transition-opacity duration-300 bg-blue-500 text-white hover:bg-blue-600">
+                  Anterior
+                </Button>
+              </div>
+            </p>
           ) : tutors.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {tutors.map((tutor) => (

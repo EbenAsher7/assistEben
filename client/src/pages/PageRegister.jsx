@@ -1,3 +1,4 @@
+import LoaderAE from "@/components/LoaderAE";
 import MainContext from "@/context/MainContext";
 import { useState, useEffect, lazy, Suspense, useContext } from "react";
 
@@ -27,6 +28,8 @@ const RegistroPagina = () => {
 
   return (
     <div className="container mx-auto p-4">
+      <h1 className="text-4xl font-extrabold mt-8 text-center sm:mt-0">Nuevo Registro</h1>
+      <h2 className="text-lg text-center">Llena los datos requeridos para continuar con el registro</h2>
       {/* BARRA DE NAVEGACION */}
       <nav className={`mb-4 ${esEscritorio ? "flex items-center justify-center" : "space-y-4"}`}>
         {pasos.map((paso, index) => (
@@ -47,8 +50,7 @@ const RegistroPagina = () => {
               </h3>
               {!esEscritorio && index === pasoActual && (
                 <div className="mt-4">
-                  <Suspense fallback={<div>Cargando...</div>}>{paso.component}</Suspense>
-                  {/* <BotonesNavegacion /> */}
+                  <Suspense fallback={<LoaderAE texto={"Cargando paso..."} />}>{paso.component}</Suspense>
                 </div>
               )}
             </div>
@@ -59,8 +61,7 @@ const RegistroPagina = () => {
 
       {esEscritorio && (
         <div>
-          <Suspense fallback={<div className="text-center">Cargando...</div>}>{pasos[pasoActual].component}</Suspense>
-          {/* <BotonesNavegacion /> */}
+          <Suspense fallback={<LoaderAE texto={"Cargando paso..."} />}>{pasos[pasoActual].component}</Suspense>
         </div>
       )}
     </div>

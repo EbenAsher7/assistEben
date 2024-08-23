@@ -29,7 +29,7 @@ const NewRegisterTutores = () => {
         setTutors(data);
       } catch (error) {
         setError("Failed to fetch tutors.", error);
-        toast({ title: "Error", description: "Failed to fetch tutors." });
+        toast({ title: "Error", description: "Failed to fetch tutors.", duration: 2500 });
       } finally {
         setLoading(false);
       }
@@ -65,6 +65,7 @@ const NewRegisterTutores = () => {
       }
 
       toast({
+        duration: 2500,
         title: "Success",
         description: "Se ha registrado correctamente.",
       });
@@ -74,7 +75,7 @@ const NewRegisterTutores = () => {
       setSelectedTutor(null);
       navegarPaso(-1);
     } catch (error) {
-      toast({ title: "Error", description: error.message });
+      toast({ title: "Error", description: error.message, duration: 2500 });
     }
   };
 

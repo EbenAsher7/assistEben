@@ -27,7 +27,7 @@ const NewRegisterModulos = () => {
       } catch (error) {
         console.error("Error fetching modules:", error);
         setError("Failed to fetch modules.");
-        toast({ title: "Error", description: "Failed to fetch modules." });
+        toast({ title: "Error", description: "Failed to fetch modules.", duration: 2500 });
       } finally {
         setIsLoading(false); // Finaliza la carga
       }

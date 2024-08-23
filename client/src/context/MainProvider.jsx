@@ -329,7 +329,17 @@ const MainProvider = ({ children }) => {
   const [telefonoNEW, setTelefonoNEW] = useState("");
   const [direccionNEW, setDireccionNEW] = useState("");
   const [cursoSeleccionadoNEW, setCursoSeleccionadoNEW] = useState(null);
-  const [currentStep, setCurrentStep] = useState(0);
+
+  //STEPPER
+  const [pasoActual, setPasoActual] = useState(0);
+
+  const navegarPaso = (direccion) => {
+    const LENGTHSTEPS = 3;
+    setPasoActual((prevPaso) => {
+      const nuevoPaso = prevPaso + direccion;
+      return Math.max(0, Math.min(nuevoPaso, LENGTHSTEPS - 1));
+    });
+  };
 
   // RETURN
   return (
@@ -362,8 +372,10 @@ const MainProvider = ({ children }) => {
         setDireccionNEW,
         cursoSeleccionadoNEW,
         setCursoSeleccionadoNEW,
-        currentStep,
-        setCurrentStep,
+        //STEPPER
+        pasoActual,
+        setPasoActual,
+        navegarPaso,
       }}
     >
       {children}

@@ -334,6 +334,11 @@ const MainProvider = ({ children }) => {
   const [pasoActual, setPasoActual] = useState(0);
 
   const navegarPaso = (direccion) => {
+    if (direccion === -1) {
+      setPasoActual(0);
+      return 0;
+    }
+
     const LENGTHSTEPS = 3;
     setPasoActual((prevPaso) => {
       const nuevoPaso = prevPaso + direccion;

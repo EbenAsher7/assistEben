@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 const NewRegisterTutores = () => {
-  const { cursoSeleccionadoNEW, nombresNEW, apellidosNEW, fechaNacimientoNEW, telefonoNEW, direccionNEW } = useContext(MainContext);
+  const { cursoSeleccionadoNEW, nombresNEW, apellidosNEW, fechaNacimientoNEW, telefonoNEW, direccionNEW, navegarPaso } = useContext(MainContext);
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -69,12 +69,10 @@ const NewRegisterTutores = () => {
         description: "Se ha registrado correctamente.",
       });
 
-      //Redirigir a "/" usando useNavigate
-      setTimeout(() => {
-        navigate("/");
-      }, 2500);
+      navigate("/");
 
       setSelectedTutor(null);
+      navegarPaso(-1);
     } catch (error) {
       toast({ title: "Error", description: error.message });
     }

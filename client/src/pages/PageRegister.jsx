@@ -29,7 +29,7 @@ const RegistroPagina = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-extrabold mt-8 text-center sm:mt-0">Nuevo Registro</h1>
-      <h2 className="text-lg text-center">Llena los datos requeridos para continuar con el registro</h2>
+      <h2 className="text-lg text-center mb-4">Llena los datos requeridos para continuar con el registro</h2>
       {/* BARRA DE NAVEGACION */}
       <nav className={`mb-4 ${esEscritorio ? "flex items-center justify-center" : "space-y-4"}`}>
         {pasos.map((paso, index) => (

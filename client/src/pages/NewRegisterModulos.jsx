@@ -69,9 +69,9 @@ const NewRegisterModulos = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="px-2">
       <div>
-        <h3 className="text-3xl font-extrabold text-center py-12">Seleccione el módulo al que está asistiendo</h3>
+        <h3 className="text-3xl font-extrabold text-center pb-8">Seleccione su módulo</h3>
         {isLoading ? (
           <p>Cargando módulos...</p>
         ) : error ? (
@@ -82,7 +82,7 @@ const NewRegisterModulos = () => {
               <div
                 key={module.id}
                 className={`border border-gray-300 rounded-lg overflow-hidden cursor-pointer shadow-lg p-4 transition-transform ease-in ${
-                  cursoSeleccionadoNEW?.id === module.id ? "bg-blue-100 border-blue-400" : ""
+                  cursoSeleccionadoNEW?.id === module.id ? "bg-blue-100 border-blue-400 dark:bg-blue-900 dark:border-blue-600" : ""
                 }`}
                 onClick={() => handleSelectModule(module)}
               >

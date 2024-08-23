@@ -103,10 +103,10 @@ const NewRegisterTutores = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="px-2">
       {cursoSeleccionadoNEW ? (
         <div>
-          <h3 className="text-3xl font-extrabold text-center py-12">Seleccione al Tutor que le asignaron</h3>
+          <h3 className="text-3xl font-extrabold text-center pb-8">Seleccione al Tutor que le asignaron</h3>
           {loading ? (
             <p className="text-center text-lg">Cargando...</p>
           ) : error ? (

@@ -19,7 +19,6 @@ const Login = memo(() => {
 
   useEffect(() => {
     if (user !== null) {
-      console.log("user: ", user);
       navigate("/attendance");
     }
   }, [user, navigate]);

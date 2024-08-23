@@ -127,7 +127,9 @@ export default function NewRegister() {
           <Button
             onClick={handleContinue}
             disabled={!isValid}
-            className={`px-14 py-6 transition-opacity duration-300 ${isValid ? "opacity-100" : "opacity-50"}`}
+            className={`px-8 py-6 transition-opacity duration-300 ${isValid ? "opacity-100" : "opacity-50"} ${
+              isValid ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-300 text-white cursor-not-allowed"
+            }`}
           >
             Siguiente
           </Button>

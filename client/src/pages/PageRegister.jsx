@@ -36,14 +36,14 @@ const RegistroPagina = () => {
           <div key={index} className={esEscritorio ? "flex items-center" : "mb-4"}>
             <div
               className={`
-              ${esEscritorio ? "flex items-center" : "p-4 border rounded shadow-md"}
+              ${esEscritorio ? "flex items-center" : "p-4 border rounded shadow-lg"}
               transition-all duration-300 ease-in-out
             `}
             >
               <h3
                 className={`
                 ${esEscritorio ? "text-base" : "text-2xl font-medium"}
-                ${index === pasoActual ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-500 text-lg"}
+                ${index === pasoActual ? "text-blue-600 dark:text-blue-400 font-black" : "text-gray-600 dark:text-gray-500 text-lg font-extralight"}
               `}
               >
                 {paso.label}

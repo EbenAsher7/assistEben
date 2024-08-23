@@ -329,6 +329,7 @@ const MainProvider = ({ children }) => {
   const [telefonoNEW, setTelefonoNEW] = useState("");
   const [direccionNEW, setDireccionNEW] = useState("");
   const [cursoSeleccionadoNEW, setCursoSeleccionadoNEW] = useState(null);
+  const [currentStep, setCurrentStep] = useState(0);
 
   // RETURN
   return (
@@ -361,6 +362,8 @@ const MainProvider = ({ children }) => {
         setDireccionNEW,
         cursoSeleccionadoNEW,
         setCursoSeleccionadoNEW,
+        currentStep,
+        setCurrentStep,
       }}
     >
       {children}

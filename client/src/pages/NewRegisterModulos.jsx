@@ -52,20 +52,28 @@ const NewRegisterModulos = () => {
 
   // Función para formatear las fechas en dd/MM/yyyy y añadir un día al final
   const formatDate = (dateString, isEndDate = false) => {
-    const date = new Date(dateString);
-    if (isEndDate) {
-      return format(addDays(date, 1), "dd/MM/yyyy");
+    try {
+      const date = new Date(dateString);
+      if (isEndDate) {
+        return format(addDays(date, 1), "dd/MM/yyyy");
+      }
+      return format(date, "dd/MM/yyyy");
+    } catch (error) {
+      return "Fecha Inválida";
     }
-    return format(date, "dd/MM/yyyy");
   };
 
   // Función para formatear el tiempo en formato 12h (AM/PM)
   const formatTime12h = (timeString) => {
-    const [hours, minutes] = timeString.split(":");
-    const date = new Date();
-    date.setHours(parseInt(hours, 10));
-    date.setMinutes(parseInt(minutes, 10));
-    return format(date, "hh:mm a");
+    try {
+      const [hours, minutes] = timeString.split(":");
+      const date = new Date();
+      date.setHours(parseInt(hours, 10));
+      date.setMinutes(parseInt(minutes, 10));
+      return format(date, "hh:mm a");
+    } catch (error) {
+      return "Hora Inválida";
+    }
   };
 
   return (

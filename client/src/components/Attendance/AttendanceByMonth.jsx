@@ -165,13 +165,13 @@ export function AttendanceByMonth({ value }) {
             <h2 className="text-lg font-extrabold text-center sm:text-left">Seleccione un año</h2>
             <DropdownAE data={years} title="Seleccione" setValueAE={setSelectedYear} />
           </div>
-          {cursos.length > 0 && (
+          {cursos?.length > 0 && (
             <div className="min-w-[250px]">
               <h2 className="text-lg font-extrabold text-center sm:text-left">Seleccione un curso</h2>
               <DropdownAE data={cursos} title="Seleccione" setValueAE={setSelectedCurso} />
             </div>
           )}
-          {cursos.length > 0 && (
+          {cursos?.length > 0 && (
             <div className="min-w-[250px]">
               <h2 className="text-lg font-extrabold text-center sm:text-left">Seleccione el día del curso</h2>
               <DropdownAE data={dias} title="Seleccione" setValueAE={setSelectedDay} />
@@ -186,16 +186,16 @@ export function AttendanceByMonth({ value }) {
               </Button>
             </div>
           )}
-          {cursos.length > 0 && (
+          {cursos?.length > 0 && (
             <div className={`hidden sm:inline-flex ${selectedDay ? "min-w-[340px]" : ""}`}>
               <h2 className={`text-lg font-extrabold text-center sm:text-left ${selectedDay ? "min-w-[340px]" : ""}`}>&nbsp;</h2>
             </div>
           )}
           <br />
           <br />
-          {allData.length > 0 && <RadarByMonth attendedStudents={attendedStudents} notAttendedStudents={notAttendedStudents} />}
+          {allData?.length > 0 && <RadarByMonth attendedStudents={attendedStudents} notAttendedStudents={notAttendedStudents} />}
           {/* Tabla para mostrar asistencias e inasistencias */}
-          {allData.length > 0 && (
+          {allData?.length > 0 && (
             <Table className="w-full sm:w-8/12 m-auto">
               <TableHeader className="border-2">
                 <TableRow>

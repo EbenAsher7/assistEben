@@ -22,7 +22,7 @@ export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable
   }
 
   // Deshabilitar el dropdown si no hay datos
-  const isDisabled = disable || data.length === 0;
+  const isDisabled = disable || data?.length === 0 || data === undefined;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -41,7 +41,7 @@ export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable
       <PopoverContent className="w-[60vw] m-auto sm:w-[330px] sm:max-w-[400px] sm:min-w-[150px] p-0">
         <Command>
           <CommandList>
-            {data.length === 0 ? (
+            {data?.length === 0 || data === undefined ? (
               <CommandEmpty>No se pudo cargar datos.</CommandEmpty>
             ) : (
               <CommandGroup>
@@ -68,7 +68,7 @@ export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable
 }
 
 DropdownAE.propTypes = {
-  data: PropTypes.array.isRequired,
+  data: PropTypes.array,
   title: PropTypes.string.isRequired,
   setValueAE: PropTypes.func.isRequired,
   defaultValue: PropTypes.string,

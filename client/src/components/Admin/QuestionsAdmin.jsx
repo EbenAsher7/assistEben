@@ -2,10 +2,11 @@ import { useState, useEffect, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
-import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
 import { Menu } from "lucide-react";
 import MainContext from "@/context/MainContext";
+import { URL_BASE } from "@/config/config";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 export default function QuestionsAdmin() {
   const [questions, setQuestions] = useState([]);
@@ -15,12 +16,53 @@ export default function QuestionsAdmin() {
   const [selectedDate, setSelectedDate] = useState(undefined);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { user } = useContext(MainContext);
 
+  const obtenerFechaFormateada = (fecha) => {
+    const hoy = fecha ?? new Date();
+    const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    const nombreDia = diasSemana[hoy.getDay()];
+    const dia = hoy.getDate().toString().padStart(2, "0");
+    const mes = (hoy.getMonth() + 1).toString().padStart(2, "0");
+    const anio = hoy.getFullYear();
+    return `${nombreDia} ${dia}/${mes}/${anio}`;
+  };
+
+  const cargarPreguntas = async (fecha = new Date()) => {
+    setIsLoading(true); // Inicia el loader
+    try {
+      const dateISO = fecha.toISOString().split("T")[0];
+      const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${dateISO}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user?.token,
+        },
+      });
+
+      const data = await response.json();
+      if (data.length === 0) {
+        setQuestions([]);
+        setCurrentQuestion(null);
+      } else {
+        setQuestions(data);
+        setCurrentQuestion(data[0]);
+      }
+      setAnsweredQuestions([]);
+    } catch (error) {
+      console.error("Error al cargar las preguntas:", error);
+      setQuestions([]);
+      setCurrentQuestion(null);
+    } finally {
+      setIsLoading(false); // Termina el loader
+    }
+  };
+
   useEffect(() => {
     if (user && user?.tipo === "Administrador") {
-      listaNormal();
+      cargarPreguntas();
     }
   }, [user]);
 
@@ -31,32 +73,6 @@ export default function QuestionsAdmin() {
       </div>
     );
   }
-
-  // Función para obtener la lista normal de preguntas
-  const listaNormal = async () => {
-    try {
-      const response = await fetch("/api/questions/normal");
-      const data = await response.json();
-      setQuestions(data);
-      setCurrentQuestion(data[0] || null);
-      setAnsweredQuestions([]);
-    } catch (error) {
-      console.error("Error al cargar las preguntas normales:", error);
-    }
-  };
-
-  // Función para obtener la lista de preguntas por fecha
-  const listaConFecha = async (date) => {
-    try {
-      const response = await fetch(`/api/questions?date=${date.toISOString()}`); // Cambia la URL a tu endpoint real
-      const data = await response.json();
-      setQuestions(data);
-      setCurrentQuestion(data[0] || null);
-      setAnsweredQuestions([]);
-    } catch (error) {
-      console.error("Error al cargar las preguntas por fecha:", error);
-    }
-  };
 
   const handleQuestionClick = (question) => {
     if (!answeredQuestions.includes(question.id)) {
@@ -92,112 +108,136 @@ export default function QuestionsAdmin() {
 
   const handleCheckboxChange = (checked) => {
     if (!checked && showDatePicker) {
-      // Si se desmarca el checkbox después de una búsqueda por fecha
       const confirmReplace = window.confirm("¿Quieres reemplazar las preguntas con la lista normal?");
       if (confirmReplace) {
-        listaNormal(); // Reemplazar con la lista normal
+        cargarPreguntas();
       }
     }
     setShowDatePicker(checked);
-    setIsDateDrawerOpen(checked); // Abrir o cerrar el Drawer basado en el checkbox
+    setIsDateDrawerOpen(checked);
   };
 
   const handleLoadQuestions = () => {
     if (selectedDate) {
-      listaConFecha(selectedDate); // Llamar a listaConFecha con la fecha seleccionada
+      cargarPreguntas(selectedDate);
       setIsDateDrawerOpen(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-4 flex flex-col items-center">
-      <div className="mb-4 flex items-center">
-        <Checkbox id="datePicker" checked={showDatePicker} onCheckedChange={handleCheckboxChange} />
-        <label htmlFor="datePicker" className="ml-2">
-          Seleccionar Fecha
-        </label>
-      </div>
-
-      <div className="flex flex-col md:flex-row gap-4 w-full max-w-screen-lg">
-        <Card className="flex-grow">
-          <CardHeader>
-            <CardTitle>La pregunta dice:</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {currentQuestion ? <p>{currentQuestion.text}</p> : <p className="text-muted-foreground">Esas fueron todas las preguntas del día de hoy</p>}
-            <div className="mt-4 space-y-2">
-              <Button onClick={handleRandomQuestion} disabled={answeredQuestions.length === questions.length}>
-                Aleatorio
-              </Button>
-              <Button onClick={handleAnsweredQuestion} disabled={!currentQuestion}>
-                Pregunta respondida
-              </Button>
+    <div className="container h-screen -mt-16 sm:mt-32 mx-auto p-4 flex flex-col items-center justify-center sm:justify-start">
+      {isLoading ? (
+        <div className="flex items-center justify-center">
+          <p>Cargando preguntas...</p>
+        </div>
+      ) : (
+        <div className="flex flex-row">
+          <div className="flex flex-col">
+            <div className="sm:hidden w-full justify-start my-4">
+              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerTrigger asChild>
+                  <Button variant="outline">
+                    <Menu className="h-4 w-4" /> Ver lista de preguntas
+                  </Button>
+                </DrawerTrigger>
+                <DrawerContent className="max-h-[500px]">
+                  <DialogTitle className="text-xl text-center font-extrabold text-black dark:text-white">Preguntas disponibles</DialogTitle>
+                  <div className="py-4 overflow-y-scroll text-left">
+                    {questions.length > 0 ? (
+                      <ul className="space-y-2">
+                        {questions.map((question) => (
+                          <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80 dark:text-white dark:odd:bg-[#202020]">
+                            <Button
+                              variant="ghost"
+                              className={`w-full text-wrap text-left py-6 text-[1rem] ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
+                              onClick={() => handleQuestionClick(question)}
+                              disabled={answeredQuestions.includes(question.id)}
+                            >
+                              {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
+                            </Button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground text-center">No hay preguntas para mostrar</p>
+                    )}
+                  </div>
+                </DrawerContent>
+              </Drawer>
             </div>
-          </CardContent>
-        </Card>
-
-        <div className="hidden md:block">
-          <Card>
-            <CardHeader>
-              <CardTitle>Preguntas disponibles</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul>
-                {questions.map((question) => (
-                  <li key={question.id}>
-                    <Button
-                      variant="ghost"
-                      className={`w-full text-left ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
-                      onClick={() => handleQuestionClick(question)}
-                      disabled={answeredQuestions.includes(question.id)}
-                    >
-                      {question.text}
+            <div className="mb-4 flex items-center">
+              <Checkbox id="datePicker" checked={showDatePicker} onCheckedChange={handleCheckboxChange} />
+              <label htmlFor="datePicker" className="ml-2">
+                Seleccionar Fecha
+              </label>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-center mb-6">Preguntas del día: {obtenerFechaFormateada(selectedDate)} </h1>
+            <div className="flex flex-col sm:flex-row gap-4 w-full">
+              <Card className="w-full sm:min-w-[800px] sm:max-w-[950px]">
+                <CardHeader>
+                  <CardTitle>La pregunta dice:</CardTitle>
+                </CardHeader>
+                <CardContent className="w-full">
+                  {currentQuestion ? (
+                    <p className="text-lg text-left p-2 sm:text-2xl">{currentQuestion.pregunta}</p>
+                  ) : (
+                    <p className="text-muted-foreground">No hay preguntas para mostrar</p>
+                  )}
+                  <div className="mt-4 space-y-2">
+                    <Button onClick={handleRandomQuestion} disabled={answeredQuestions.length === questions.length}>
+                      Aleatorio
                     </Button>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        </div>
+                    <Button onClick={handleAnsweredQuestion} disabled={!currentQuestion}>
+                      Pregunta respondida
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
 
-        <div className="sm:hidden">
-          <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-            <DrawerTrigger asChild>
-              <Button variant="outline" className="mt-24">
-                <Menu className="h-4 w-4" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="max-h-[500px]">
-              <h2 className="text-xl text-center font-extrabold">Preguntas disponibles</h2>
-              <div className="py-4 overflow-y-scroll">
-                <ul className="space-y-2">
-                  {questions.map((question) => (
-                    <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80">
-                      <Button
-                        variant="ghost"
-                        className={`w-full text-wrap text-left py-6 text-[1rem] ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
-                        onClick={() => handleQuestionClick(question)}
-                        disabled={answeredQuestions.includes(question.id)}
-                      >
-                        {question?.text.length > 40 ? `${question.text.slice(0, 40)}...` : question.text}
-                      </Button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </DrawerContent>
-          </Drawer>
+          <div className="hidden sm:block ">
+            <Card className="sm:min-w-[200px] sm:max-w-[350px]">
+              <CardHeader>
+                <CardTitle>Preguntas disponibles</CardTitle>
+              </CardHeader>
+              <CardContent className="w-full text-left justify-start max-h-[450px] overflow-y-scroll">
+                {questions.length > 0 ? (
+                  <ul className="space-y-2">
+                    {questions.map((question) => (
+                      <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80 dark:odd:bg-[#1a1a1a] dark:odd:text-white text-left justify-start">
+                        <button
+                          className={`w-full text-left text-wrap text-black dark:text-white hover:bg-slate-300 dark:hover:bg-slate-400 rounded-md py-3 px-2 ${
+                            answeredQuestions.includes(question.id) ? "line-through" : ""
+                          }`}
+                          onClick={() => handleQuestionClick(question)}
+                          disabled={answeredQuestions.includes(question.id)}
+                        >
+                          {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-muted-foreground">No hay preguntas para mostrar</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
+      )}
 
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
-        <DrawerContent className="p-4">
-          <h2 className="text-xl font-bold">Seleccionar Fecha</h2>
-          <div className="mt-4">
-            <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border" />
-            <Button onClick={handleLoadQuestions} className="mt-4">
-              Cargar preguntas
-            </Button>
+        <DrawerContent>
+          <DrawerTitle className="text-xl text-center font-extrabold">Seleccionar Fecha</DrawerTitle>
+          <input
+            type="date"
+            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+            className="border p-2 w-full"
+          />
+          <div className="flex justify-end mt-4">
+            <Button onClick={handleLoadQuestions}>Cargar preguntas</Button>
           </div>
         </DrawerContent>
       </Drawer>

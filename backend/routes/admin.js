@@ -311,4 +311,36 @@ router.get('/preguntasTipoAsistencia', async (req, res) => {
   }
 })
 
+// Obtener lista de preguntas por día
+router.get('/preguntasAnonimas/:day', async (req, res) => {
+  // si no viene día, ejeecutar la consulta para el día actual
+  const { day } = req.params
+
+  const date = day ?? new Date().toISOString().split('T')[0]
+
+  try {
+    // Consulta para obtener todos los módulos con sus respectivos tutores, excluyendo el tutor con el ID dado
+    const result = await turso.execute({
+      sql: 'SELECT id, pregunta from Preguntas WHERE fecha = ?',
+      args: [date]
+    })
+
+    // Transformar los datos en el formato deseado
+    const columns = result.columns
+    const rows = result.rows
+
+    const modules = rows.map((row) => {
+      const module = {}
+      columns.forEach((col, index) => {
+        module[col] = row[index]
+      })
+      return module
+    })
+
+    res.status(200).json(modules)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

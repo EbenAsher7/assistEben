@@ -10,6 +10,8 @@ export default function QuestionUser() {
   const { toast } = useToast();
   const { user } = useContext(MainContext);
   const [puedePreguntar, setPuedePreguntar] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     // Si el usuario está autenticado, siempre puede preguntar
@@ -46,6 +48,8 @@ export default function QuestionUser() {
     e.preventDefault();
     if (pregunta.trim()) {
       if (puedePreguntar) {
+        setIsLoading(true);
+        setHasError(false);
         try {
           const response = await fetch(`${URL_BASE}/api/user/preguntas/nueva`, {
             method: "POST",
@@ -56,21 +60,23 @@ export default function QuestionUser() {
               pregunta,
             }),
           });
+
+          if (!response.ok) {
+            throw new Error("Falló al registrar la pregunta");
+          }
+
           toast({
             variant: "success",
             title: "Pregunta enviada",
             description: "Tu pregunta ha sido enviada con éxito.",
             duration: 2500,
           });
+
           setPregunta("");
           if (!user) {
             const hoy = new Date();
             localStorage.setItem("ultimaPregunta", hoy.toISOString());
             setPuedePreguntar(false);
-          }
-
-          if (!response.ok) {
-            throw new Error("Falló al registrar la pregunta");
           }
         } catch (error) {
           toast({
@@ -79,6 +85,9 @@ export default function QuestionUser() {
             variant: "destructive",
             duration: 2500,
           });
+          setHasError(true);
+        } finally {
+          setIsLoading(false);
         }
       } else {
         toast({
@@ -111,11 +120,13 @@ export default function QuestionUser() {
               value={pregunta}
               onChange={(e) => setPregunta(e.target.value)}
               className="min-h-[100px] bg-background text-foreground border-input"
-              disabled={!puedePreguntar}
+              disabled={!puedePreguntar || isLoading}
             />
-            <Button type="submit" className="w-full" disabled={!puedePreguntar}>
-              {puedePreguntar ? "Mandar pregunta" : "Ya has mandado una pregunta hoy"}
+            <Button type="submit" className="w-full" disabled={!puedePreguntar || isLoading}>
+              {isLoading ? "Enviando..." : puedePreguntar ? "Mandar pregunta" : "Ya has mandado una pregunta hoy"}
             </Button>
+            {isLoading && <p className="text-center mt-2">Cargando...</p>}
+            {hasError && !isLoading && <p className="text-center mt-2 text-red-500">Hubo un error. Intenta de nuevo.</p>}
           </form>
         </div>
       </div>

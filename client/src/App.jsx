@@ -11,6 +11,7 @@ import RegisterAttendance from "./pages/RegisterAttendance";
 import Administration from "./pages/Administration";
 import PageRegister from "./pages/PageRegister";
 import QuestionUser from "./components/Preguntas/QuestionUser";
+import QuestionsAdmin from "./components/Admin/QuestionsAdmin";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/newRegister" element={<PageRegister />} />
         <Route path="/admin" element={<Administration />} />
         <Route path="/questions" element={<QuestionUser />} />
+        <Route path="/adminquestions" element={<QuestionsAdmin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

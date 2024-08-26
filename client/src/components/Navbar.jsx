@@ -50,6 +50,13 @@ const Navbar = memo(() => {
             {user.tipo === "Administrador" && (
               <li className="text-black dark:text-white flex justify-center items-center">
                 <Link
+                  to="/adminquestions"
+                  className="bg-pink-500 text-white dark:bg-pink-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md border-[1px] border-pink-300 dark:border-pink-800"
+                  onClick={closeNavbar}
+                >
+                  Preguntas
+                </Link>
+                <Link
                   to="/admin"
                   className="bg-purple-500 text-white dark:bg-purple-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md border-[1px] border-purple-300 dark:border-purple-800"
                   onClick={closeNavbar}

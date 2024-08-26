@@ -133,7 +133,7 @@ export default function QuestionsAdmin() {
       ) : (
         <div className="flex flex-row">
           {/* ################### PARTE PRINCIPAL ################### */}
-          <div className="flex flex-col">
+          <div className="flex flex-col mt-32 sm:mt-0">
             {/* ################### DRAWER MOBILE DE PREGUNTAS ################### */}
             <div className="sm:hidden w-full justify-start my-4">
               <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
@@ -179,20 +179,36 @@ export default function QuestionsAdmin() {
             <div className="flex flex-col sm:flex-row gap-4 w-full">
               <Card className="w-full sm:min-w-[800px] sm:max-w-[950px]">
                 <CardHeader>
-                  <CardTitle>La pregunta dice:</CardTitle>
+                  <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
                 </CardHeader>
                 <CardContent className="w-full">
                   {currentQuestion ? (
-                    <p className="text-lg text-left p-2 sm:text-4xl">{currentQuestion.pregunta}</p>
+                    <p className="text-lg text-left p-2 sm:text-4xl mb-12">{currentQuestion.pregunta}</p>
                   ) : (
                     <p className="text-muted-foreground">No hay preguntas para mostrar</p>
                   )}
-                  <div className="mt-4 space-y-2">
-                    <Button onClick={handleRandomQuestion} disabled={answeredQuestions.length === questions.length}>
+                  <div className="flex mt-4 gap-4 items-center justify-center mb-6">
+                    <Button
+                      className="gap-2 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
+                      onClick={handleRandomQuestion}
+                      disabled={answeredQuestions.length === questions.length}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.833 12a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm-7 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm3.5 -3.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm-3.5 -3.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm7 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3z" />
+                      </svg>
                       Aleatorio
                     </Button>
-                    <Button onClick={handleAnsweredQuestion} disabled={!currentQuestion}>
-                      Pregunta respondida
+                    <Button
+                      className="gap-1 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
+                      onClick={handleAnsweredQuestion}
+                      disabled={!currentQuestion}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.626 7.293a1 1 0 0 0 -1.414 0l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l2 2l.094 .083a1 1 0 0 0 1.32 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
+                      </svg>
+                      Marcar como<span className="hidden sm:inline-flex">pregunta</span> respondida
                     </Button>
                   </div>
                 </CardContent>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { Menu } from "lucide-react";
+import MainContext from "@/context/MainContext";
 
 export default function QuestionsAdmin() {
   const [questions, setQuestions] = useState([]);
@@ -14,6 +15,22 @@ export default function QuestionsAdmin() {
   const [selectedDate, setSelectedDate] = useState(undefined);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
+
+  const { user } = useContext(MainContext);
+
+  useEffect(() => {
+    if (user && user?.tipo === "Administrador") {
+      listaNormal();
+    }
+  }, [user]);
+
+  if (!user || user.tipo !== "Administrador") {
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-2xl font-bold text-center">No tienes permiso para ver esta página</h1>
+      </div>
+    );
+  }
 
   // Función para obtener la lista normal de preguntas
   const listaNormal = async () => {
@@ -40,10 +57,6 @@ export default function QuestionsAdmin() {
       console.error("Error al cargar las preguntas por fecha:", error);
     }
   };
-
-  useEffect(() => {
-    listaNormal(); // Cargar la lista normal de preguntas al inicio
-  }, []);
 
   const handleQuestionClick = (question) => {
     if (!answeredQuestions.includes(question.id)) {

@@ -274,7 +274,7 @@ router.post('/user/registerAlumno', async (req, res) => {
 })
 
 // Registrar nueva pregunta
-router.post('/preguntas/nueva', async (req, res) => {
+router.post('/user/preguntas/nueva', async (req, res) => {
   try {
     const { pregunta } = req.body
 
@@ -286,7 +286,7 @@ router.post('/preguntas/nueva', async (req, res) => {
     // Insertar la nueva pregunta en la tabla Preguntas
     const resultado = await turso.execute({
       sql: `INSERT INTO Preguntas (pregunta, fecha)
-            VALUES (?, NOW())`,
+            VALUES (?, date('now'))`,
       args: [pregunta]
     })
 

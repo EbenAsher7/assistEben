@@ -13,16 +13,36 @@ export default function QuestionsAdmin() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(undefined);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
+
+  // Función para obtener la lista normal de preguntas
+  const listaNormal = async () => {
+    try {
+      const response = await fetch("/api/questions/normal");
+      const data = await response.json();
+      setQuestions(data);
+      setCurrentQuestion(data[0] || null);
+      setAnsweredQuestions([]);
+    } catch (error) {
+      console.error("Error al cargar las preguntas normales:", error);
+    }
+  };
+
+  // Función para obtener la lista de preguntas por fecha
+  const listaConFecha = async (date) => {
+    try {
+      const response = await fetch(`/api/questions?date=${date.toISOString()}`); // Cambia la URL a tu endpoint real
+      const data = await response.json();
+      setQuestions(data);
+      setCurrentQuestion(data[0] || null);
+      setAnsweredQuestions([]);
+    } catch (error) {
+      console.error("Error al cargar las preguntas por fecha:", error);
+    }
+  };
 
   useEffect(() => {
-    // Cargar preguntas iniciales (puedes reemplazar esto con tu lógica real)
-    const initialQuestions = [
-      { id: 1, text: "¿Cuál es tu color favorito?" },
-      { id: 2, text: "¿Cuál es tu comida favorita?" },
-      { id: 3, text: "¿Cuál es tu película favorita?" },
-    ];
-    setQuestions(initialQuestions);
-    setCurrentQuestion(initialQuestions[0]);
+    listaNormal(); // Cargar la lista normal de preguntas al inicio
   }, []);
 
   const handleQuestionClick = (question) => {
@@ -47,49 +67,45 @@ export default function QuestionsAdmin() {
       const newAnsweredQuestions = [...answeredQuestions, currentQuestion.id];
       setAnsweredQuestions(newAnsweredQuestions);
 
-      const remainingQuestions = questions.filter((q) => !newAnsweredQuestions.includes(q.id));
-      if (remainingQuestions.length > 0) {
-        setCurrentQuestion(remainingQuestions[0]);
+      const unansweredQuestions = questions.filter((q) => !newAnsweredQuestions.includes(q.id));
+      if (unansweredQuestions.length > 0) {
+        const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
+        setCurrentQuestion(unansweredQuestions[randomIndex]);
       } else {
         setCurrentQuestion(null);
       }
     }
   };
 
-  const handleLoadQuestions = async () => {
-    if (selectedDate) {
-      // Aquí iría tu lógica real para cargar preguntas basadas en la fecha
-      try {
-        const response = await fetch(`/api/questions?date=${selectedDate.toISOString()}`);
-        const newQuestions = await response.json();
-        setQuestions(newQuestions);
-        setCurrentQuestion(newQuestions[0] || null);
-        setAnsweredQuestions([]);
-      } catch (error) {
-        console.error("Error al cargar las preguntas:", error);
+  const handleCheckboxChange = (checked) => {
+    if (!checked && showDatePicker) {
+      // Si se desmarca el checkbox después de una búsqueda por fecha
+      const confirmReplace = window.confirm("¿Quieres reemplazar las preguntas con la lista normal?");
+      if (confirmReplace) {
+        listaNormal(); // Reemplazar con la lista normal
       }
+    }
+    setShowDatePicker(checked);
+    setIsDateDrawerOpen(checked); // Abrir o cerrar el Drawer basado en el checkbox
+  };
+
+  const handleLoadQuestions = () => {
+    if (selectedDate) {
+      listaConFecha(selectedDate); // Llamar a listaConFecha con la fecha seleccionada
+      setIsDateDrawerOpen(false);
     }
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 flex flex-col items-center">
       <div className="mb-4 flex items-center">
-        <Checkbox id="datePicker" checked={showDatePicker} onCheckedChange={(checked) => setShowDatePicker(checked)} />
+        <Checkbox id="datePicker" checked={showDatePicker} onCheckedChange={handleCheckboxChange} />
         <label htmlFor="datePicker" className="ml-2">
           Seleccionar Fecha
         </label>
       </div>
 
-      {showDatePicker && (
-        <div className="mb-4">
-          <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border" />
-          <Button onClick={handleLoadQuestions} className="mt-2">
-            Cargar preguntas
-          </Button>
-        </div>
-      )}
-
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex flex-col md:flex-row gap-4 w-full max-w-screen-lg">
         <Card className="flex-grow">
           <CardHeader>
             <CardTitle>La pregunta dice:</CardTitle>
@@ -113,7 +129,7 @@ export default function QuestionsAdmin() {
               <CardTitle>Preguntas disponibles</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul className="space-y-2">
+              <ul>
                 {questions.map((question) => (
                   <li key={question.id}>
                     <Button
@@ -131,26 +147,26 @@ export default function QuestionsAdmin() {
           </Card>
         </div>
 
-        <div className="md:hidden">
+        <div className="sm:hidden">
           <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
             <DrawerTrigger asChild>
-              <Button variant="outline">
+              <Button variant="outline" className="mt-24">
                 <Menu className="h-4 w-4" />
               </Button>
             </DrawerTrigger>
-            <DrawerContent>
-              <div className="p-4">
-                <h2 className="text-lg font-semibold mb-4">Preguntas disponibles</h2>
+            <DrawerContent className="max-h-[500px]">
+              <h2 className="text-xl text-center font-extrabold">Preguntas disponibles</h2>
+              <div className="py-4 overflow-y-scroll">
                 <ul className="space-y-2">
                   {questions.map((question) => (
-                    <li key={question.id}>
+                    <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80">
                       <Button
                         variant="ghost"
-                        className={`w-full text-left ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
+                        className={`w-full text-wrap text-left py-6 text-[1rem] ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
                         onClick={() => handleQuestionClick(question)}
                         disabled={answeredQuestions.includes(question.id)}
                       >
-                        {question.text}
+                        {question?.text.length > 40 ? `${question.text.slice(0, 40)}...` : question.text}
                       </Button>
                     </li>
                   ))}
@@ -160,6 +176,18 @@ export default function QuestionsAdmin() {
           </Drawer>
         </div>
       </div>
+
+      <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
+        <DrawerContent className="p-4">
+          <h2 className="text-xl font-bold">Seleccionar Fecha</h2>
+          <div className="mt-4">
+            <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border" />
+            <Button onClick={handleLoadQuestions} className="mt-4">
+              Cargar preguntas
+            </Button>
+          </div>
+        </DrawerContent>
+      </Drawer>
     </div>
   );
 }

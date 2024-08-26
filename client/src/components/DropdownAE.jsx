@@ -21,6 +21,9 @@ export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable
     return <Input value={defaultValue} disabled className="w-full m-auto sm:w-[330px] sm:max-w-[400px] text-black dark:text-white" />;
   }
 
+  // Deshabilitar el dropdown si no hay datos
+  const isDisabled = disable || data.length === 0;
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -28,8 +31,8 @@ export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          disabled={disable}
-          className={cn("w-full m-auto sm:w-[330px] sm:max-w-[400px] sm:min-w-[150px] justify-between", disable && "cursor-not-allowed opacity-50")}
+          disabled={isDisabled}
+          className={cn("w-full m-auto sm:w-[330px] sm:max-w-[400px] sm:min-w-[150px] justify-between", isDisabled && "cursor-not-allowed opacity-50")}
         >
           {value ? data.find((item) => item.value === value)?.label : title}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -38,22 +41,25 @@ export function DropdownAE({ data, title, setValueAE, defaultValue = "", disable
       <PopoverContent className="w-[60vw] m-auto sm:w-[330px] sm:max-w-[400px] sm:min-w-[150px] p-0">
         <Command>
           <CommandList>
-            <CommandEmpty>No se encontró ninguna coincidencia.</CommandEmpty>
-            <CommandGroup>
-              {data.map((item) => (
-                <CommandItem
-                  key={item.value}
-                  value={item.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue);
-                    setOpen(false);
-                  }}
-                >
-                  <Check className={cn("mr-2 h-4 w-4", value === item.value ? "opacity-100" : "opacity-0")} />
-                  {item.label}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {data.length === 0 ? (
+              <CommandEmpty>No se pudo cargar datos.</CommandEmpty>
+            ) : (
+              <CommandGroup>
+                {data.map((item) => (
+                  <CommandItem
+                    key={item.value}
+                    value={item.value}
+                    onSelect={(currentValue) => {
+                      setValue(currentValue === value ? "" : currentValue);
+                      setOpen(false);
+                    }}
+                  >
+                    <Check className={cn("mr-2 h-4 w-4", value === item.value ? "opacity-100" : "opacity-0")} />
+                    {item.label}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>

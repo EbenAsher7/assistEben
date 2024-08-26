@@ -10,6 +10,7 @@ import RegisterAttendance from "./pages/RegisterAttendance";
 // import NewRegister from "./pages/NewRegister";
 import Administration from "./pages/Administration";
 import PageRegister from "./pages/PageRegister";
+import QuestionUser from "./components/Preguntas/QuestionUser";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
         <Route path="/registerAttendance" element={<RegisterAttendance />} />
         <Route path="/newRegister" element={<PageRegister />} />
         <Route path="/admin" element={<Administration />} />
+        <Route path="/questions" element={<QuestionUser />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </div>

@@ -125,7 +125,7 @@ export default function QuestionsAdmin() {
   };
 
   return (
-    <div className="container h-screen -mt-16 sm:mt-32 mx-auto p-4 flex flex-col items-center justify-center sm:justify-start">
+    <div className="container -mt-16 sm:mt-32 mx-auto p-4 flex flex-col items-center justify-center sm:justify-start">
       {isLoading ? (
         <div className="flex items-center justify-center">
           <p>Cargando preguntas...</p>
@@ -183,7 +183,7 @@ export default function QuestionsAdmin() {
                 </CardHeader>
                 <CardContent className="w-full">
                   {currentQuestion ? (
-                    <p className="text-lg text-left p-2 sm:text-2xl">{currentQuestion.pregunta}</p>
+                    <p className="text-lg text-left p-2 sm:text-4xl">{currentQuestion.pregunta}</p>
                   ) : (
                     <p className="text-muted-foreground">No hay preguntas para mostrar</p>
                   )}
@@ -233,8 +233,8 @@ export default function QuestionsAdmin() {
 
       {/* ################### SELECCIONAR FECHA ################### */}
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
-        <DrawerContent>
-          <DrawerTitle className="text-xl text-center font-extrabold">Seleccionar Fecha</DrawerTitle>
+        <DrawerContent className="w-full sm:w-[300px] sm:h-screen px-4 ">
+          <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-10">Seleccionar Fecha</DrawerTitle>
           <input
             type="date"
             value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}

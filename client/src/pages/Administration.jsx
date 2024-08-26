@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import MainContext from "@/context/MainContext";
 import { useNavigate } from "react-router-dom";
 import AdminNavBar from "@/components/Admin/AdminNavBar";
+import ProtectedRoute from "./ProtectedRoute";
 
 const Administration = () => {
   const { user } = useContext(MainContext);
@@ -11,7 +12,7 @@ const Administration = () => {
 
   useEffect(() => {
     if (user) {
-      if (!user.tipo || user.tipo !== "Administrador") {
+      if (user.tipo !== "Administrador") {
         setAccessDenied(true);
         const intervalId = setInterval(() => {
           setCountdown((prevCountdown) => {
@@ -37,7 +38,9 @@ const Administration = () => {
 
   return (
     <>
-      <AdminNavBar />
+      <ProtectedRoute>
+        <AdminNavBar />
+      </ProtectedRoute>
     </>
   );
 };

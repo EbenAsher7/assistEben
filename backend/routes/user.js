@@ -273,4 +273,31 @@ router.post('/user/registerAlumno', async (req, res) => {
   }
 })
 
+// Registrar nueva pregunta
+router.post('/preguntas/nueva', async (req, res) => {
+  try {
+    const { pregunta } = req.body
+
+    // Verificar que la pregunta esté presente
+    if (!pregunta) {
+      return res.status(400).json({ error: 'La pregunta es requerida' })
+    }
+
+    // Insertar la nueva pregunta en la tabla Preguntas
+    const resultado = await turso.execute({
+      sql: `INSERT INTO Preguntas (pregunta, fecha)
+            VALUES (?, NOW())`,
+      args: [pregunta]
+    })
+
+    if (resultado.affectedRows === 0) {
+      return res.status(500).json({ error: 'No se pudo registrar la pregunta' })
+    }
+
+    res.json({ success: 'Pregunta registrada correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 export default router

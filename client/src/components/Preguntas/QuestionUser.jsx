@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import MainContext from "@/context/MainContext";
+import { URL_BASE } from "@/config/config";
 
 export default function QuestionUser() {
   const [pregunta, setPregunta] = useState("");
@@ -41,22 +42,43 @@ export default function QuestionUser() {
     return `${nombreDia} ${dia}/${mes}/${anio}`;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (pregunta.trim()) {
       if (puedePreguntar) {
-        console.log("Pregunta enviada:", pregunta);
-        toast({
-          variant: "success",
-          title: "Pregunta enviada",
-          description: "Tu pregunta ha sido enviada con éxito.",
-          duration: 2500,
-        });
-        setPregunta("");
-        if (!user) {
-          const hoy = new Date();
-          localStorage.setItem("ultimaPregunta", hoy.toISOString());
-          setPuedePreguntar(false);
+        try {
+          const response = await fetch(`${URL_BASE}/api/user/preguntas/nueva`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              pregunta,
+            }),
+          });
+          toast({
+            variant: "success",
+            title: "Pregunta enviada",
+            description: "Tu pregunta ha sido enviada con éxito.",
+            duration: 2500,
+          });
+          setPregunta("");
+          if (!user) {
+            const hoy = new Date();
+            localStorage.setItem("ultimaPregunta", hoy.toISOString());
+            setPuedePreguntar(false);
+          }
+
+          if (!response.ok) {
+            throw new Error("Falló al registrar la pregunta");
+          }
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Falló al registrar la pregunta.",
+            variant: "destructive",
+            duration: 2500,
+          });
         }
       } else {
         toast({

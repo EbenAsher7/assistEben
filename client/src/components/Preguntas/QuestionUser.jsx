@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
+import LoaderAE from "../LoaderAE";
 
 export default function QuestionUser() {
   const [pregunta, setPregunta] = useState("");
@@ -119,13 +120,19 @@ export default function QuestionUser() {
               placeholder={puedePreguntar ? "Escribe tu pregunta aquí..." : "Ya has mandado una pregunta hoy"}
               value={pregunta}
               onChange={(e) => setPregunta(e.target.value)}
-              className="min-h-[100px] bg-background text-foreground border-input"
+              className="min-h-[140px] bg-background text-foreground border-input"
               disabled={!puedePreguntar || isLoading}
+              style={{ resize: "none" }}
+              maxLength={200}
             />
             <Button type="submit" className="w-full" disabled={!puedePreguntar || isLoading}>
               {isLoading ? "Enviando..." : puedePreguntar ? "Mandar pregunta" : "Ya has mandado una pregunta hoy"}
             </Button>
-            {isLoading && <p className="text-center mt-2">Cargando...</p>}
+            {isLoading && (
+              <p className="text-center mt-2">
+                <LoaderAE texto="Enviando pregunta..." />
+              </p>
+            )}
             {hasError && !isLoading && <p className="text-center mt-2 text-red-500">Hubo un error. Intenta de nuevo.</p>}
           </form>
         </div>

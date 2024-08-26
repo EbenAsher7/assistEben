@@ -5,6 +5,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
+  z-index: 0; /* Asegura que el contenedor esté en un nivel bajo, pero visible */
 }
 
 .circles li {
@@ -16,6 +17,23 @@
   background: rgba(255, 255, 255, 0.1);
   animation: animate 25s linear infinite;
   bottom: -150px;
+  z-index: -1; /* Elementos li por debajo del contenido, pero aún visibles */
+}
+
+/* Estilos para asegurar que los elementos interactivos estén encima */
+.background-pattern,
+.background-pattern * {
+  position: relative;
+  z-index: 1; /* Asegura que estén por encima de los círculos animados */
+}
+
+@keyframes animate {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(-100vh) translateX(100vw);
+  }
 }
 
 .circles li:nth-child(1) {

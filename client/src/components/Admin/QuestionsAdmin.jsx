@@ -132,7 +132,9 @@ export default function QuestionsAdmin() {
         </div>
       ) : (
         <div className="flex flex-row">
+          {/* ################### PARTE PRINCIPAL ################### */}
           <div className="flex flex-col">
+            {/* ################### DRAWER MOBILE DE PREGUNTAS ################### */}
             <div className="sm:hidden w-full justify-start my-4">
               <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
                 <DrawerTrigger asChild>
@@ -165,6 +167,7 @@ export default function QuestionsAdmin() {
                 </DrawerContent>
               </Drawer>
             </div>
+            {/* ################### SELECCIONAR LA FECHA ################### */}
             <div className="mb-4 flex items-center">
               <Checkbox id="datePicker" checked={showDatePicker} onCheckedChange={handleCheckboxChange} />
               <label htmlFor="datePicker" className="ml-2">
@@ -172,6 +175,7 @@ export default function QuestionsAdmin() {
               </label>
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-center mb-6">Preguntas del día: {obtenerFechaFormateada(selectedDate)} </h1>
+            {/* ################### PREGUNTAS PRINCIPAL ################### */}
             <div className="flex flex-col sm:flex-row gap-4 w-full">
               <Card className="w-full sm:min-w-[800px] sm:max-w-[950px]">
                 <CardHeader>
@@ -195,7 +199,7 @@ export default function QuestionsAdmin() {
               </Card>
             </div>
           </div>
-
+          {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}
           <div className="hidden sm:block ">
             <Card className="sm:min-w-[200px] sm:max-w-[350px]">
               <CardHeader>
@@ -227,6 +231,7 @@ export default function QuestionsAdmin() {
         </div>
       )}
 
+      {/* ################### SELECCIONAR FECHA ################### */}
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
         <DrawerContent>
           <DrawerTitle className="text-xl text-center font-extrabold">Seleccionar Fecha</DrawerTitle>

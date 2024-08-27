@@ -12,7 +12,7 @@ import LoaderAE from "@/components/LoaderAE";
 function generateUsername(nombres, apellidos) {
   const userNameNew = `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
   const userName = userNameNew.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  return userName.toLowerCase();
+  return userName.toLowerCase().trim();
 }
 
 function generatePassword() {
@@ -177,7 +177,7 @@ const AddTutores = () => {
             type="text"
             name="Nombre de usuario"
             value={username}
-            onChange={(e) => setUsername(e.target.value.toLowerCase())}
+            onChange={(e) => setUsername(e.target.value.toLowerCase().trim())}
             placeholder="Username"
           />
         </div>

@@ -48,7 +48,7 @@ router.get('/allTutorsByModule/:tutorID', async (req, res) => {
       FROM Modulos m
       LEFT JOIN Tutores t ON m.id = t.modulo_id
       WHERE t.activo = 1
-      AND t.id != ?`,
+      AND t.id != ? AND m.activo = 1`,
       args: [tutorID]
     })
 
@@ -243,6 +243,7 @@ router.get('/alumnosPendientesModulo', async (req, res) => {
           Modulos m ON a.modulo_id = m.id
       WHERE
           a.activo = 'Pendiente'
+          AND m.activo = 1
       GROUP BY
           m.id
       ORDER BY
@@ -285,6 +286,7 @@ router.get('/preguntasTipoAsistencia', async (req, res) => {
           Modulos m ON al.modulo_id = m.id
       WHERE
           a.pregunta IS NOT NULL
+          AND m.activo = 1
       GROUP BY
           m.id, a.tipo
       ORDER BY

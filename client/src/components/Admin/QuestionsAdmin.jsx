@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Menu } from "lucide-react";
+import { Dices, ChevronUp, SquareCheckBig, Calendar } from "lucide-react";
 import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import LoaderAE from "../LoaderAE";
 
 export default function QuestionsAdmin() {
   const [questions, setQuestions] = useState([]);
@@ -106,97 +106,54 @@ export default function QuestionsAdmin() {
     }
   };
 
-  const handleCheckboxChange = (checked) => {
-    if (!checked && showDatePicker) {
-      const confirmReplace = window.confirm("¿Quieres reemplazar las preguntas con la lista normal?");
-      if (confirmReplace) {
-        cargarPreguntas();
-      }
-    }
-    setShowDatePicker(checked);
-    setIsDateDrawerOpen(checked);
+  const handleDatePickerClick = () => {
+    setIsDateDrawerOpen(true);
   };
 
   const handleLoadQuestions = () => {
     if (selectedDate) {
       cargarPreguntas(selectedDate);
       setIsDateDrawerOpen(false);
+      setShowDatePicker(true);
     }
   };
 
   return (
-    <div className="container -mt-16 sm:mt-32 mx-auto p-4 flex flex-col items-center justify-center sm:justify-start">
+    <div className="container -mt-16 sm:mt-32 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
       {isLoading ? (
-        <div className="flex items-center justify-center">
-          <p>Cargando preguntas...</p>
+        <div className="flex items-center justify-center mt-40">
+          <LoaderAE texto="Cargando preguntas..." />
         </div>
       ) : (
         <div className="flex flex-row">
           {/* ################### PARTE PRINCIPAL ################### */}
           <div className="flex flex-col mt-32 sm:mt-0">
-            {/* ################### DRAWER MOBILE DE PREGUNTAS ################### */}
-            <div className="sm:hidden w-full justify-start my-4">
-              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <DrawerTrigger asChild>
-                  <Button variant="outline">
-                    <Menu className="h-4 w-4" /> Ver lista de preguntas
-                  </Button>
-                </DrawerTrigger>
-                <DrawerContent className="max-h-[500px]">
-                  <DialogTitle className="text-xl text-center font-extrabold text-black dark:text-white">Preguntas disponibles</DialogTitle>
-                  <div className="py-4 overflow-y-scroll text-left">
-                    {questions.length > 0 ? (
-                      <ul className="space-y-2">
-                        {questions.map((question) => (
-                          <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80 dark:text-white dark:odd:bg-[#202020]">
-                            <Button
-                              variant="ghost"
-                              className={`w-full text-wrap text-left py-6 text-[1rem] ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
-                              onClick={() => handleQuestionClick(question)}
-                              disabled={answeredQuestions.includes(question.id)}
-                            >
-                              {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
-                            </Button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-muted-foreground text-center">No hay preguntas para mostrar</p>
-                    )}
-                  </div>
-                </DrawerContent>
-              </Drawer>
-            </div>
-            {/* ################### SELECCIONAR LA FECHA ################### */}
-            <div className="mb-4 flex items-center">
-              <Checkbox id="datePicker" checked={showDatePicker} onCheckedChange={handleCheckboxChange} />
-              <label htmlFor="datePicker" className="ml-2">
-                Seleccionar Fecha
-              </label>
-            </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-center mb-6">Preguntas del día: {obtenerFechaFormateada(selectedDate)} </h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-center mt-6">Preguntas del día: {obtenerFechaFormateada(selectedDate)} </h1>
+            {/* Nuevo: Mostrar total de preguntas y respondidas */}
+            <p className="text-center mb-4 italic">
+              Total de preguntas: {questions.length}&nbsp;&nbsp;|&nbsp;&nbsp;Respondidas: {answeredQuestions.length}
+            </p>
             {/* ################### PREGUNTAS PRINCIPAL ################### */}
-            <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <div className="flex flex-col sm:flex-row gap-1 w-full mb-5 ">
               <Card className="w-full sm:min-w-[800px] sm:max-w-[950px]">
                 <CardHeader>
                   <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
                 </CardHeader>
-                <CardContent className="w-full">
-                  {currentQuestion ? (
-                    <p className="text-lg text-left p-2 sm:text-4xl mb-12">{currentQuestion.pregunta}</p>
-                  ) : (
-                    <p className="text-muted-foreground">No hay preguntas para mostrar</p>
-                  )}
-                  <div className="flex mt-4 gap-4 items-center justify-center mb-6">
+                <CardContent className="w-full min-h-[270px] h-[270px] relative">
+                  <div className="flex flex-col justify-center items-center min-h-[190px] h-[190px]">
+                    {currentQuestion ? (
+                      <p className="text-lg text-left p-2 sm:text-4xl">{currentQuestion.pregunta}</p>
+                    ) : (
+                      <p className="text-muted-foreground">No hay preguntas para mostrar</p>
+                    )}
+                  </div>
+                  <div className="flex gap-4 items-center justify-center absolute bottom-4 left-1/2 transform -translate-x-1/2">
                     <Button
                       className="gap-2 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
                       onClick={handleRandomQuestion}
                       disabled={answeredQuestions.length === questions.length}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.833 12a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm-7 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm3.5 -3.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm-3.5 -3.5a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3zm7 0a1.5 1.5 0 1 0 0 3a1.5 1.5 0 0 0 0 -3z" />
-                      </svg>
+                      <Dices />
                       Aleatorio
                     </Button>
                     <Button
@@ -204,17 +161,26 @@ export default function QuestionsAdmin() {
                       onClick={handleAnsweredQuestion}
                       disabled={!currentQuestion}
                     >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M18.333 2c1.96 0 3.56 1.537 3.662 3.472l.005 .195v12.666c0 1.96 -1.537 3.56 -3.472 3.662l-.195 .005h-12.666a3.667 3.667 0 0 1 -3.662 -3.472l-.005 -.195v-12.666c0 -1.96 1.537 -3.56 3.472 -3.662l.195 -.005h12.666zm-2.626 7.293a1 1 0 0 0 -1.414 0l-3.293 3.292l-1.293 -1.292l-.094 -.083a1 1 0 0 0 -1.32 1.497l2 2l.094 .083a1 1 0 0 0 1.32 -.083l4 -4l.083 -.094a1 1 0 0 0 -.083 -1.32z" />
-                      </svg>
-                      Marcar como<span className="hidden sm:inline-flex">pregunta</span> respondida
+                      <SquareCheckBig />
+                      Marcar <span className="hidden sm:inline-flex">como pregunta</span> respondida
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
+            {/* ################### SELECCIONAR LA FECHA ################### */}
+            <p className="text-sm italic text-center mb-4 opacity-50 px-2">Para ver otras fechas, presiona el botón</p>
+            <Button
+              onClick={handleDatePickerClick}
+              className={`flex items-center gap-2 w-[250px] mx-auto ${
+                showDatePicker ? "bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-800 dark:text-white" : "bg-indigo-500 hover:bg-indigo-600"
+              } text-white rounded-full px-6 py-3 transition-colors duration-300`}
+            >
+              <Calendar className="h-5 w-5" />
+              {showDatePicker ? `Fecha seleccionada: ${selectedDate?.toLocaleDateString("es-GT")}` : "Seleccionar fecha"}
+            </Button>
           </div>
+
           {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}
           <div className="hidden sm:block ">
             <Card className="sm:min-w-[200px] sm:max-w-[350px]">
@@ -250,15 +216,55 @@ export default function QuestionsAdmin() {
       {/* ################### SELECCIONAR FECHA ################### */}
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
         <DrawerContent className="w-full sm:w-[300px] sm:h-screen px-4 ">
-          <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-10">Seleccionar Fecha</DrawerTitle>
-          <input
-            type="date"
-            value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
-            onChange={(e) => setSelectedDate(new Date(e.target.value))}
-            className="border p-2 w-full"
-          />
-          <div className="flex justify-end mt-4">
-            <Button onClick={handleLoadQuestions}>Cargar preguntas</Button>
+          <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-5">Seleccionar Fecha</DrawerTitle>
+          <div className="w-10/12 m-auto sm:m-0 flex justify-center items-center flex-col pb-10">
+            <input
+              type="date"
+              value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              className="border p-2 w-full rounded-md"
+              placeholder="Ingrese una fecha para filtrar"
+            />
+            <div className="flex justify-end mt-6">
+              <Button className="w-[300px] sm:w-[200px]" onClick={handleLoadQuestions}>
+                Cargar preguntas
+              </Button>
+            </div>
+          </div>
+        </DrawerContent>
+      </Drawer>
+
+      {/* ################### DRAWER MOBILE DE PREGUNTAS ################### */}
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+        <DrawerTrigger asChild>
+          <Button
+            variant="outline"
+            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 py-8 rounded-md flex items-center justify-center bg-pink-500 text-white dark:bg-pink-600 dark:text-white sm:hidden"
+          >
+            <ChevronUp className="h-6 w-6" /> &nbsp; Lista de Preguntas
+          </Button>
+        </DrawerTrigger>
+        <DrawerContent className="max-h-[80vh]">
+          <DialogTitle className="text-xl text-center font-extrabold text-black dark:text-white">Preguntas disponibles</DialogTitle>
+          <div className="py-4 overflow-y-scroll text-left">
+            {questions.length > 0 ? (
+              <ul className="space-y-2">
+                {questions.map((question) => (
+                  <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80 dark:text-white dark:odd:bg-[#202020]">
+                    <Button
+                      variant="ghost"
+                      className={`w-full text-wrap text-left py-6 text-[1rem] ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
+                      onClick={() => handleQuestionClick(question)}
+                      disabled={answeredQuestions.includes(question.id)}
+                    >
+                      {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground text-center">No hay preguntas para mostrar</p>
+            )}
           </div>
         </DrawerContent>
       </Drawer>

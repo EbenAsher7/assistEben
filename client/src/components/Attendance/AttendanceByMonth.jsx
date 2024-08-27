@@ -229,7 +229,11 @@ export function AttendanceByMonth({ value }) {
           <br />
           <br />
           {isDataLoaded && allData?.length > 0 && isTableRendered && (
-            <DownloadTableExcel filename="asistieron" sheet="Asistieron" currentTableRef={tableRef.current}>
+            <DownloadTableExcel
+              filename={`Lista asistencia de ${selectedMonth} ${selectedYear} - ${cursos[selectedCurso - 1]?.label}`}
+              sheet={`Lista asistencia ${selectedMonth}`}
+              currentTableRef={tableRef.current}
+            >
               <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">
                 Exportar asistentes a Excel
               </button>

@@ -20,19 +20,21 @@ export default function QuestionsAdmin() {
 
   const { user } = useContext(MainContext);
 
-  const obtenerFechaFormateada = (fecha) => {
-    const hoy = fecha ?? new Date();
+  const obtenerFechaFormateada = (fecha, nombre = true) => {
+    let hoy = fecha ? new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000) : new Date();
     const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
     const nombreDia = diasSemana[hoy.getDay()];
     const dia = hoy.getDate().toString().padStart(2, "0");
     const mes = (hoy.getMonth() + 1).toString().padStart(2, "0");
     const anio = hoy.getFullYear();
+    if (!nombre) return `${dia}/${mes}/${anio}`;
     return `${nombreDia} ${dia}/${mes}/${anio}`;
   };
 
   const cargarPreguntas = async (fecha = new Date()) => {
     setIsLoading(true); // Inicia el loader
     try {
+      // const dateISO = fecha.toISOString().split("T")[0];
       const dateISO = fecha.toISOString().split("T")[0];
       const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${dateISO}`, {
         method: "GET",
@@ -119,7 +121,7 @@ export default function QuestionsAdmin() {
   };
 
   return (
-    <div className="container -mt-16 sm:mt-32 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
+    <div className="container -mt-16 sm:mt-24 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
       {isLoading ? (
         <div className="flex items-center justify-center mt-40">
           <LoaderAE texto="Cargando preguntas..." />
@@ -135,7 +137,7 @@ export default function QuestionsAdmin() {
             </p>
             {/* ################### PREGUNTAS PRINCIPAL ################### */}
             <div className="flex flex-col sm:flex-row gap-1 w-full mb-5 ">
-              <Card className="w-full sm:min-w-[800px] sm:max-w-[950px]">
+              <Card className="w-full sm:min-w-[800px] sm:max-w-[800px]">
                 <CardHeader>
                   <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
                 </CardHeader>
@@ -151,7 +153,7 @@ export default function QuestionsAdmin() {
                     <Button
                       className="gap-2 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
                       onClick={handleRandomQuestion}
-                      disabled={answeredQuestions.length === questions.length}
+                      disabled={answeredQuestions.length === questions.length || questions.length === 0 || questions.length === 1}
                     >
                       <Dices />
                       Aleatorio
@@ -173,21 +175,23 @@ export default function QuestionsAdmin() {
             <Button
               onClick={handleDatePickerClick}
               className={`flex items-center gap-2 w-[250px] mx-auto ${
-                showDatePicker ? "bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-800 dark:text-white" : "bg-indigo-500 hover:bg-indigo-600"
+                showDatePicker
+                  ? "bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-800 dark:text-white"
+                  : "dark:bg-indigo-800 dark:text-white bg-indigo-500 hover:bg-indigo-600"
               } text-white rounded-full px-6 py-3 transition-colors duration-300`}
             >
               <Calendar className="h-5 w-5" />
-              {showDatePicker ? `Fecha seleccionada: ${selectedDate?.toLocaleDateString("es-GT")}` : "Seleccionar fecha"}
+              {showDatePicker ? `Fecha seleccionada: ${selectedDate ? obtenerFechaFormateada(selectedDate, false) : ""}` : "Seleccionar fecha"}
             </Button>
           </div>
 
           {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}
           <div className="hidden sm:block ">
-            <Card className="sm:min-w-[200px] sm:max-w-[350px]">
+            <Card className="sm:min-w-[200px] sm:max-w-[350px] ">
               <CardHeader>
                 <CardTitle>Preguntas disponibles</CardTitle>
               </CardHeader>
-              <CardContent className="w-full text-left justify-start max-h-[450px] overflow-y-scroll">
+              <CardContent className="w-full text-left justify-start overflow-y-scroll min-h-[382px] max-h-[382px] no-scrollbar">
                 {questions.length > 0 ? (
                   <ul className="space-y-2">
                     {questions.map((question) => (
@@ -221,7 +225,10 @@ export default function QuestionsAdmin() {
             <input
               type="date"
               value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
-              onChange={(e) => setSelectedDate(new Date(e.target.value))}
+              onChange={(e) => {
+                const newDate = new Date(e.target.value + "T00:00:00");
+                setSelectedDate(newDate);
+              }}
               className="border p-2 w-full rounded-md"
               placeholder="Ingrese una fecha para filtrar"
             />

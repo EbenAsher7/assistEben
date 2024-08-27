@@ -18,7 +18,7 @@ export function AttendanceByDay({ value }) {
   const [loading, setLoading] = useState(false);
   const [attendedStudents, setAttendedStudents] = useState([]);
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
-  const [allData, setAllData] = useState([]);
+  const [allData, setAllData] = useState({ attendedStudents: [], notAttendedStudents: [] });
   const { toast } = useToast();
 
   // REFS
@@ -44,8 +44,6 @@ export function AttendanceByDay({ value }) {
 
   const loadData = async () => {
     try {
-      setAttendedStudents([]);
-      setNotAttendedStudents([]);
       setLoading(true);
       if (!selectedDate) {
         toast({
@@ -94,6 +92,51 @@ export function AttendanceByDay({ value }) {
   const virtualCount = attendedStudents.filter((student) => student.TipoAsistencia === "Virtual").length;
   const presencialCount = attendedStudents.filter((student) => student.TipoAsistencia === "Presencial").length;
 
+  useEffect(() => {
+    if (tableRefAttended.current && tableRefNotAttended.current) {
+      tableRefAttended.current.innerHTML = renderTable(allData.attendedStudents, true);
+      tableRefNotAttended.current.innerHTML = renderTable(allData.notAttendedStudents, false);
+    }
+  }, [allData]);
+
+  const renderTable = (students, isAttended) => {
+    const headerRow = isAttended
+      ? `<tr>
+         <th>#</th>
+         <th>Nombre</th>
+         <th>Teléfono</th>
+         <th>Tipo de Asistencia</th>
+         <th>Pregunta</th>
+       </tr>`
+      : `<tr>
+         <th>#</th>
+         <th>Nombre</th>
+         <th>Teléfono</th>
+       </tr>`;
+
+    const rows = students
+      .map((student, index) => {
+        if (isAttended) {
+          return `<tr>
+        <td>${index + 1}</td>
+        <td>${student.AlumnoNombres}</td>
+        <td>${student.AlumnoTelefono}</td>
+        <td>${student.TipoAsistencia}</td>
+        <td>${student.Pregunta || ""}</td>
+      </tr>`;
+        } else {
+          return `<tr>
+        <td>${index + 1}</td>
+        <td>${student.AlumnoNombres}</td>
+        <td>${student.AlumnoTelefono}</td>
+      </tr>`;
+        }
+      })
+      .join("");
+
+    return `<table><thead>${headerRow}</thead><tbody>${rows}</tbody></table>`;
+  };
+
   return (
     <TabsContent value={value}>
       <Card>
@@ -135,13 +178,12 @@ export function AttendanceByDay({ value }) {
               </DownloadTableExcel>
             </div>
           )}
-
           {(attendedStudents.length > 0 || notAttendedStudents.length > 0) && <RadarByDay data={allData} />}
           {/* Tabla de alumnos que asistieron */}
           {attendedStudents.length > 0 && (
             <div className="space-y-4 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-green-500 text-lg font-bold">Alumnos que asistieron:</h2>
-              <table className="w-full border-collapse border border-gray-200" ref={tableRefAttended}>
+              <table className="w-full border-collapse border border-gray-200">
                 <thead className="bg-green-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
@@ -197,12 +239,11 @@ export function AttendanceByDay({ value }) {
               </div>
             </div>
           )}
-
           {/* Tabla de alumnos que no asistieron */}
           {notAttendedStudents.length > 0 && (
             <div className="space-y-4 pt-8 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-red-500 text-lg font-bold">Alumnos que no asistieron:</h2>
-              <table className="w-full border-collapse border border-gray-200" ref={tableRefNotAttended}>
+              <table className="w-full border-collapse border border-gray-200">
                 <thead className="bg-red-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
@@ -222,6 +263,8 @@ export function AttendanceByDay({ value }) {
               </table>
             </div>
           )}
+          <div className="hidden" style={{ display: "none" }} ref={tableRefAttended}></div>
+          <div className="hidden" style={{ display: "none" }} ref={tableRefNotAttended}></div>
         </CardContent>
       </Card>
     </TabsContent>

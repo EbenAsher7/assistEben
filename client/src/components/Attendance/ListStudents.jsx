@@ -1,6 +1,6 @@
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { format } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { addDays } from "date-fns";
+import { DownloadTableExcel } from "react-export-table-to-excel";
 
 function EditStudentDialog({ student, onStudentUpdate }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -258,7 +259,9 @@ export function ListStudents({ value }) {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [isLoadingCursos, setIsLoadingCursos] = useState(true);
+  const [allStudents, setAllStudents] = useState([]);
   const { toast } = useToast();
+  const allDataTableRef = useRef(null);
 
   const { user, fetchModulos, fetchAllModulos } = useContext(MainContext);
 
@@ -361,6 +364,7 @@ export function ListStudents({ value }) {
           if (response.ok) {
             const data = await response.json();
             setAlumnosCursos(data.length ? data : []);
+            setAllStudents(data.length ? data : []); // Guardamos todos los estudiantes
           } else {
             throw new Error("Failed to fetch");
           }
@@ -401,8 +405,21 @@ export function ListStudents({ value }) {
           <hr />
         </div>
         <h2 className="text-xl font-extrabold text-center mb-2">Seleccione un curso para filtrar</h2>
-        <div className={`w-8/12 m-auto flex justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-4 "}`}>
+        <div className={`w-8/12 m-auto flex flex-col justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-4 "}`}>
           {cursos && <DropdownAE data={cursos} title="Seleccione" setValueAE={setCursoSeleccionado} disabled={isLoadingAlumnos} />}
+          {/* BOTON PARA DESCARGAR EXCEL */}
+
+          {cursoSeleccionado && (
+            <div className="flex w-full justify-center items-center my-2">
+              <DownloadTableExcel
+                filename={`Lista de Estudiantes - ${cursos[cursoSeleccionado].label} - ${new Date().toLocaleDateString("es-GT")}`}
+                sheet={`Estudiantes ${cursos[cursoSeleccionado].label}`}
+                currentTableRef={allDataTableRef.current}
+              >
+                <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">Exportar a excel</button>
+              </DownloadTableExcel>
+            </div>
+          )}
         </div>
         {cursoSeleccionado && (
           <CardContent className="space-y-2">
@@ -450,6 +467,38 @@ export function ListStudents({ value }) {
                     </TableBody>
                   </Table>
                 </div>
+                {/* TABLA INVISIBLE PARA EXPORTAR DATOS */}
+                <div style={{ display: "none" }}>
+                  <Table ref={allDataTableRef}>
+                    <TableHeader>
+                      <TableRow>
+                        {columns.map((column) => (
+                          <TableHead key={column.accessorKey || column.id}>
+                            {typeof column.header === "string" ? column.header : column.accessorKey}
+                          </TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {allStudents.map((student) => (
+                        <TableRow key={student.AlumnoID}>
+                          {columns.map((column) => (
+                            <TableCell key={column.accessorKey || column.id}>
+                              {column.accessorKey === "AlumnoNombres"
+                                ? `${student.AlumnoNombres} ${student.AlumnoApellidos}`
+                                : column.accessorKey === "AlumnoFechaNacimiento"
+                                ? student.AlumnoFechaNacimiento
+                                  ? format(new Date(student.AlumnoFechaNacimiento), "dd/MM/yyyy")
+                                  : "No disponible"
+                                : student[column.accessorKey]}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {/* TABLA INVISIBLE PARA EXPORTAR DATOS */}
                 <div className="flex items-center justify-end space-x-2 py-4">
                   <div className="space-x-2">
                     <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>

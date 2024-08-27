@@ -2,14 +2,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
 import { CalendarAE } from "../CalendarAE";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "../ui/button";
-import LoaderAE from "../LoaderAE"; // Importar el componente LoaderAE
+import LoaderAE from "../LoaderAE";
 import RadarByDay from "./RadarByDay";
+import { DownloadTableExcel } from "react-export-table-to-excel";
 
 export function AttendanceByDay({ value }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -19,6 +20,10 @@ export function AttendanceByDay({ value }) {
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
   const [allData, setAllData] = useState([]);
   const { toast } = useToast();
+
+  // REFS
+  const tableRefAttended = useRef(null);
+  const tableRefNotAttended = useRef(null);
 
   // CONTEXTO
   const { user } = useContext(MainContext);
@@ -116,12 +121,27 @@ export function AttendanceByDay({ value }) {
             {loading ? <LoaderAE /> : "Mostrar asistencias registradas"}
           </Button>
           <br />
+          {attendedStudents.length > 0 && notAttendedStudents.length > 0 && !loading && (
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-2">
+              <DownloadTableExcel filename="asistieron" sheet="Asistieron" currentTableRef={tableRefAttended.current}>
+                <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">
+                  Exportar asistentes a Excel
+                </button>
+              </DownloadTableExcel>
+              <DownloadTableExcel filename="no_asistieron" sheet="No Asistieron" currentTableRef={tableRefNotAttended.current}>
+                <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">
+                  Exportar no asistentes a Excel
+                </button>
+              </DownloadTableExcel>
+            </div>
+          )}
+
           {(attendedStudents.length > 0 || notAttendedStudents.length > 0) && <RadarByDay data={allData} />}
           {/* Tabla de alumnos que asistieron */}
           {attendedStudents.length > 0 && (
             <div className="space-y-4 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-green-500 text-lg font-bold">Alumnos que asistieron:</h2>
-              <table className="w-full border-collapse border border-gray-200">
+              <table className="w-full border-collapse border border-gray-200" ref={tableRefAttended}>
                 <thead className="bg-green-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
@@ -182,7 +202,7 @@ export function AttendanceByDay({ value }) {
           {notAttendedStudents.length > 0 && (
             <div className="space-y-4 pt-8 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-red-500 text-lg font-bold">Alumnos que no asistieron:</h2>
-              <table className="w-full border-collapse border border-gray-200">
+              <table className="w-full border-collapse border border-gray-200" ref={tableRefNotAttended}>
                 <thead className="bg-red-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>

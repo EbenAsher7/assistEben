@@ -2,13 +2,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { URL_BASE } from "@/config/config";
 import { DropdownAE } from "../DropdownAE";
 import { Button } from "../ui/button";
 import MainContext from "@/context/MainContext";
 import { useToast } from "@/components/ui/use-toast";
 import RadarByMonth from "./RadarByMonth";
+import { DownloadTableExcel } from "react-export-table-to-excel";
 
 export function AttendanceByMonth({ value }) {
   const [selectedMonth, setSelectedMonth] = useState(null);
@@ -19,6 +20,8 @@ export function AttendanceByMonth({ value }) {
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
   const [allData, setAllData] = useState([]);
   const [cursos, setCursos] = useState([]);
+
+  const tableRef = useRef(null);
 
   const { user, fetchModulos } = useContext(MainContext);
   const { toast } = useToast();
@@ -193,10 +196,17 @@ export function AttendanceByMonth({ value }) {
           )}
           <br />
           <br />
+          {allData?.length > 0 && (
+            <DownloadTableExcel filename="asistenciasMes" sheet="Asistencias" currentTableRef={tableRef.current}>
+              <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">
+                Exportar asistencias por mes
+              </button>
+            </DownloadTableExcel>
+          )}
           {allData?.length > 0 && <RadarByMonth attendedStudents={attendedStudents} notAttendedStudents={notAttendedStudents} />}
           {/* Tabla para mostrar asistencias e inasistencias */}
           {allData?.length > 0 && (
-            <Table className="w-full sm:w-8/12 m-auto">
+            <Table className="w-full sm:w-8/12 m-auto" ref={tableRef}>
               <TableHeader className="border-2">
                 <TableRow>
                   <TableHead>Nombre</TableHead>

@@ -73,13 +73,6 @@ const MainProvider = ({ children }) => {
     localStorage.setItem("isLogin", JSON.stringify(isLogin));
   }, [isLogin]);
 
-  // Función para verificar si una fecha está dentro del último mes
-  const isWithinLastMonth = (date) => {
-    const oneMonthAgo = new Date();
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-    return new Date(date) >= oneMonthAgo;
-  };
-
   const checkAttendanceStatus = (alumnoId) => {
     const user = JSON.parse(localStorage.getItem("user"));
     const isTutor = user && ["Tutor", "Administrador"].includes(user.tipo);
@@ -94,68 +87,6 @@ const MainProvider = ({ children }) => {
       return !(storedHistory[today] && storedHistory[today].asistencias.length > 0);
     }
   };
-
-  useEffect(() => {
-    if (alumnoSeleccionado && alumnoSeleccionado.tipo) {
-      const registerAttendance = async () => {
-        const now = new Date();
-        const fechaActual = now.toISOString().split("T")[0];
-        try {
-          const response = await fetch(`${URL_BASE}/api/user/registerAttendance`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              alumno_id: alumnoSeleccionado.id,
-              fecha: fechaActual,
-              pregunta: alumnoSeleccionado.pregunta || "",
-              tipo: alumnoSeleccionado.tipo,
-            }),
-          });
-          if (response.ok) {
-            const attendanceData = {
-              id: alumnoSeleccionado.id,
-              nombres: alumnoSeleccionado.nombres,
-              apellidos: alumnoSeleccionado.apellidos,
-              fecha: fechaActual,
-            };
-            setAttendanceHistory(() => {
-              const storedHistory = JSON.parse(localStorage.getItem("attendanceHistory")) || {};
-              if (!isWithinLastMonth(fechaActual)) {
-                localStorage.removeItem("attendanceHistory");
-                localStorage.removeItem("lastAttendance");
-                return { [fechaActual]: { asistencias: [attendanceData] } };
-              }
-              const newHistory = { ...storedHistory };
-              if (!newHistory[fechaActual]) {
-                newHistory[fechaActual] = { asistencias: [] };
-              }
-              newHistory[fechaActual].asistencias.push(attendanceData);
-              localStorage.setItem("attendanceHistory", JSON.stringify(newHistory));
-              localStorage.setItem("lastAttendance", JSON.stringify(attendanceData));
-              return newHistory;
-            });
-          } else {
-            toast({
-              variant: "destructive",
-              title: "Error",
-              description: "Ocurrió un error al registrar asistencia.",
-              duration: 2500,
-            });
-          }
-        } catch (error) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Ocurrió un error al registrar asistencia.",
-            duration: 2500,
-          });
-        }
-      };
-      registerAttendance();
-    }
-  }, [alumnoSeleccionado, toast]);
 
   useEffect(() => {
     const storedHistory = localStorage.getItem("attendanceHistory");

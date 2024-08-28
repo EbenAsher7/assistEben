@@ -68,8 +68,8 @@ const InputDebounce = () => {
         toast({
           title: "Error",
           variant: "destructive",
-          description: error.message,
-          duration: 2500,
+          description:
+            "No se ha podido obtener la lista de estudiantes, comprueba tu conexión a internet. Si el problema persiste intenta nuevamente más tarde",
         });
       } finally {
         setLoading(false);
@@ -147,8 +147,8 @@ const InputDebounce = () => {
         className="w-full py-2 px-4 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500 dark:bg-neutral-700 dark:text-white dark:placeholder:text-white/60 placeholder:text-black/60 dark:border-neutral-500"
       />
       {loading && valueDebounce.length >= 3 && (
-        <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10 mx-8 sm:mx-4">          
-          <LoadingTexto texto={"Buscando su nombre, espere..."}/>
+        <div className="absolute top-full left-0 right-0 flex items-center justify-center bg-white dark:bg-neutral-700 py-2 px-4 border border-gray-300 rounded-b-md z-10 mx-8 sm:mx-4">
+          <LoadingTexto texto={"Buscando su nombre, espere..."} />
         </div>
       )}
       {results.length > 0 && (

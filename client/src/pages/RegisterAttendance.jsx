@@ -4,10 +4,13 @@ import MainContext from "../context/MainContext";
 import { PersonStanding, Monitor } from "lucide-react";
 import ConfettiExplosion from "react-confetti-explosion";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { URL_BASE } from "@/config/config";
 
 const RegisterAttendance = () => {
   const navigate = useNavigate();
-  const { alumnoSeleccionado, setAlumnoSeleccionado, checkAttendanceStatus } = useContext(MainContext);
+  const { toast } = useToast();
+  const { alumnoSeleccionado, setAlumnoSeleccionado, checkAttendanceStatus, setAttendanceHistory } = useContext(MainContext);
 
   const [presencialSelected, setPresencialSelected] = useState(false);
   const [virtualSelected, setVirtualSelected] = useState(false);
@@ -15,6 +18,7 @@ const RegisterAttendance = () => {
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
   const [pregunta, setPregunta] = useState("");
   const [isTutor, setIsTutor] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (alumnoSeleccionado === null) {
@@ -35,29 +39,90 @@ const RegisterAttendance = () => {
   const handlePresencialClick = () => {
     setPresencialSelected(true);
     setVirtualSelected(false);
-    setConfirmClicked(false);
   };
 
   const handleVirtualClick = () => {
     setVirtualSelected(true);
     setPresencialSelected(false);
-    setConfirmClicked(false);
   };
 
-  const handleConfirmClick = () => {
+  // Función para verificar si una fecha está dentro del último mes
+  const isWithinLastMonth = (date) => {
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+    return new Date(date) >= oneMonthAgo;
+  };
+
+  const handleConfirmClick = async () => {
     if (alreadyRegistered) return;
 
+    setIsLoading(true);
     const tipo = presencialSelected ? "Presencial" : "Virtual";
-    setAlumnoSeleccionado({ ...alumnoSeleccionado, tipo, pregunta });
-    setConfirmClicked(true);
 
-    setTimeout(() => {
-      setConfirmClicked(false);
-      setPresencialSelected(false);
-      setVirtualSelected(false);
-      setAlumnoSeleccionado(null);
-      navigate("/");
-    }, 4500);
+    try {
+      const now = new Date();
+      const fechaActual = now.toISOString().split("T")[0];
+      const response = await fetch(`${URL_BASE}/api/user/registerAttendance`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          alumno_id: alumnoSeleccionado.id,
+          fecha: fechaActual,
+          pregunta: pregunta,
+          tipo: tipo,
+        }),
+      });
+
+      if (response.ok) {
+        setConfirmClicked(true);
+        const attendanceData = {
+          id: alumnoSeleccionado.id,
+          nombres: alumnoSeleccionado.nombres,
+          apellidos: alumnoSeleccionado.apellidos,
+          fecha: fechaActual,
+        };
+        updateAttendanceHistory(fechaActual, attendanceData);
+
+        setTimeout(() => {
+          setConfirmClicked(false);
+          setPresencialSelected(false);
+          setVirtualSelected(false);
+          setAlumnoSeleccionado(null);
+          navigate("/");
+        }, 4500);
+      } else {
+        throw new Error("Error al registrar asistencia");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al registrar asistencia. Por favor, intenta nuevamente. Si el problema persiste, intente nuevamente más tarde.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateAttendanceHistory = (fechaActual, attendanceData) => {
+    setAttendanceHistory(() => {
+      const storedHistory = JSON.parse(localStorage.getItem("attendanceHistory")) || {};
+      if (!isWithinLastMonth(fechaActual)) {
+        localStorage.removeItem("attendanceHistory");
+        localStorage.removeItem("lastAttendance");
+        return { [fechaActual]: { asistencias: [attendanceData] } };
+      }
+      const newHistory = { ...storedHistory };
+      if (!newHistory[fechaActual]) {
+        newHistory[fechaActual] = { asistencias: [] };
+      }
+      newHistory[fechaActual].asistencias.push(attendanceData);
+      localStorage.setItem("attendanceHistory", JSON.stringify(newHistory));
+      localStorage.setItem("lastAttendance", JSON.stringify(attendanceData));
+      return newHistory;
+    });
   };
 
   const handleBackClick = () => {
@@ -124,8 +189,8 @@ const RegisterAttendance = () => {
                 <button className="mt-4 p-2 px-4 text-black dark:text-white border-2 rounded-md" onClick={handleBackClick}>
                   Regresar
                 </button>
-                <button className="mt-4 p-2 px-4 bg-blue-500 text-white rounded-md" onClick={handleConfirmClick}>
-                  Confirmar asistencia
+                <button className="mt-4 p-2 px-4 bg-blue-500 text-white rounded-md disabled:opacity-50" onClick={handleConfirmClick} disabled={isLoading}>
+                  {isLoading ? "Registrando..." : "Confirmar asistencia"}
                 </button>
               </div>
             </div>

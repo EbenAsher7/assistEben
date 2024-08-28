@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
-import { Dices, ChevronUp, SquareCheckBig, Calendar } from "lucide-react";
+import { Dices, ChevronUp, SquareCheckBig, Calendar, MessageSquareMore, MessageSquareReply, MailQuestion } from "lucide-react";
 import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { DialogTitle } from "@radix-ui/react-dialog";
@@ -121,7 +121,7 @@ export default function QuestionsAdmin() {
   };
 
   return (
-    <div className="container -mt-16 sm:mt-24 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
+    <div className="container -mt-16 sm:mt-14 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
       {isLoading ? (
         <div className="flex items-center justify-center mt-40">
           <LoaderAE texto="Cargando preguntas..." />
@@ -129,12 +129,24 @@ export default function QuestionsAdmin() {
       ) : (
         <div className="flex flex-row">
           {/* ################### PARTE PRINCIPAL ################### */}
-          <div className="flex flex-col mt-32 sm:mt-0">
-            <h1 className="text-xl sm:text-2xl font-bold text-center mt-6">Preguntas del día: {obtenerFechaFormateada(selectedDate)} </h1>
+          <div className="flex flex-col mt-24 sm:mt-0">
+            <div className="flex flex-col sm:flex-row sm:gap-8 sm:justify-center sm:items-center">
+              <MailQuestion className="sm:m-0 mx-auto -mb-2" size={70} />
+              <div className="my-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">Preguntas del día</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">{obtenerFechaFormateada(selectedDate)} </h1>
+              </div>
+            </div>
+            <hr className="hidden sm:block sm:mb-3 sm:w-10/12 sm:mx-auto" />
             {/* Nuevo: Mostrar total de preguntas y respondidas */}
-            <p className="text-center mb-4 italic">
-              Total de preguntas: {questions.length}&nbsp;&nbsp;|&nbsp;&nbsp;Respondidas: {answeredQuestions.length}
-            </p>
+            <div className="flex flex-col space-y-0 opacity-80 italic -mt-1 mb-2 sm:flex-row sm:justify-center sm:gap-9 sm:items-center">
+              <span className="mx-auto sm:m-0 italic gap-2 inline-flex">
+                Total de preguntas: <span className="text-lg font-bold">{questions.length}</span> <MessageSquareMore />
+              </span>
+              <span className="mx-auto sm:m-0 italic gap-2 inline-flex">
+                Total Respondidas:&nbsp; <span className="text-lg font-bold">{answeredQuestions.length}</span> <MessageSquareReply />
+              </span>
+            </div>
             {/* ################### PREGUNTAS PRINCIPAL ################### */}
             <div className="flex flex-col sm:flex-row gap-1 w-full mb-5 ">
               <Card className="w-full sm:min-w-[800px] sm:max-w-[800px]">
@@ -187,11 +199,11 @@ export default function QuestionsAdmin() {
 
           {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}
           <div className="hidden sm:block ">
-            <Card className="sm:min-w-[200px] sm:max-w-[350px] ">
+            <Card className="sm:min-w-[250px] sm:max-w-[350px] ">
               <CardHeader>
                 <CardTitle>Preguntas disponibles</CardTitle>
               </CardHeader>
-              <CardContent className="w-full text-left justify-start overflow-y-scroll min-h-[382px] max-h-[382px] no-scrollbar">
+              <CardContent className="w-full text-left justify-start overflow-y-scroll min-h-[435px] max-h-[435px] no-scrollbar">
                 {questions.length > 0 ? (
                   <ul className="space-y-2">
                     {questions.map((question) => (

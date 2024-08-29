@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -7,6 +7,7 @@ import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import LoaderAE from "../LoaderAE";
+import { useToast } from "../ui/use-toast";
 
 export default function QuestionsAdmin() {
   const [questions, setQuestions] = useState([]);
@@ -17,6 +18,13 @@ export default function QuestionsAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  const [loadingRespondida, setLoadingRespondida] = useState(false);
+
+  const [selectedQuestionId, setSelectedQuestionId] = useState(null);
+  const selectedQuestionRef = useRef(null);
+
+  const { toast } = useToast();
 
   const { user } = useContext(MainContext);
 
@@ -32,9 +40,8 @@ export default function QuestionsAdmin() {
   };
 
   const cargarPreguntas = async (fecha = new Date()) => {
-    setIsLoading(true); // Inicia el loader
+    setIsLoading(true);
     try {
-      // const dateISO = fecha.toISOString().split("T")[0];
       const dateISO = fecha.toISOString().split("T")[0];
       const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${dateISO}`, {
         method: "GET",
@@ -50,15 +57,29 @@ export default function QuestionsAdmin() {
         setCurrentQuestion(null);
       } else {
         setQuestions(data);
-        setCurrentQuestion(data[0]);
+        // Seleccionar una pregunta aleatoria no respondida al cargar
+        const unansweredQuestions = data.filter((q) => !q.respondida);
+        if (unansweredQuestions.length > 0) {
+          const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
+          setCurrentQuestion(unansweredQuestions[randomIndex]);
+        } else {
+          setCurrentQuestion(null);
+        }
       }
-      setAnsweredQuestions([]);
+      // Actualizar las preguntas respondidas basándose en el campo 'respondida'
+      setAnsweredQuestions(data.filter((q) => q.respondida).map((q) => q.id));
     } catch (error) {
       console.error("Error al cargar las preguntas:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Error al cargar las preguntas, intente nuevamente",
+        duration: 3000,
+      });
       setQuestions([]);
       setCurrentQuestion(null);
     } finally {
-      setIsLoading(false); // Termina el loader
+      setIsLoading(false);
     }
   };
 
@@ -67,6 +88,12 @@ export default function QuestionsAdmin() {
       cargarPreguntas();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (selectedQuestionRef.current) {
+      selectedQuestionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selectedQuestionId]);
 
   if (!user || user.tipo !== "Administrador") {
     return (
@@ -79,31 +106,65 @@ export default function QuestionsAdmin() {
   const handleQuestionClick = (question) => {
     if (!answeredQuestions.includes(question.id)) {
       setCurrentQuestion(question);
+      setSelectedQuestionId(question.id);
       setIsDrawerOpen(false);
     }
   };
 
   const handleRandomQuestion = () => {
-    const unansweredQuestions = questions.filter((q) => !answeredQuestions.includes(q.id));
+    const unansweredQuestions = questions.filter((q) => !q.respondida);
     if (unansweredQuestions.length > 0) {
       const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
-      setCurrentQuestion(unansweredQuestions[randomIndex]);
+      const randomQuestion = unansweredQuestions[randomIndex];
+      setCurrentQuestion(randomQuestion);
+      setSelectedQuestionId(randomQuestion.id);
     } else {
       setCurrentQuestion(null);
+      setSelectedQuestionId(null);
     }
   };
 
-  const handleAnsweredQuestion = () => {
-    if (currentQuestion) {
-      const newAnsweredQuestions = [...answeredQuestions, currentQuestion.id];
-      setAnsweredQuestions(newAnsweredQuestions);
+  const handleAnsweredQuestion = async () => {
+    if (currentQuestion && !currentQuestion.respondida) {
+      setLoadingRespondida(true);
+      try {
+        const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${currentQuestion.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+        });
 
-      const unansweredQuestions = questions.filter((q) => !newAnsweredQuestions.includes(q.id));
-      if (unansweredQuestions.length > 0) {
-        const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
-        setCurrentQuestion(unansweredQuestions[randomIndex]);
-      } else {
-        setCurrentQuestion(null);
+        if (response.ok) {
+          // Actualizar el estado local
+          setQuestions((prevQuestions) => prevQuestions.map((q) => (q.id === currentQuestion.id ? { ...q, respondida: true } : q)));
+          setAnsweredQuestions((prev) => [...prev, currentQuestion.id]);
+
+          // Seleccionar aleatoriamente la siguiente pregunta no respondida
+          const unansweredQuestions = questions.filter((q) => !q.respondida && q.id !== currentQuestion.id);
+          if (unansweredQuestions.length > 0) {
+            const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
+            const nextQuestion = unansweredQuestions[randomIndex];
+            setCurrentQuestion(nextQuestion);
+            setSelectedQuestionId(nextQuestion.id);
+          } else {
+            setCurrentQuestion(null);
+            setSelectedQuestionId(null);
+          }
+        } else {
+          throw new Error("Error al marcar la pregunta como respondida");
+        }
+      } catch (error) {
+        console.error("Error al marcar la pregunta como respondida:", error);
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Error al marcar la pregunta como respondida",
+          duration: 2500,
+        });
+      } finally {
+        setLoadingRespondida(false);
       }
     }
   };
@@ -119,6 +180,29 @@ export default function QuestionsAdmin() {
       setShowDatePicker(true);
     }
   };
+
+  const renderQuestions = () => (
+    <ul className="space-y-2">
+      {questions.map((question) => (
+        <li
+          key={question.id}
+          className={`odd:bg-[#f0f0f0] text-black/80 dark:odd:bg-[#1a1a1a] dark:odd:text-white text-left justify-start
+                      ${question.id === selectedQuestionId ? "bg-orange-500 dark:bg-orange-700" : ""}`}
+          ref={question.id === selectedQuestionId ? selectedQuestionRef : null}
+        >
+          <button
+            className={`w-full text-left text-wrap text-black dark:text-white hover:bg-slate-300 dark:hover:bg-slate-400 rounded-md py-3 px-2 ${
+              question.respondida ? "line-through" : ""
+            } ${question.id === selectedQuestionId ? "text-white" : ""}`}
+            onClick={() => handleQuestionClick(question)}
+            disabled={question.respondida}
+          >
+            {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
 
   return (
     <div className="container -mt-16 sm:mt-14 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
@@ -173,10 +257,13 @@ export default function QuestionsAdmin() {
                     <Button
                       className="gap-1 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
                       onClick={handleAnsweredQuestion}
-                      disabled={!currentQuestion}
+                      disabled={!currentQuestion || currentQuestion.respondida || loadingRespondida}
                     >
                       <SquareCheckBig />
-                      Marcar <span className="hidden sm:inline-flex">como pregunta</span> respondida
+                      <div className={`${loadingRespondida ? "hidden" : ""}`}>
+                        Marcar <span className="hidden sm:inline-flex">como pregunta</span> respondida
+                      </div>
+                      <div className={`${loadingRespondida ? "" : "hidden"}`}>Respondiendo...</div>
                     </Button>
                   </div>
                 </CardContent>
@@ -204,25 +291,7 @@ export default function QuestionsAdmin() {
                 <CardTitle>Preguntas disponibles</CardTitle>
               </CardHeader>
               <CardContent className="w-full text-left justify-start overflow-y-scroll min-h-[435px] max-h-[435px] no-scrollbar">
-                {questions.length > 0 ? (
-                  <ul className="space-y-2">
-                    {questions.map((question) => (
-                      <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80 dark:odd:bg-[#1a1a1a] dark:odd:text-white text-left justify-start">
-                        <button
-                          className={`w-full text-left text-wrap text-black dark:text-white hover:bg-slate-300 dark:hover:bg-slate-400 rounded-md py-3 px-2 ${
-                            answeredQuestions.includes(question.id) ? "line-through" : ""
-                          }`}
-                          onClick={() => handleQuestionClick(question)}
-                          disabled={answeredQuestions.includes(question.id)}
-                        >
-                          {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-muted-foreground">No hay preguntas para mostrar</p>
-                )}
+                {questions.length > 0 ? renderQuestions() : <p className="text-muted-foreground">No hay preguntas para mostrar</p>}
               </CardContent>
             </Card>
           </div>

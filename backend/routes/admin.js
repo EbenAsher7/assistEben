@@ -323,7 +323,7 @@ router.get('/preguntasAnonimas/:day', async (req, res) => {
   try {
     // Consulta para obtener todos los módulos con sus respectivos tutores, excluyendo el tutor con el ID dado
     const result = await turso.execute({
-      sql: 'SELECT id, pregunta from Preguntas WHERE fecha = ?',
+      sql: 'SELECT id, pregunta, respondida from Preguntas WHERE fecha = ?',
       args: [date]
     })
 
@@ -342,6 +342,22 @@ router.get('/preguntasAnonimas/:day', async (req, res) => {
     res.status(200).json(modules)
   } catch (error) {
     res.status(500).json({ error: error.message })
+  }
+})
+
+// Actualizar estado de la pregunta a respondida (1)
+router.put('/preguntasAnonimas/:id', async (req, res) => {
+  const { id } = req.params
+
+  try {
+    await turso.execute({
+      sql: 'UPDATE Preguntas SET respondida = 1 WHERE id = ?',
+      args: [id]
+    })
+
+    res.status(200).json({ message: 'Pregunta actualizada correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: 'Hubo un error al actualizar la pregunta' })
   }
 })
 

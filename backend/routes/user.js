@@ -97,50 +97,62 @@ router.post('/user/login', async (req, res) => {
 // Buscar alumno por nombres y apellidos "LIKE"
 router.post('/user/searchStudent', async (req, res) => {
   try {
-    const { search } = req.body
+    const { search } = req.body;
 
     // verificar que los datos requeridos estén presentes
     if (!search) {
-      return res.status(400).json({ error: 'Faltan datos requeridos' })
+      return res.status(400).json({ error: 'Faltan datos requeridos' });
     }
 
-    // Buscar el alumno y su tutor, solo en módulos activos
-    const resultado = await turso.execute({
-      sql: `SELECT
-              a.id,
-              a.nombres AS nombres,
-              a.apellidos AS apellidos,
-              a.telefono AS telefono,
-              t.nombres AS tutor_nombres,
-              t.apellidos AS tutor_apellidos,
-              m.nombre AS modulo_nombre
-            FROM
-              Alumnos a
-            LEFT JOIN
-              Tutores t ON a.tutor_id = t.id
-            LEFT JOIN
-              Modulos m ON a.modulo_id = m.id
-            WHERE
-              CONCAT(a.nombres, ' ', a.apellidos) LIKE ?
-              AND m.activo = 1`,
-      args: [`%${search}%`]
-    })
+    // Divide el término de búsqueda en palabras individuales
+    const searchWords = search.split(' ');
 
-    const columns = resultado.columns
-    const rows = resultado.rows
+    // Construir condiciones LIKE dinámicamente
+    const likeClauses = searchWords.map(word => `CONCAT(a.nombres, ' ', a.apellidos) LIKE ?`).join(' AND ');
+    const likeParams = searchWords.map(word => `%${word}%`);
+
+    // Buscar el alumno y su tutor, solo en módulos activos
+    const query = `
+      SELECT
+        a.id,
+        a.nombres AS nombres,
+        a.apellidos AS apellidos,
+        a.telefono AS telefono,
+        t.nombres AS tutor_nombres,
+        t.apellidos AS tutor_apellidos,
+        m.nombre AS modulo_nombre
+      FROM
+        Alumnos a
+      LEFT JOIN
+        Tutores t ON a.tutor_id = t.id
+      LEFT JOIN
+        Modulos m ON a.modulo_id = m.id
+      WHERE
+        ${likeClauses}
+        AND m.activo = 1
+    `;
+
+    const resultado = await turso.execute({
+      sql: query,
+      args: likeParams
+    });
+
+    const columns = resultado.columns;
+    const rows = resultado.rows;
 
     const students = rows.map((row) => {
-      const student = {}
+      const student = {};
       columns.forEach((col, index) => {
-        student[col] = row[index]
-      })
-      return student
-    })
-    res.status(200).json(students)
+        student[col] = row[index];
+      });
+      return student;
+    });
+
+    res.status(200).json(students);
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    return res.status(500).json({ error: error.message });
   }
-})
+});
 
 // registramos asistencia
 router.post('/user/registerAttendance', async (req, res) => {

@@ -412,9 +412,9 @@ export function ListStudents({ value }) {
           {cursoSeleccionado && (
             <div className="flex w-full justify-center items-center my-2">
               <DownloadTableExcel
-                filename={`Lista de Estudiantes - ${cursos[cursoSeleccionado].label} - ${new Date().toLocaleDateString("es-GT")}`}
-                sheet={`Estudiantes ${cursos[cursoSeleccionado].label}`}
-                currentTableRef={allDataTableRef.current}
+                filename={`Lista de Estudiantes - ${cursos[cursoSeleccionado]?.label} - ${new Date().toLocaleDateString("es-GT")}`}
+                sheet={`Estudiantes ${cursos[cursoSeleccionado]?.label}`}
+                currentTableRef={allDataTableRef?.current}
               >
                 <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">Exportar a excel</button>
               </DownloadTableExcel>

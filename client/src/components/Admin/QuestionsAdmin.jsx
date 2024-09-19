@@ -8,6 +8,7 @@ import { URL_BASE } from "@/config/config";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import LoaderAE from "../LoaderAE";
 import { useToast } from "../ui/use-toast";
+import { DatePicker } from "@gsebdev/react-simple-datepicker";
 
 export default function QuestionsAdmin() {
   const [questions, setQuestions] = useState([]);
@@ -15,6 +16,7 @@ export default function QuestionsAdmin() {
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState(undefined);
+  const [selectedDate2, setSelectedDate2] = useState(undefined);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -29,6 +31,7 @@ export default function QuestionsAdmin() {
   const { user } = useContext(MainContext);
 
   const obtenerFechaFormateada = (fecha, nombre = true) => {
+    if (fecha?.includes("/")) return fecha;
     let hoy = fecha ? new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000) : new Date();
     const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
     const nombreDia = diasSemana[hoy.getDay()];
@@ -39,11 +42,20 @@ export default function QuestionsAdmin() {
     return `${nombreDia} ${dia}/${mes}/${anio}`;
   };
 
-  const cargarPreguntas = async (fecha = new Date()) => {
+  const cargarPreguntas = async (fecha = new Date(), fecha2 = new Date()) => {
     setIsLoading(true);
     try {
-      const dateISO = fecha.toISOString().split("T")[0];
-      const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${dateISO}`, {
+      if (fecha instanceof Date) fecha = fecha.toISOString().split("T")[0];
+      if (fecha2 instanceof Date) fecha2 = fecha2.toISOString().split("T")[0];
+
+      // replace / with - for the date format
+      const date = fecha.split("/").reverse().join("-"); // yyyy-dd-mm
+      const dateFormatted = `${date.split("-")[0]}-${date.split("-")[2]}-${date.split("-")[1]}`;
+
+      const date2 = fecha2.split("/").reverse().join("-"); // yyyy-dd-mm
+      const date2Formatted = `${date2.split("-")[0]}-${date2.split("-")[2]}-${date2.split("-")[1]}`;
+
+      const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${dateFormatted}/${date2Formatted}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -174,8 +186,8 @@ export default function QuestionsAdmin() {
   };
 
   const handleLoadQuestions = () => {
-    if (selectedDate) {
-      cargarPreguntas(selectedDate);
+    if (selectedDate && selectedDate2) {
+      cargarPreguntas(selectedDate, selectedDate2);
       setIsDateDrawerOpen(false);
       setShowDatePicker(true);
     }
@@ -218,7 +230,9 @@ export default function QuestionsAdmin() {
               <MailQuestion className="sm:m-0 mx-auto -mb-2" size={70} />
               <div className="my-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">Preguntas del día</h1>
-                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">{obtenerFechaFormateada(selectedDate)} </h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">
+                  {obtenerFechaFormateada(selectedDate)} al {obtenerFechaFormateada(selectedDate2)}{" "}
+                </h1>
               </div>
             </div>
             <hr className="hidden sm:block sm:mb-3 sm:w-10/12 sm:mx-auto" />
@@ -302,8 +316,28 @@ export default function QuestionsAdmin() {
       <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
         <DrawerContent className="w-full sm:w-[300px] sm:h-screen px-4 ">
           <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-5">Seleccionar Fecha</DrawerTitle>
-          <div className="w-10/12 m-auto sm:m-0 flex justify-center items-center flex-col pb-10">
-            <input
+          <div className="w-10/12 m-auto sm:m-0 flex justify-center items-center flex-col pb-72">
+            <label className="text-black dark:text-white font-[18px]">Ingrese primer fecha</label>
+            <DatePicker
+              id="datepicker-id1"
+              name="date1"
+              onChange={(e) => {
+                setSelectedDate(e.target.value);
+              }}
+              placeholder="Primer fecha"
+              value={selectedDate ?? new Date()}
+            />
+            <label className="text-black dark:text-white font-[18px]">Ingrese primer fecha</label>
+            <DatePicker
+              id="datepicker-id2"
+              name="date2"
+              onChange={(e) => {
+                setSelectedDate2(e.target.value);
+              }}
+              placeholder="Segunda fecha"
+              value={selectedDate2 ?? new Date()}
+            />
+            {/* <input
               type="date"
               value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
               onChange={(e) => {
@@ -312,7 +346,7 @@ export default function QuestionsAdmin() {
               }}
               className="border p-2 w-full rounded-md"
               placeholder="Ingrese una fecha para filtrar"
-            />
+            /> */}
             <div className="flex justify-end mt-6">
               <Button className="w-[300px] sm:w-[200px]" onClick={handleLoadQuestions}>
                 Cargar preguntas

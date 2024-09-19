@@ -313,18 +313,24 @@ router.get('/preguntasTipoAsistencia', async (req, res) => {
   }
 })
 
-// Obtener lista de preguntas por día
-router.get('/preguntasAnonimas/:day', async (req, res) => {
-  // si no viene día, ejeecutar la consulta para el día actual
-  const { day } = req.params
+// Obtener lista de preguntas por rango de fechas
+router.get('/preguntasAnonimas/:startDate/:endDate', async (req, res) => {
+  // Extraer las fechas de los parámetros de la ruta
+  const { startDate, endDate } = req.params
 
-  const date = day ?? new Date().toISOString().split('T')[0]
+  // Si no se proporcionan fechas, asignar las fechas de hoy y mañana como predeterminadas
+  const start = startDate ?? new Date().toISOString().split('T')[0]
+  const end =
+    endDate ??
+    new Date(new Date().setDate(new Date().getDate() + 1))
+      .toISOString()
+      .split('T')[0]
 
   try {
-    // Consulta para obtener todos los módulos con sus respectivos tutores, excluyendo el tutor con el ID dado
+    // Consulta para obtener las preguntas dentro del rango de fechas
     const result = await turso.execute({
-      sql: 'SELECT id, pregunta, respondida from Preguntas WHERE fecha = ?',
-      args: [date]
+      sql: 'SELECT id, pregunta, respondida FROM Preguntas WHERE fecha BETWEEN ? AND ?',
+      args: [start, end]
     })
 
     // Transformar los datos en el formato deseado
@@ -338,7 +344,6 @@ router.get('/preguntasAnonimas/:day', async (req, res) => {
       })
       return module
     })
-
     res.status(200).json(modules)
   } catch (error) {
     res.status(500).json({ error: error.message })

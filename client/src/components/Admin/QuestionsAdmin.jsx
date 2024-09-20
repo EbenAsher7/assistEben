@@ -30,23 +30,6 @@ export default function QuestionsAdmin() {
 
   const { user } = useContext(MainContext);
 
-  // const obtenerFechaFormateada = (fecha, nombre = true) => {
-  //   if (fecha?.includes("/")) {
-  //     const date = fecha.split("/").reverse().join("-");
-  //     const dateFormatted = `${date.split("-")[0]}-${date.split("-")[2]}-${date.split("-")[1]}`;
-  //     return dateFormatted;
-  //   }
-
-  //   let hoy = fecha ? new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000) : new Date();
-  //   const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-  //   const nombreDia = diasSemana[hoy.getDay()];
-  //   const dia = hoy.getDate().toString().padStart(2, "0");
-  //   const mes = (hoy.getMonth() + 1).toString().padStart(2, "0");
-  //   const anio = hoy.getFullYear();
-  //   if (!nombre) return `${dia}/${mes}/${anio}`;
-  //   return `${nombreDia} ${dia}/${mes}/${anio}`;
-  // };
-
   const obtenerFechaFormateada2 = (fecha) => {
     if (fecha?.includes("/")) {
       const date = fecha.split("/").reverse().join("-");
@@ -367,16 +350,6 @@ export default function QuestionsAdmin() {
               placeholder="Segunda fecha"
               value={selectedDate2 ?? new Date()}
             />
-            {/* <input
-              type="date"
-              value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
-              onChange={(e) => {
-                const newDate = new Date(e.target.value + "T00:00:00");
-                setSelectedDate(newDate);
-              }}
-              className="border p-2 w-full rounded-md"
-              placeholder="Ingrese una fecha para filtrar"
-            /> */}
             <div className="flex justify-end mt-6">
               <Button className="w-[300px] sm:w-[200px]" onClick={handleLoadQuestions}>
                 Cargar preguntas

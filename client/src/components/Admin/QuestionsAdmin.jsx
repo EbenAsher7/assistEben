@@ -30,16 +30,29 @@ export default function QuestionsAdmin() {
 
   const { user } = useContext(MainContext);
 
-  const obtenerFechaFormateada = (fecha, nombre = true) => {
-    if (fecha?.includes("/")) return fecha;
-    let hoy = fecha ? new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000) : new Date();
-    const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-    const nombreDia = diasSemana[hoy.getDay()];
-    const dia = hoy.getDate().toString().padStart(2, "0");
-    const mes = (hoy.getMonth() + 1).toString().padStart(2, "0");
-    const anio = hoy.getFullYear();
-    if (!nombre) return `${dia}/${mes}/${anio}`;
-    return `${nombreDia} ${dia}/${mes}/${anio}`;
+  // const obtenerFechaFormateada = (fecha, nombre = true) => {
+  //   if (fecha?.includes("/")) {
+  //     const date = fecha.split("/").reverse().join("-");
+  //     const dateFormatted = `${date.split("-")[0]}-${date.split("-")[2]}-${date.split("-")[1]}`;
+  //     return dateFormatted;
+  //   }
+
+  //   let hoy = fecha ? new Date(fecha.getTime() + fecha.getTimezoneOffset() * 60000) : new Date();
+  //   const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  //   const nombreDia = diasSemana[hoy.getDay()];
+  //   const dia = hoy.getDate().toString().padStart(2, "0");
+  //   const mes = (hoy.getMonth() + 1).toString().padStart(2, "0");
+  //   const anio = hoy.getFullYear();
+  //   if (!nombre) return `${dia}/${mes}/${anio}`;
+  //   return `${nombreDia} ${dia}/${mes}/${anio}`;
+  // };
+
+  const obtenerFechaFormateada2 = (fecha) => {
+    if (fecha?.includes("/")) {
+      const date = fecha.split("/").reverse().join("-");
+      const dateFormatted = `${date.split("-")[1]}/${date.split("-")[2]}/${date.split("-")[0]}`;
+      return dateFormatted;
+    }
   };
 
   const cargarPreguntas = async (fecha = new Date(), fecha2 = new Date()) => {
@@ -186,6 +199,16 @@ export default function QuestionsAdmin() {
   };
 
   const handleLoadQuestions = () => {
+    if (!selectedDate || !selectedDate2) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Las dos fechas son requeridas",
+        duration: 2000,
+      });
+      return;
+    }
+
     if (selectedDate && selectedDate2) {
       cargarPreguntas(selectedDate, selectedDate2);
       setIsDateDrawerOpen(false);
@@ -230,8 +253,8 @@ export default function QuestionsAdmin() {
               <MailQuestion className="sm:m-0 mx-auto -mb-2" size={70} />
               <div className="my-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">Preguntas del día</h1>
-                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">
-                  {obtenerFechaFormateada(selectedDate)} al {obtenerFechaFormateada(selectedDate2)}{" "}
+                <h1 className="sm:text-xl font-bold text-center sm:text-left">
+                  {obtenerFechaFormateada2(selectedDate)} al {obtenerFechaFormateada2(selectedDate2)}{" "}
                 </h1>
               </div>
             </div>
@@ -239,10 +262,11 @@ export default function QuestionsAdmin() {
             {/* Nuevo: Mostrar total de preguntas y respondidas */}
             <div className="flex flex-col space-y-0 opacity-80 italic -mt-1 mb-2 sm:flex-row sm:justify-center sm:gap-9 sm:items-center">
               <span className="mx-auto sm:m-0 italic gap-2 inline-flex">
-                Total de preguntas: <span className="text-lg font-bold">{questions.length}</span> <MessageSquareMore />
+                Total de preguntas: <span className="text-lg font-bold">{String(questions?.length).padStart(3, " ")}</span> <MessageSquareMore />
               </span>
               <span className="mx-auto sm:m-0 italic gap-2 inline-flex">
-                Total Respondidas:&nbsp; <span className="text-lg font-bold">{answeredQuestions.length}</span> <MessageSquareReply />
+                Total Respondidas:&nbsp; <span className="text-lg font-bold">{String(answeredQuestions?.length).padStart(3, " ")}</span>{" "}
+                <MessageSquareReply />
               </span>
             </div>
             {/* ################### PREGUNTAS PRINCIPAL ################### */}
@@ -284,18 +308,24 @@ export default function QuestionsAdmin() {
               </Card>
             </div>
             {/* ################### SELECCIONAR LA FECHA ################### */}
-            <p className="text-sm italic text-center mb-4 opacity-50 px-2">Para ver otras fechas, presiona el botón</p>
-            <Button
-              onClick={handleDatePickerClick}
-              className={`flex items-center gap-2 w-[250px] mx-auto ${
-                showDatePicker
-                  ? "bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-800 dark:text-white"
-                  : "dark:bg-indigo-800 dark:text-white bg-indigo-500 hover:bg-indigo-600"
-              } text-white rounded-full px-6 py-3 transition-colors duration-300`}
-            >
-              <Calendar className="h-5 w-5" />
-              {showDatePicker ? `Fecha seleccionada: ${selectedDate ? obtenerFechaFormateada(selectedDate, false) : ""}` : "Seleccionar fecha"}
-            </Button>
+            <p className="text-sm italic text-center mb-2 opacity-50 px-2">Para ver otras fechas, presiona el botón</p>
+            <div className="mb-48">
+              <Button
+                onClick={handleDatePickerClick}
+                className={`flex items-center gap-2 w-[250px] mx-auto ${
+                  showDatePicker
+                    ? "bg-indigo-500 hover:bg-indigo-600 dark:bg-indigo-800 dark:text-white"
+                    : "dark:bg-indigo-800 dark:text-white bg-indigo-500 hover:bg-indigo-600"
+                } text-white rounded-full px-6 py-3 transition-colors duration-300`}
+              >
+                <Calendar className="h-5 w-5" />
+                {showDatePicker
+                  ? `${selectedDate ? obtenerFechaFormateada2(selectedDate, false) : ""} - ${
+                      selectedDate2 ? obtenerFechaFormateada2(selectedDate2, false) : ""
+                    }`
+                  : "Seleccionar fechas"}
+              </Button>
+            </div>
           </div>
 
           {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}

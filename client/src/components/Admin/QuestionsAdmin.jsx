@@ -364,7 +364,7 @@ export default function QuestionsAdmin() {
         <DrawerTrigger asChild>
           <Button
             variant="outline"
-            className="fixed bottom-4 left-1/2 transform -translate-x-1/2 py-8 rounded-md flex items-center justify-center bg-pink-500 text-white dark:bg-pink-600 dark:text-white sm:hidden"
+            className="fixed bottom-0 left-1/2 transform -translate-x-1/2 py-8 px-8 rounded-md flex items-center justify-center bg-pink-500 text-white dark:bg-pink-600 dark:text-white sm:hidden"
           >
             <ChevronUp className="h-6 w-6" /> &nbsp; Lista de Preguntas
           </Button>

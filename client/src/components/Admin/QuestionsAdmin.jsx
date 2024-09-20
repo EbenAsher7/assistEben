@@ -15,8 +15,6 @@ export default function QuestionsAdmin() {
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(undefined);
-  const [selectedDate2, setSelectedDate2] = useState(undefined);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,6 +28,17 @@ export default function QuestionsAdmin() {
 
   const { user } = useContext(MainContext);
 
+  const obtenerFechaFormateada = (fecha) => {
+    const dia = fecha.getDate().toString().padStart(2, "0");
+    const mes = (fecha.getMonth() + 1).toString().padStart(2, "0");
+    const anio = fecha.getFullYear();
+    return `${mes}/${dia}/${anio}`;
+  };
+
+  //VARIABLE DE FECHA
+  const [selectedDate, setSelectedDate] = useState(obtenerFechaFormateada(new Date()));
+  const [selectedDate2, setSelectedDate2] = useState(obtenerFechaFormateada(new Date()));
+
   const obtenerFechaFormateada2 = (fecha) => {
     if (fecha?.includes("/")) {
       const date = fecha.split("/").reverse().join("-");
@@ -38,12 +47,9 @@ export default function QuestionsAdmin() {
     }
   };
 
-  const cargarPreguntas = async (fecha = new Date(), fecha2 = new Date()) => {
+  const cargarPreguntas = async (fecha = selectedDate, fecha2 = selectedDate2) => {
     setIsLoading(true);
     try {
-      if (fecha instanceof Date) fecha = fecha.toISOString().split("T")[0];
-      if (fecha2 instanceof Date) fecha2 = fecha2.toISOString().split("T")[0];
-
       // replace / with - for the date format
       const date = fecha.split("/").reverse().join("-"); // yyyy-dd-mm
       const dateFormatted = `${date.split("-")[0]}-${date.split("-")[2]}-${date.split("-")[1]}`;
@@ -91,9 +97,10 @@ export default function QuestionsAdmin() {
     }
   };
 
+  // Modifica el useEffect para usar las fechas por defecto
   useEffect(() => {
     if (user && user?.tipo === "Administrador") {
-      cargarPreguntas();
+      cargarPreguntas(selectedDate, selectedDate2);
     }
   }, [user]);
 
@@ -237,7 +244,7 @@ export default function QuestionsAdmin() {
               <div className="my-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">Preguntas del día</h1>
                 <h1 className="sm:text-xl font-bold text-center sm:text-left">
-                  {obtenerFechaFormateada2(selectedDate)} {selectedDate && " al "} {obtenerFechaFormateada2(selectedDate2)}{" "}
+                  {obtenerFechaFormateada2(selectedDate)} {selectedDate && " al "} {obtenerFechaFormateada2(selectedDate2)}
                 </h1>
               </div>
             </div>

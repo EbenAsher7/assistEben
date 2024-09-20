@@ -237,7 +237,7 @@ export default function QuestionsAdmin() {
               <div className="my-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">Preguntas del día</h1>
                 <h1 className="sm:text-xl font-bold text-center sm:text-left">
-                  {obtenerFechaFormateada2(selectedDate)} al {obtenerFechaFormateada2(selectedDate2)}{" "}
+                  {obtenerFechaFormateada2(selectedDate)} {selectedDate && " al "} {obtenerFechaFormateada2(selectedDate2)}{" "}
                 </h1>
               </div>
             </div>
@@ -258,8 +258,8 @@ export default function QuestionsAdmin() {
                 <CardHeader>
                   <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
                 </CardHeader>
-                <CardContent className="w-full min-h-[270px] h-[270px] relative">
-                  <div className="flex flex-col justify-center items-center min-h-[190px] h-[190px]">
+                <CardContent className="w-full min-h-[330px] h-[330px] relative">
+                  <div className="flex flex-col justify-center items-center min-h-[230px] h-[230px]">
                     {currentQuestion ? (
                       <p className="text-lg text-left p-2 sm:text-4xl">{currentQuestion.pregunta}</p>
                     ) : (

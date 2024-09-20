@@ -13,15 +13,16 @@ export default function QuestionUser() {
   const [puedePreguntar, setPuedePreguntar] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [isCounterAnimated, setIsCounterAnimated] = useState(false);
+
+  const MAX_LENGTH = 250;
 
   useEffect(() => {
-    // Si el usuario está autenticado, siempre puede preguntar
     if (user) {
       setPuedePreguntar(true);
       return;
     }
 
-    // Si el usuario no está autenticado, revisa el localStorage
     const ultimaPregunta = localStorage.getItem("ultimaPregunta");
     if (ultimaPregunta) {
       const ultimaFecha = new Date(ultimaPregunta);
@@ -35,6 +36,13 @@ export default function QuestionUser() {
     }
   }, [user]);
 
+  useEffect(() => {
+    if (pregunta.length === MAX_LENGTH) {
+      setIsCounterAnimated(true);
+      setTimeout(() => setIsCounterAnimated(false), 1000);
+    }
+  }, [pregunta]);
+
   const obtenerFechaFormateada = () => {
     const hoy = new Date();
     const diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
@@ -47,7 +55,7 @@ export default function QuestionUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (pregunta.trim()) {
+    if (pregunta.trim() && pregunta.length >= 10) {
       if (puedePreguntar) {
         setIsLoading(true);
         setHasError(false);
@@ -101,7 +109,7 @@ export default function QuestionUser() {
     } else {
       toast({
         title: "Error",
-        description: "Por favor, escribe una pregunta antes de enviar.",
+        description: "Su pregunta es demasiado corta para ser enviada.",
         variant: "destructive",
         duration: 2500,
       });
@@ -116,15 +124,24 @@ export default function QuestionUser() {
           <h1 className="text-3xl font-bold text-foreground text-center">Preguntas del tema del: {obtenerFechaFormateada()}</h1>
           <p className="text-muted-foreground text-center italic opacity-50">Las preguntas serán anónimas</p>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <Textarea
-              placeholder={puedePreguntar ? "Escribe tu pregunta aquí..." : "Ya has mandado una pregunta hoy"}
-              value={pregunta}
-              onChange={(e) => setPregunta(e.target.value)}
-              className="min-h-[140px] bg-background text-foreground border-input"
-              disabled={!puedePreguntar || isLoading}
-              style={{ resize: "none" }}
-              maxLength={200}
-            />
+            <div className="relative">
+              <Textarea
+                placeholder={puedePreguntar ? "Escribe tu pregunta aquí..." : "Ya has mandado una pregunta hoy"}
+                value={pregunta}
+                onChange={(e) => setPregunta(e.target.value)}
+                className="min-h-[200px] bg-background text-foreground border-input pr-16"
+                disabled={!puedePreguntar || isLoading}
+                style={{ resize: "none" }}
+                maxLength={MAX_LENGTH}
+              />
+              <div
+                className={`absolute bottom-2 right-2 text-sm ${
+                  pregunta.length === MAX_LENGTH ? "text-red-500" : "text-gray-500"
+                } transition-all duration-300 ${isCounterAnimated ? "scale-120" : "scale-100"}`}
+              >
+                {pregunta.length}/{MAX_LENGTH}
+              </div>
+            </div>
             <Button type="submit" className="w-full" disabled={!puedePreguntar || isLoading}>
               {isLoading ? "Enviando..." : puedePreguntar ? "Mandar pregunta" : "Ya has mandado una pregunta hoy"}
             </Button>

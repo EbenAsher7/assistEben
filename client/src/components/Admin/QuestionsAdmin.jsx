@@ -299,7 +299,7 @@ export default function QuestionsAdmin() {
             </div>
             {/* ################### SELECCIONAR LA FECHA ################### */}
             <p className="text-sm italic text-center mb-2 opacity-50 px-2">Para ver otras fechas, presiona el botón</p>
-            <div className="mb-48">
+            <div className="mb-48 sm:mb-0">
               <Button
                 onClick={handleDatePickerClick}
                 className={`flex items-center gap-2 w-[250px] mx-auto ${

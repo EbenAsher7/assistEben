@@ -154,7 +154,7 @@ const Navbar = memo(() => {
   return (
     <nav className="bg-white border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500 fixed top-0 w-full z-50" ref={navbarRef}>
       <div className="w-full flex flex-wrap items-center justify-between p-2 sm:pl-4">
-        <Link to="/" className="flex items-center gap-2" onClick={closeNavbar}>
+        <Link to="/questions" className="flex items-center gap-2" onClick={closeNavbar}>
           <img src={LOGODOCTRINA} className="h-10 py-1 ml-2 dark:invert invert-0" alt="Logo Ministerios Ebenezer" />
         </Link>
         <button

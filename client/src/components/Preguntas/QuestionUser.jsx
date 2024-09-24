@@ -126,7 +126,9 @@ export default function QuestionUser() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
               <Textarea
-                placeholder={puedePreguntar ? "Escribe tu pregunta aquí..." : "Ya has mandado una pregunta hoy"}
+                placeholder={
+                  puedePreguntar ? "Escribe tu pregunta aquí..." : "Ya has mandado una pregunta hoy, tendrás disponible otra pegunta el día de mañana."
+                }
                 value={pregunta}
                 onChange={(e) => setPregunta(e.target.value)}
                 className="min-h-[200px] bg-background text-foreground border-input pr-16"
@@ -143,7 +145,7 @@ export default function QuestionUser() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={!puedePreguntar || isLoading}>
-              {isLoading ? "Enviando..." : puedePreguntar ? "Mandar pregunta" : "Ya has mandado una pregunta hoy"}
+              {isLoading ? "Enviando..." : puedePreguntar ? "Mandar pregunta" : "Ya has mandado una hoy, intenta mañana"}
             </Button>
             {isLoading && (
               <p className="text-center mt-2">

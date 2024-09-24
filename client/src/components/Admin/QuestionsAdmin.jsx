@@ -18,6 +18,7 @@ export default function QuestionsAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isMaximized, setIsMaximized] = useState(false);
 
   const [loadingRespondida, setLoadingRespondida] = useState(false);
 
@@ -206,28 +207,81 @@ export default function QuestionsAdmin() {
     }
   };
 
+  const handleMaximize = () => {
+    setIsMaximized(true); // Abrir modal
+  };
+
+  const handleCloseMaximize = () => {
+    setIsMaximized(false); // Cerrar modal
+  };
+
   const renderQuestions = () => (
     <ul className="space-y-2">
-      {questions.map((question) => (
-        <li
-          key={question.id}
-          className={`odd:bg-[#f0f0f0] text-black/80 dark:odd:bg-[#1a1a1a] dark:odd:text-white text-left justify-start
-                      ${question.id === selectedQuestionId ? "bg-orange-500 dark:bg-orange-700" : ""}`}
-          ref={question.id === selectedQuestionId ? selectedQuestionRef : null}
-        >
-          <button
-            className={`w-full text-left text-wrap text-black dark:text-white hover:bg-slate-300 dark:hover:bg-slate-400 rounded-md py-3 px-2 ${
-              question.respondida ? "line-through" : ""
-            } ${question.id === selectedQuestionId ? "text-white" : ""}`}
-            onClick={() => handleQuestionClick(question)}
-            disabled={question.respondida}
+      {questions.map((question, index) => {
+        const isSelected = question.id === selectedQuestionId;
+        const isEven = index % 2 === 0;
+
+        // Determinamos los colores según si es par o impar, además de si el tema es claro u oscuro
+        const backgroundColor = isEven
+          ? isSelected
+            ? "bg-orange-500 dark:bg-orange-700"
+            : "bg-gray-100 dark:bg-gray-800"
+          : isSelected
+          ? "bg-orange-500 dark:bg-orange-700"
+          : "bg-white dark:bg-gray-900";
+
+        const textColor = isSelected ? "text-white" : "text-black dark:text-white";
+        const hoverColor = isSelected ? "" : "hover:bg-gray-100 dark:hover:bg-slate-800";
+
+        return (
+          <li
+            key={question.id}
+            className={`text-left justify-start rounded-md py-3 px-2 ${backgroundColor} ${textColor} ${
+              isSelected ? "" : "hover:bg-gray-100 dark:hover:bg-gray-800"
+            }`}
+            ref={isSelected ? selectedQuestionRef : null}
           >
-            {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
-          </button>
-        </li>
-      ))}
+            <button
+              className={`w-full text-left text-wrap ${hoverColor} ${question.respondida ? "line-through" : ""}`}
+              onClick={() => handleQuestionClick(question)}
+              disabled={question.respondida}
+            >
+              {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
+            </button>
+          </li>
+        );
+      })}
     </ul>
   );
+
+  const renderBotones = (size = 1) => {
+    // Definimos el tamaño de los botones
+    const buttonSizeClass = size === 2 ? "w-[400px] h-[100px] text-xl" : ""; // Si size es 2, aplicamos el tamaño más grande
+
+    return (
+      <div className="flex gap-4 items-center justify-center absolute bottom-4 left-1/2 transform -translate-x-1/2">
+        <Button
+          className={`gap-2 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700 ${buttonSizeClass}`}
+          onClick={handleRandomQuestion}
+          disabled={answeredQuestions.length === questions.length || questions.length === 0 || questions.length === 1}
+        >
+          <Dices />
+          Aleatorio
+        </Button>
+        <Button
+          className={`gap-1 bg-emerald-500 text-white dark:bg-emerald-800 dark:text-white hover:bg-emerald-600 dark:hover:bg-emerald-700 ${buttonSizeClass}`}
+          onClick={handleAnsweredQuestion}
+          disabled={!currentQuestion || currentQuestion.respondida || loadingRespondida}
+        >
+          <SquareCheckBig />
+          <div className={`${loadingRespondida ? "hidden" : ""}`}>
+            Marcar <span className="hidden sm:inline-flex">como pregunta</span> respondida
+          </div>
+          <div className={`${loadingRespondida ? "" : "hidden"}`}>Respondiendo...</div>
+        </Button>
+      </div>
+    );
+  };
 
   return (
     <div className="container -mt-16 sm:mt-14 mx-auto py-4 px-5 flex flex-col items-center justify-center sm:justify-start">
@@ -263,7 +317,12 @@ export default function QuestionsAdmin() {
             <div className="flex flex-col sm:flex-row gap-1 w-full mb-5 ">
               <Card className="w-full sm:min-w-[800px] sm:max-w-[800px]">
                 <CardHeader>
-                  <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
+                    <Button className="hidden sm:flex w-[300px] h-[50px]" onClick={handleMaximize}>
+                      Maximizar la pregunta
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent className="w-full min-h-[330px] h-[330px] relative">
                   <div className="flex flex-col justify-center items-center min-h-[230px] h-[230px]">
@@ -273,27 +332,8 @@ export default function QuestionsAdmin() {
                       <p className="text-muted-foreground">No hay preguntas para mostrar</p>
                     )}
                   </div>
-                  <div className="flex gap-4 items-center justify-center absolute bottom-4 left-1/2 transform -translate-x-1/2">
-                    <Button
-                      className="gap-2 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
-                      onClick={handleRandomQuestion}
-                      disabled={answeredQuestions.length === questions.length || questions.length === 0 || questions.length === 1}
-                    >
-                      <Dices />
-                      Aleatorio
-                    </Button>
-                    <Button
-                      className="gap-1 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
-                      onClick={handleAnsweredQuestion}
-                      disabled={!currentQuestion || currentQuestion.respondida || loadingRespondida}
-                    >
-                      <SquareCheckBig />
-                      <div className={`${loadingRespondida ? "hidden" : ""}`}>
-                        Marcar <span className="hidden sm:inline-flex">como pregunta</span> respondida
-                      </div>
-                      <div className={`${loadingRespondida ? "" : "hidden"}`}>Respondiendo...</div>
-                    </Button>
-                  </div>
+                  {/* RENDERIZAR BOTONES */}
+                  {renderBotones()}
                 </CardContent>
               </Card>
             </div>
@@ -319,7 +359,7 @@ export default function QuestionsAdmin() {
           </div>
 
           {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}
-          <div className="hidden sm:block ">
+          <div className="hidden sm:block w-1/4 overflow-y-auto max-h-screen">
             <Card className="sm:min-w-[250px] sm:max-w-[350px] ">
               <CardHeader>
                 <CardTitle>Preguntas disponibles</CardTitle>
@@ -400,6 +440,28 @@ export default function QuestionsAdmin() {
           </div>
         </DrawerContent>
       </Drawer>
+
+      {/* ################### MODAL ####################### */}
+      {/* Modal Maximizado */}
+      {isMaximized && (
+        <div className="fixed inset-0 p-4 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-neutral-800 m-4 w-full h-full p-8 max-w-6xl max-h-screen relative flex flex-col justify-between">
+            {/* Botón de cerrar */}
+            <button className="absolute top-4 right-4 text-white dark:text-white text-3xl bg-red-500 rounded-full size-16" onClick={handleCloseMaximize}>
+              &#x2715; {/* Este es el símbolo de "X" */}
+            </button>
+
+            {/* Contenedor del texto que ocupa 3/4 del espacio */}
+            <div className="flex flex-col items-center justify-center flex-grow">
+              <h1 className="text-5xl font-bold mb-6 text-yellow-500 dark:text-yellow-500">La pregunta dice:</h1>
+              <div className="text-7xl mb-6 text-center">{currentQuestion ? currentQuestion.pregunta : "No hay preguntas para mostrar"}</div>
+            </div>
+
+            {/* RENDERIZAR BOTONES al final */}
+            <div className="flex justify-center mt-6">{renderBotones(2)}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

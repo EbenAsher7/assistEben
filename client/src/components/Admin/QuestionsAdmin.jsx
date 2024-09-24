@@ -319,7 +319,29 @@ export default function QuestionsAdmin() {
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
-                    <Button className="hidden sm:flex w-[300px] h-[50px]" onClick={handleMaximize}>
+                    <Button className="hidden sm:flex w-[200px] h-[50px] justify-center items-center" onClick={handleMaximize}>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mr-2"
+                      >
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                        <path d="M16 4l4 0l0 4" />
+                        <path d="M14 10l6 -6" />
+                        <path d="M8 20l-4 0l0 -4" />
+                        <path d="M4 20l6 -6" />
+                        <path d="M16 20l4 0l0 -4" />
+                        <path d="M14 14l6 6" />
+                        <path d="M8 4l-4 0l0 4" />
+                        <path d="M4 4l6 6" />
+                      </svg>
                       Maximizar la pregunta
                     </Button>
                   </div>
@@ -444,8 +466,14 @@ export default function QuestionsAdmin() {
       {/* ################### MODAL ####################### */}
       {/* Modal Maximizado */}
       {isMaximized && (
-        <div className="fixed inset-0 p-4 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-neutral-800 m-4 w-full h-full p-8 max-w-6xl max-h-screen relative flex flex-col justify-between">
+        <div
+          className="fixed inset-0 p-4 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          onClick={handleCloseMaximize} // Detecta clics en la capa fuera del modal
+        >
+          <div
+            className="bg-white dark:bg-neutral-800 m-4 w-full h-full p-8 max-w-6xl max-h-screen relative flex flex-col justify-between"
+            onClick={(e) => e.stopPropagation()} // Evita que el clic en el modal cierre el mismo
+          >
             {/* Botón de cerrar */}
             <button className="absolute top-4 right-4 text-white dark:text-white text-3xl bg-red-500 rounded-full size-16" onClick={handleCloseMaximize}>
               &#x2715; {/* Este es el símbolo de "X" */}

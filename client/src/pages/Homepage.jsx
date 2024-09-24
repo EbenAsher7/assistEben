@@ -19,7 +19,8 @@ const Homepage = () => {
       </ul>
       <div className="w-full flex justify-center items-center flex-col sm:flex-row h-dvh sm:-mt-24 -mt-48 background-pattern">
         <div className="flex flex-col gap-3 justify-center max-w-[400px] items-center sm:mr-24">
-          <img src="/cropped-favicon.png" alt="logo Ebenezer" className="size-32 sm:size-64 invert dark:invert-0" />
+          <img src="/cropped-favicon.png" alt="logo Ebenezer" className="hidden sm:inline-flex size-32 sm:size-64 invert dark:invert-0" />
+          <img src="/LOGODOCTRINA.webp" alt="logo Ebenezer" className="inline-flex sm:hidden h-16 mb-4 invert-0 dark:invert" />
         </div>
         <div className="flex flex-col gap-3 sm:-mt-24">
           <div className="sm:min-w-[300px] sm:max-w-[700px] w-full">

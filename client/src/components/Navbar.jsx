@@ -1,6 +1,6 @@
 import { useState, useContext, useCallback, useMemo, useEffect, useRef } from "react";
 import { ThemeToggle } from "./ThemeToggle";
-import LOGO from "/logoEbenezer.webp";
+import LOGODOCTRINA from "/LOGODOCTRINA.webp";
 import { Link, useNavigate } from "react-router-dom";
 import MainContext from "../context/MainContext";
 import "flowbite";
@@ -155,8 +155,7 @@ const Navbar = memo(() => {
     <nav className="bg-white border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500 fixed top-0 w-full z-50" ref={navbarRef}>
       <div className="w-full flex flex-wrap items-center justify-between p-2 sm:pl-4">
         <Link to="/" className="flex items-center gap-2" onClick={closeNavbar}>
-          <img src={LOGO} className="h-10 dark:invert-0 invert" alt="Logo Ministerios Ebenezer" />
-          <span className="self-center text-md sm:text-xl font-semibold whitespace-nowrap dark:text-white">Ministerios Ebenezer</span>
+          <img src={LOGODOCTRINA} className="h-10 py-1 ml-2 dark:invert invert-0" alt="Logo Ministerios Ebenezer" />
         </Link>
         <button
           onClick={toggleNavbar}

@@ -37,9 +37,11 @@ export default function QuestionsAdmin() {
   };
 
   //VARIABLE DE FECHA
-  const [selectedDate, setSelectedDate] = useState(obtenerFechaFormateada(new Date()));
-  const [selectedDate2, setSelectedDate2] = useState(obtenerFechaFormateada(new Date()));
+ // const [selectedDate, setSelectedDate] = useState(obtenerFechaFormateada(new Date()));
+ // const [selectedDate2, setSelectedDate2] = useState(obtenerFechaFormateada(new Date()));
 
+  const [selectedDate, setSelectedDate] = useState(obtenerFechaFormateada(new Date(new Date().setDate(new Date().getDate() - 2))));
+const [selectedDate2, setSelectedDate2] = useState(obtenerFechaFormateada(new Date(new Date().setDate(new Date().getDate() + 2))));
   const obtenerFechaFormateada2 = (fecha) => {
     if (fecha?.includes("/")) {
       const date = fecha.split("/").reverse().join("-");

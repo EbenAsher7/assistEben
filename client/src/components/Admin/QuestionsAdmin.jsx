@@ -336,7 +336,7 @@ export default function QuestionsAdmin() {
             {/* <label className="text-black dark:text-white font-[18px]">Ingrese primer fecha</label> */}
             <CRDate title="Ingrese primer fecha" setValue={setSelectedDate} defaultValue={selectedDate} placeholder="Primer fecha" />
             <div className="my-4"></div>
-            <CRDate position="top" title="Ingrese segunda fecha" setValue={setSelectedDate2} defaultValue={selectedDate2} placeholder="Segunda fecha" />
+            <CRDate title="Ingrese segunda fecha" setValue={setSelectedDate2} defaultValue={selectedDate2} placeholder="Segunda fecha" />
 
             {/* <DatePicker
               id="datepicker-id1"

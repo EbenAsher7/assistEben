@@ -28,6 +28,8 @@ export default function QuestionsAdmin() {
 
   const { user } = useContext(MainContext);
 
+  const [preventNavigation, setPreventNavigation] = useState(false);
+
   const obtenerFechaFormateada = (fecha) => {
     const dia = fecha.getDate().toString().padStart(2, "0");
     const mes = (fecha.getMonth() + 1).toString().padStart(2, "0");
@@ -35,17 +37,29 @@ export default function QuestionsAdmin() {
     return `${anio}-${mes}-${dia}`;
   };
 
+  // prevenir la navegación
+  useEffect(() => {
+    const handlePopState = (event) => {
+      if (preventNavigation) {
+        event.preventDefault();
+        setIsDrawerOpen(false);
+        setIsDateDrawerOpen(false);
+        setPreventNavigation(false);
+        window.history.pushState(null, "", window.location.pathname);
+      }
+    };
+
+    window.history.pushState(null, "", window.location.pathname);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [preventNavigation]);
+
   //VARIABLE DE FECHA
   const [selectedDate, setSelectedDate] = useState(obtenerFechaFormateada(new Date(new Date().setDate(new Date().getDate() - 2))));
   const [selectedDate2, setSelectedDate2] = useState(obtenerFechaFormateada(new Date(new Date().setDate(new Date().getDate() + 2))));
-
-  // const obtenerFechaFormateada2 = (fecha) => {
-  //   if (fecha?.includes("/")) {
-  //     const date = fecha.split("/").reverse().join("-");
-  //     const dateFormatted = `${date.split("-")[1]}/${date.split("-")[2]}/${date.split("-")[0]}`;
-  //     return dateFormatted;
-  //   }
-  // };
 
   const cargarPreguntas = async (fecha = selectedDate, fecha2 = selectedDate2) => {
     setIsLoading(true);
@@ -186,6 +200,7 @@ export default function QuestionsAdmin() {
 
   const handleDatePickerClick = () => {
     setIsDateDrawerOpen(true);
+    setPreventNavigation(true);
   };
 
   const handleLoadQuestions = () => {
@@ -202,6 +217,7 @@ export default function QuestionsAdmin() {
     if (selectedDate && selectedDate2) {
       cargarPreguntas(selectedDate, selectedDate2);
       setIsDateDrawerOpen(false);
+      setPreventNavigation(false); // Añade esta línea
       setShowDatePicker(true);
     }
   };
@@ -329,7 +345,13 @@ export default function QuestionsAdmin() {
       )}
 
       {/* ################### SELECCIONAR FECHA ################### */}
-      <Drawer open={isDateDrawerOpen} onOpenChange={setIsDateDrawerOpen}>
+      <Drawer
+        open={isDateDrawerOpen}
+        onOpenChange={(open) => {
+          setIsDateDrawerOpen(open);
+          if (!open) setPreventNavigation(false);
+        }}
+      >
         <DrawerContent className="w-full sm:w-[300px] sm:h-screen px-4 ">
           <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-5">Seleccionar Fecha</DrawerTitle>
           <div className="w-10/12 m-auto sm:m-0 flex justify-center items-center flex-col pb-72">
@@ -337,26 +359,6 @@ export default function QuestionsAdmin() {
             <CRDate title="Ingrese primer fecha" setValue={setSelectedDate} defaultValue={selectedDate} placeholder="Primer fecha" />
             <div className="my-4"></div>
             <CRDate title="Ingrese segunda fecha" setValue={setSelectedDate2} defaultValue={selectedDate2} placeholder="Segunda fecha" />
-
-            {/* <DatePicker
-              id="datepicker-id1"
-              name="date1"
-              onChange={(e) => {
-                setSelectedDate(e.target.value);
-              }}
-              placeholder="Primer fecha"
-              value={selectedDate ?? new Date()}
-            /> */}
-            {/* <label className="text-black dark:text-white font-[18px]">Ingrese primer fecha</label>
-            <DatePicker
-              id="datepicker-id2"
-              name="date2"
-              onChange={(e) => {
-                setSelectedDate2(e.target.value);
-              }}
-              placeholder="Segunda fecha"
-              value={selectedDate2 ?? new Date()}
-            /> */}
             <div className="flex justify-end mt-6">
               <Button className="w-[300px] sm:w-[200px]" onClick={handleLoadQuestions}>
                 Cargar preguntas
@@ -367,7 +369,13 @@ export default function QuestionsAdmin() {
       </Drawer>
 
       {/* ################### DRAWER MOBILE DE PREGUNTAS ################### */}
-      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+      <Drawer
+        open={isDrawerOpen}
+        onOpenChange={(open) => {
+          setIsDrawerOpen(open);
+          if (!open) setPreventNavigation(false);
+        }}
+      >
         <DrawerTrigger asChild>
           <Button
             variant="outline"

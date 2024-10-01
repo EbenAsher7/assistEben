@@ -233,23 +233,23 @@ export default function QuestionsAdmin() {
     );
   }, [questions, searchTerm]);
 
-  const renderQuestions = () => (
+  const renderQuestions = (questionsToRender, align = "text-left", length = 40) => (
     <ul className="space-y-2">
-      {filteredQuestions.map((question) => (
+      {questionsToRender.map((question) => (
         <li
           key={question.id}
           className={`odd:bg-[#f0f0f0] text-black/80 dark:odd:bg-[#1a1a1a] dark:odd:text-white text-left justify-start
-                      ${question.id === selectedQuestionId ? "bg-orange-500 dark:bg-orange-700" : ""}`}
+                    ${question.id === selectedQuestionId ? "bg-orange-500 dark:bg-orange-700" : ""}`}
           ref={question.id === selectedQuestionId ? selectedQuestionRef : null}
         >
           <button
-            className={`w-full text-left text-wrap text-black dark:text-white hover:bg-slate-300 dark:hover:bg-slate-400 rounded-md py-3 px-2 ${
+            className={`w-full ${align} text-wrap text-black dark:text-white hover:bg-slate-300 dark:hover:bg-slate-400 rounded-md py-3 px-2 ${
               question.respondida ? "line-through" : ""
             } ${question.id === selectedQuestionId ? "text-white" : ""}`}
             onClick={() => handleQuestionClick(question)}
             disabled={question.respondida}
           >
-            {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
+            {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, length)}...` : question.pregunta}
           </button>
         </li>
       ))}
@@ -356,7 +356,11 @@ export default function QuestionsAdmin() {
                   className="w-full p-2 mb-4 border rounded-md dark:bg-gray-700 dark:border-gray-600"
                 />
                 <div className="w-full text-left justify-start overflow-y-scroll min-h-[435px] max-h-[435px] no-scrollbar">
-                  {filteredQuestions.length > 0 ? renderQuestions() : <p className="text-muted-foreground">No hay preguntas para mostrar</p>}
+                  {filteredQuestions.length > 0 ? (
+                    renderQuestions(filteredQuestions, "text-left", 80)
+                  ) : (
+                    <p className="text-muted-foreground">No hay preguntas para mostrar</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -416,21 +420,8 @@ export default function QuestionsAdmin() {
             />
           </div>
           <div className="py-4 overflow-y-scroll text-left">
-            {questions.length > 0 ? (
-              <ul className="space-y-2">
-                {questions.map((question) => (
-                  <li key={question.id} className="odd:bg-[#f0f0f0] text-black/80 dark:text-white dark:odd:bg-[#202020]">
-                    <Button
-                      variant="ghost"
-                      className={`w-full text-wrap text-left py-6 text-[1rem] ${answeredQuestions.includes(question.id) ? "line-through" : ""}`}
-                      onClick={() => handleQuestionClick(question)}
-                      disabled={answeredQuestions.includes(question.id)}
-                    >
-                      {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, 40)}...` : question.pregunta}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
+            {filteredQuestions.length > 0 ? (
+              renderQuestions(filteredQuestions, "text-center", 40)
             ) : (
               <p className="text-muted-foreground text-center">No hay preguntas para mostrar</p>
             )}

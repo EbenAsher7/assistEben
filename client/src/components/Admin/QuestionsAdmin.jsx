@@ -64,21 +64,13 @@ export default function QuestionsAdmin() {
   const cargarPreguntas = async (fecha = selectedDate, fecha2 = selectedDate2) => {
     setIsLoading(true);
     try {
-      // replace / with - for the date format
-      const date = fecha.split("/").reverse().join("-"); // yyyy-dd-mm
-      const dateFormatted = `${date.split("-")[0]}-${date.split("-")[2]}-${date.split("-")[1]}`;
-
-      const date2 = fecha2.split("/").reverse().join("-"); // yyyy-dd-mm
-      const date2Formatted = `${date2.split("-")[0]}-${date2.split("-")[2]}-${date2.split("-")[1]}`;
-
-      const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${dateFormatted}/${date2Formatted}`, {
+      const response = await fetch(`${URL_BASE}/admin/preguntasAnonimas/${fecha}/${fecha2}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: user?.token,
         },
       });
-
       const data = await response.json();
       if (data.length === 0) {
         setQuestions([]);

@@ -1,4 +1,5 @@
-import { useState, useEffect, useContext, useRef } from "react";
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useState, useEffect, useContext, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
@@ -23,6 +24,8 @@ export default function QuestionsAdmin() {
 
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const selectedQuestionRef = useRef(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { toast } = useToast();
 
@@ -133,7 +136,7 @@ export default function QuestionsAdmin() {
   };
 
   const handleRandomQuestion = () => {
-    const unansweredQuestions = questions.filter((q) => !q.respondida);
+    const unansweredQuestions = filteredQuestions.filter((q) => !q.respondida);
     if (unansweredQuestions.length > 0) {
       const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
       const randomQuestion = unansweredQuestions[randomIndex];
@@ -214,9 +217,25 @@ export default function QuestionsAdmin() {
     }
   };
 
+  // FILTRAR PREGUNTAS
+  const filteredQuestions = useMemo(() => {
+    return questions.filter((question) =>
+      question.pregunta
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .includes(
+          searchTerm
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+        )
+    );
+  }, [questions, searchTerm]);
+
   const renderQuestions = () => (
     <ul className="space-y-2">
-      {questions.map((question) => (
+      {filteredQuestions.map((question) => (
         <li
           key={question.id}
           className={`odd:bg-[#f0f0f0] text-black/80 dark:odd:bg-[#1a1a1a] dark:odd:text-white text-left justify-start
@@ -328,8 +347,17 @@ export default function QuestionsAdmin() {
               <CardHeader>
                 <CardTitle>Preguntas disponibles</CardTitle>
               </CardHeader>
-              <CardContent className="w-full text-left justify-start overflow-y-scroll min-h-[435px] max-h-[435px] no-scrollbar">
-                {questions.length > 0 ? renderQuestions() : <p className="text-muted-foreground">No hay preguntas para mostrar</p>}
+              <CardContent>
+                <input
+                  type="text"
+                  placeholder="Buscar entre las preguntas..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full p-2 mb-4 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+                />
+                <div className="w-full text-left justify-start overflow-y-scroll min-h-[435px] max-h-[435px] no-scrollbar">
+                  {filteredQuestions.length > 0 ? renderQuestions() : <p className="text-muted-foreground">No hay preguntas para mostrar</p>}
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -378,6 +406,15 @@ export default function QuestionsAdmin() {
         </DrawerTrigger>
         <DrawerContent className="max-h-[80vh]">
           <DialogTitle className="text-xl text-center font-extrabold text-black dark:text-white">Preguntas disponibles</DialogTitle>
+          <div className="px-4 py-2">
+            <input
+              type="text"
+              placeholder="Buscar entre las preguntas..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-2 mb-1 border rounded-md dark:bg-gray-700 dark:border-gray-600"
+            />
+          </div>
           <div className="py-4 overflow-y-scroll text-left">
             {questions.length > 0 ? (
               <ul className="space-y-2">

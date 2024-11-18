@@ -55,11 +55,11 @@ router.get('/modulesByTutor/:tutorID', async (req, res) => {
     const result = await turso.execute({
       sql: `
         SELECT Modulos.id, Modulos.nombre, Modulos.fecha_inicio, Modulos.fecha_fin,
-               Modulos.horarioInicio, Modulos.horarioFin, Modulos.encargado_id,
-               Modulos.descripcion, Modulos.foto_url, Modulos.activo
-        FROM TutoresModulos
-        JOIN Modulos ON TutoresModulos.modulo_id = Modulos.id
-        WHERE TutoresModulos.tutor_id = ?
+        Modulos.horarioInicio, Modulos.horarioFin, Modulos.encargado_id,
+        Modulos.descripcion, Modulos.foto_url, Modulos.activo
+          FROM TutoresModulos
+          JOIN Modulos ON TutoresModulos.modulo_id = Modulos.id
+          WHERE TutoresModulos.tutor_id = ? AND CAST(Modulos.activo AS INTEGER) = 1
       `,
       args: [tutorID]
     })

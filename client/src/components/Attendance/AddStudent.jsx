@@ -9,9 +9,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { DropdownAE } from "../DropdownAE";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CalendarAE } from "../CalendarAE";
+// import { CalendarAE } from "../CalendarAE";
 import { Button } from "../ui/button";
-import { format, addDays } from "date-fns"; // Importa addDays
+// import { format, addDays } from "date-fns"; // Importa addDays
+import CRDate from "../ui/CRDate";
+import CRSelect from "../Preguntas/CRSelect";
+
+import { prefijos } from "@/context/prefijos";
 
 export function AddStudent({ value }) {
   const [loadingData, setLoadingData] = useState(true);
@@ -20,6 +24,8 @@ export function AddStudent({ value }) {
   const [cursoSelected, setCursoSelected] = useState(null);
   const [tutorSelected, setTutorSelected] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [prefijo, setPrefijo] = useState("");
+  const [email, setEmail] = useState("");
   const { toast } = useToast();
 
   // UseState para todos los inputs
@@ -71,14 +77,16 @@ export function AddStudent({ value }) {
     if (validateForm()) {
       setLoading(true);
       try {
-        const adjustedDate = addDays(selectedDate, 1); // Ajusta la fecha sumando un día
-        const formattedDate = adjustedDate ? format(adjustedDate, "yyyy-MM-dd") : "";
+        // const adjustedDate = addDays(selectedDate, 1); // Ajusta la fecha sumando un día
+        // const formattedDate = adjustedDate ? format(adjustedDate, "yyyy-MM-dd") : "";
         const dataFinal = {
           nombres: name,
           apellidos: lastName,
-          fecha_nacimiento: formattedDate ?? "",
+          fecha_nacimiento: selectedDate ?? "",
+          prefijo: prefijo,
           telefono: phone,
           direccion: address ?? "",
+          email: email ?? "",
           tutor_id: parseInt(user?.id),
           modulo_id: parseInt(cursoSelected),
           activo: activo,
@@ -105,6 +113,8 @@ export function AddStudent({ value }) {
           setName("");
           setLastName("");
           setPhone("");
+          setEmail("");
+          setPrefijo("");
           setAddress("");
           setObservations("");
           setTutorSelected(null);
@@ -178,14 +188,23 @@ export function AddStudent({ value }) {
             </Label>
             <Input value={lastName} placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
           </div>
+
           <div className="space-y-1 flex flex-col">
-            <CalendarAE title="Fecha de Nacimiento" setDate={setSelectedDate} />
+            <CRDate title="Fecha de Nacimiento" setValue={setSelectedDate} placeholder="Seleccione la fecha de nacimiento" />
           </div>
           <div className="space-y-1">
+            <CRSelect title="Prefijo telefónico" autoClose data={prefijos} setValue={setPrefijo} />
+            <br />
             <Label htmlFor="name">
               Teléfono<span className="text-red-500">*</span>
             </Label>
             <Input value={phone} placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="email" className="-mt-1">
+              Correo Electrónico
+            </Label>
+            <Input type="email" value={email} placeholder="Ingrese el correo electronico" onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Dirección</Label>

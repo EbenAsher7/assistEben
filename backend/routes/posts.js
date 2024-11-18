@@ -188,7 +188,9 @@ router.post('/addStudent', async (req, res) => {
       nombres,
       apellidos,
       fecha_nacimiento,
+      prefijo,
       telefono,
+      email,
       direccion,
       tutor_id,
       modulo_id,
@@ -228,7 +230,7 @@ router.post('/addStudent', async (req, res) => {
 
     // Agregar el alumno
     const resultado = await turso.execute({
-      sql: 'INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, telefono, direccion, tutor_id, modulo_id, activo, observaciones) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      sql: 'INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, telefono, direccion, tutor_id, modulo_id, activo, observaciones, email, prefijoNumero) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       args: [
         nombres,
         apellidos,
@@ -238,7 +240,9 @@ router.post('/addStudent', async (req, res) => {
         tutor_id,
         modulo_id,
         activo,
-        observaciones
+        observaciones,
+        email,
+        prefijo
       ]
     })
 

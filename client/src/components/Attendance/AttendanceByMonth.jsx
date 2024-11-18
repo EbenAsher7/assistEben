@@ -65,6 +65,7 @@ export function AttendanceByMonth({ value }) {
   useEffect(() => {
     fetchModulos(user.id).then((data) => {
       setCursos(data);
+      console.log("sotz vino:", data);
       setIsInitialLoading(false);
     });
   }, [fetchModulos, user.id]);

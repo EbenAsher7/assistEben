@@ -49,7 +49,7 @@ router.get('/getStudentsByTutor/:tutorId', async (req, res) => {
   try {
     const tutorId = req.params.tutorId
     const result = await turso.execute({
-      sql: 'SELECT Alumnos.id AS AlumnoID, Alumnos.nombres AS AlumnoNombres, Alumnos.apellidos AS AlumnoApellidos, Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento, Alumnos.telefono AS AlumnoTelefono, Alumnos.direccion AS AlumnoDireccion, Alumnos.activo AS AlumnoActivo, Alumnos.observaciones AS AlumnoObservaciones FROM Alumnos JOIN Tutores ON Alumnos.tutor_id = Tutores.id WHERE Tutores.id = ?;',
+      sql: 'SELECT Alumnos.id AS AlumnoID, Alumnos.nombres AS AlumnoNombres, Alumnos.apellidos AS AlumnoApellidos, Alumnos.fecha_nacimiento AS AlumnoFechaNacimiento, Alumnos.telefono AS AlumnoTelefono, Alumnos.direccion AS AlumnoDireccion, Alumnos.activo AS AlumnoActivo, Alumnos.observaciones AS AlumnoObservaciones, Alumnos.email AS AlumnoEmail, Alumnos.prefijoNumero AS AlumnoPrefijoNumero FROM Alumnos JOIN Tutores ON Alumnos.tutor_id = Tutores.id WHERE Tutores.id = ?;',
       args: [tutorId]
     })
 
@@ -113,7 +113,9 @@ router.get(
               Alumnos.telefono AS AlumnoTelefono,
               Alumnos.direccion AS AlumnoDireccion,
               Alumnos.activo AS AlumnoActivo,
-              Alumnos.observaciones AS AlumnoObservaciones
+              Alumnos.observaciones AS AlumnoObservaciones,
+              Alumnos.email AS AlumnoEmail,
+              Alumnos.prefijoNumero AS AlumnoPrefijoNumero
             FROM
               Alumnos
             JOIN
@@ -158,7 +160,9 @@ router.get(
               Alumnos.telefono AS AlumnoTelefono,
               Alumnos.direccion AS AlumnoDireccion,
               Alumnos.activo AS AlumnoActivo,
-              Alumnos.observaciones AS AlumnoObservaciones
+              Alumnos.observaciones AS AlumnoObservaciones,
+              Alumnos.email AS AlumnoEmail,
+              Alumnos.prefijoNumero AS AlumnoPrefijoNumero
             FROM
               Alumnos
             JOIN
@@ -200,7 +204,9 @@ router.get('/getStudentsByModule/:moduleId', async (req, res) => {
           Alumnos.nombres AS AlumnoNombres,
           Alumnos.apellidos AS AlumnoApellidos,
           Alumnos.telefono AS AlumnoTelefono,
-          Alumnos.activo AS AlumnoActivo
+          Alumnos.activo AS AlumnoActivo,
+          Alumnos.email AS AlumnoEmail,
+          Alumnos.prefijoNumero AS AlumnoPrefijoNumero
         FROM Tutores
         JOIN Alumnos ON Tutores.id = Alumnos.tutor_id
         WHERE Tutores.modulo_id = ? AND AlumnoActivo = 'Activo';
@@ -221,7 +227,9 @@ router.get('/getStudentsByModule/:moduleId', async (req, res) => {
         alumno_nombres: student.AlumnoNombres + ' ' + student.AlumnoApellidos,
         alumno_telefono: student.AlumnoTelefono,
         tutor_nombre: student.TutorNombres + ' ' + student.TutorApellidos,
-        alumno_activo: student.AlumnoActivo
+        alumno_activo: student.AlumnoActivo,
+        alumno_email: student.AlumnoEmail,
+        alumno_prefijo: student.AlumnoPrefijoNumero
       }
     })
 
@@ -294,7 +302,9 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
           Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
           Alumnos.telefono AS AlumnoTelefono,
           Asistencias.tipo AS TipoAsistencia,
-          Asistencias.pregunta as Pregunta
+          Asistencias.pregunta as Pregunta,
+          Alumnos.email AS AlumnoEmail,
+          Alumnos.prefijoNumero AS AlumnoPrefijoNumero
         FROM Alumnos
         LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id AND Asistencias.fecha = ?
         WHERE Alumnos.tutor_id = ? AND Alumnos.activo = 'Activo';
@@ -314,7 +324,9 @@ router.get('/getAttendanceByDateAndTutor/:date/:tutorId', async (req, res) => {
         AlumnoNombres: row[columns.indexOf('AlumnoNombres')],
         AlumnoTelefono: row[columns.indexOf('AlumnoTelefono')],
         TipoAsistencia: row[columns.indexOf('TipoAsistencia')],
-        Pregunta: row[columns.indexOf('Pregunta')]
+        Pregunta: row[columns.indexOf('Pregunta')],
+        AlumnoEmail: row[columns.indexOf('AlumnoEmail')],
+        AlumnoPrefijoNumero: row[columns.indexOf('AlumnoPrefijoNumero')]
       }
       if (student.TipoAsistencia) {
         attendedStudents.push(student)

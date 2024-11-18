@@ -1,20 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TabsContent } from "@/components/ui/tabs";
 import PropTypes from "prop-types";
-import { CalendarAE } from "../CalendarAE";
 import { useContext, useEffect, useState, useRef } from "react";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
-import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "../ui/button";
 import LoaderAE from "../LoaderAE";
 import RadarByDay from "./RadarByDay";
 import { DownloadTableExcel } from "react-export-table-to-excel";
+import CRDate from "../ui/CRDate";
 
 export function AttendanceByDay({ value }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [onlyTuesday, setOnlyTuesday] = useState(true);
   const [loading, setLoading] = useState(false);
   const [attendedStudents, setAttendedStudents] = useState([]);
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
@@ -55,8 +53,8 @@ export function AttendanceByDay({ value }) {
         return;
       }
 
-      const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
-      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutor/${formattedDate}/${user.id}`, {
+      // const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
+      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutor/${selectedDate}/${user.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -84,10 +82,6 @@ export function AttendanceByDay({ value }) {
     }
   };
 
-  const handleCheckboxChange = () => {
-    setOnlyTuesday(!onlyTuesday);
-  };
-
   // Calcular el número de estudiantes virtuales y presenciales
   const virtualCount = attendedStudents.filter((student) => student.TipoAsistencia === "Virtual").length;
   const presencialCount = attendedStudents.filter((student) => student.TipoAsistencia === "Presencial").length;
@@ -107,6 +101,7 @@ export function AttendanceByDay({ value }) {
          <th>Teléfono</th>
          <th>Tipo de Asistencia</th>
          <th>Pregunta</th>
+         <th>Correo</th>
        </tr>`
       : `<tr>
          <th>#</th>
@@ -123,6 +118,7 @@ export function AttendanceByDay({ value }) {
         <td>${student.AlumnoTelefono}</td>
         <td>${student.TipoAsistencia}</td>
         <td>${student.Pregunta || ""}</td>
+        <td>${student.AlumnoEmail}</td>
       </tr>`;
         } else {
           return `<tr>
@@ -149,16 +145,8 @@ export function AttendanceByDay({ value }) {
         </div>
         <CardContent className="space-y-4">
           <div className="space-y-1 flex flex-col pt-1 sm:justify-center sm:items-center">
-            <CalendarAE title="Fecha de asistencia" setDate={setSelectedDate} onlyTuesday={onlyTuesday} size="25px" />
-            <label className="flex items-center space-x-2 w-full justify-end sm:justify-center">
-              <input
-                type="checkbox"
-                checked={onlyTuesday}
-                onChange={handleCheckboxChange}
-                className="form-checkbox h-5 w-5 text-dark-600 dark:text-white-400"
-              />
-              <span className="text-gray-700 dark:text-gray-300">Mostrar solo los Martes</span>
-            </label>
+            <CRDate title="Fecha de asistencia" setValue={setSelectedDate} placeholder="Seleccione una fecha de asistencia" />
+            {/* TODO meter también el curso por seleccionar */}
           </div>
           <Button disabled={loading} onClick={loadData} className="w-full sm:w-[300px] m-auto justify-center flex">
             {loading ? <LoaderAE /> : "Mostrar asistencias registradas"}
@@ -191,6 +179,7 @@ export function AttendanceByDay({ value }) {
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">Pregunta</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">Correo</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -202,7 +191,7 @@ export function AttendanceByDay({ value }) {
                         {student.Pregunta?.length > 0 ? (
                           <a
                             className="text-yellow-500 underline"
-                            href={`https://wa.me/502${student.AlumnoTelefono}?text=${encodeURIComponent(
+                            href={`https://wa.me/${student.AlumnoPrefijoNumero}${student.AlumnoTelefono}?text=${encodeURIComponent(
                               `${greeting} ${student.AlumnoNombres},\nLe saluda su tutor(a) de Ebenezer, con respecto a la pregunta que hizo:\n\n*${student.Pregunta}.* \n\nLe comento:\n\n`
                             )}`}
                             target="_blank"
@@ -211,7 +200,10 @@ export function AttendanceByDay({ value }) {
                             {student.AlumnoTelefono}
                           </a>
                         ) : (
-                          <>{student.AlumnoTelefono}</>
+                          <>
+                            {student.AlumnoPrefijoNumero !== null ? "+" + student.AlumnoPrefijoNumero + " " : ""}
+                            {student.AlumnoTelefono}
+                          </>
                         )}
                       </td>
                       <td
@@ -222,6 +214,7 @@ export function AttendanceByDay({ value }) {
                         {student.TipoAsistencia}
                       </td>
                       <td className="border border-gray-200 px-4 py-2 overflow-x-auto min-w-[200px] max-w-[300px]">{student.Pregunta}</td>
+                      <td className="border border-gray-200 px-4 py-2 overflow-x-auto min-w-[200px] max-w-[300px]">{student.AlumnoEmail}</td>
                     </tr>
                   ))}
                 </tbody>

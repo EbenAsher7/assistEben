@@ -10,9 +10,12 @@ import LoaderAE from "../LoaderAE";
 import RadarByDay from "./RadarByDay";
 import { DownloadTableExcel } from "react-export-table-to-excel";
 import CRDate from "../ui/CRDate";
+import CRSelect from "../Preguntas/CRSelect";
 
 export function AttendanceByDay({ value }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedModule, setSelectedModule] = useState(null);
+  const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
   const [attendedStudents, setAttendedStudents] = useState([]);
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
@@ -24,9 +27,22 @@ export function AttendanceByDay({ value }) {
   const tableRefNotAttended = useRef(null);
 
   // CONTEXTO
-  const { user } = useContext(MainContext);
+  const { user, fetchModulos } = useContext(MainContext);
 
   const [greeting, setGreeting] = useState("");
+
+  useEffect(() => {
+    const loadModules = async () => {
+      if (user?.id) {
+        const modulesData = await fetchModulos(user.id);
+        if (modulesData) {
+          setModules(modulesData);
+          console.log(modulesData);
+        }
+      }
+    };
+    loadModules();
+  }, [user?.id, fetchModulos]);
 
   useEffect(() => {
     const date = new Date();
@@ -43,18 +59,17 @@ export function AttendanceByDay({ value }) {
   const loadData = async () => {
     try {
       setLoading(true);
-      if (!selectedDate) {
+      if (!selectedDate || !selectedModule) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "La fecha es obligatoria",
+          description: "La fecha y el módulo son obligatorios",
           duration: 2500,
         });
         return;
       }
 
-      // const formattedDate = selectedDate ? format(selectedDate, "yyyy-MM-dd") : "";
-      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutor/${selectedDate}/${user.id}`, {
+      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutorAndModule/${selectedDate}/${user.id}/${selectedModule[0].value}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -144,11 +159,15 @@ export function AttendanceByDay({ value }) {
           <hr />
         </div>
         <CardContent className="space-y-4">
-          <div className="space-y-1 flex flex-col pt-1 sm:justify-center sm:items-center">
+          <div className="space-y-4 flex flex-col pt-1 sm:justify-center sm:items-center">
             <CRDate title="Fecha de asistencia" setValue={setSelectedDate} placeholder="Seleccione una fecha de asistencia" />
-            {/* TODO meter también el curso por seleccionar */}
+            <CRSelect title="Seleccione módulo" autoClose data={modules} setValue={setSelectedModule} placeholder="Seleccione un módulo" />
           </div>
-          <Button disabled={loading} onClick={loadData} className="w-full sm:w-[300px] m-auto justify-center flex">
+          <Button
+            disabled={loading || (!selectedDate?.length > 0 && !selectedModule?.length > 0)}
+            onClick={loadData}
+            className="w-full sm:w-[300px] m-auto justify-center flex"
+          >
             {loading ? <LoaderAE /> : "Mostrar asistencias registradas"}
           </Button>
           <br />

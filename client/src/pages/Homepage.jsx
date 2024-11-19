@@ -35,16 +35,14 @@ const Homepage = () => {
       </div>
 
       <footer className="dark:bg-black/30 bg-white/50 dark:text-white text-black text-center -gap-1 py-2 sm:py-6 flex justify-between items-center fixed bottom-0 w-full z-[1000000000] px-4 sm:px-8 flex-col">
-        <p className="text-xs sm:text-base">
-          Sistema desarrollado exclusivamente para Iglesia Ebenezer, Guatemala | <script>document.write(new Date().getFullYear())</script>
-        </p>
-        <div className="sm:space-x-4 flex flex-row items-center justify-center">
+        <p className="text-xs sm:text-base">Sistema desarrollado exclusivamente para Iglesia Ebenezer, Guatemala</p>
+        <div className="sm:space-x-4 flex flex-row items-center justify-center -mt-1">
           <p className="text-xs sm:text-base">Buscas un sistema similar, contáctame: </p>
           <a href="https://wa.me/+50238639275" target="_blank" rel="noopener noreferrer" className="p-1 sm:p-2 flex items-center justify-center">
-            <img src="/whatsapp.png" alt="WhatsApp" className="h-4 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
+            <img src="/whatsapp.png" alt="WhatsApp" className="h-5 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
           </a>
           <a href="https://www.facebook.com/choper.paiz" target="_blank" rel="noopener noreferrer" className="p-1 sm:p-2 flex items-center justify-center">
-            <img src="/facebook.png" alt="Facebook" className="h-4 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
+            <img src="/facebook.png" alt="Facebook" className="h-5 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
           </a>
         </div>
       </footer>

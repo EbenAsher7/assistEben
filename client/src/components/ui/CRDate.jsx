@@ -19,7 +19,7 @@ const StyleCalendar = {
   },
   popupBottom: {
     top: "100%",
-    left: "0px",
+    left: "-10px",
     transform: "translateX(0)",
   },
   popupRight: {

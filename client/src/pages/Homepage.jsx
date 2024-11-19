@@ -3,8 +3,8 @@ import "./Homepage.css";
 
 const Homepage = () => {
   return (
-    <div>
-      {/* Fondo animaod para el homepage */}
+    <div className="flex flex-col min-h-dvh -mb-5 -mt-[60px] sm:-mt-[70px]">
+      {/* Fondo animado para el homepage */}
       <ul className="circles">
         <li className="dark:invert-0 invert"></li>
         <li className="dark:invert-0 invert"></li>
@@ -17,7 +17,7 @@ const Homepage = () => {
         <li className="dark:invert-0 invert"></li>
         <li className="dark:invert-0 invert"></li>
       </ul>
-      <div className="w-full flex justify-center items-center flex-col sm:flex-row h-dvh sm:-mt-24 -mt-48 background-pattern">
+      <div className="flex-grow flex justify-center items-center flex-col sm:flex-row background-pattern">
         <div className="flex flex-col gap-3 justify-center max-w-[400px] items-center sm:mr-24">
           <img src="/cropped-favicon.png" alt="logo Ebenezer" className="hidden sm:inline-flex size-32 sm:size-64 invert dark:invert-0" />
           <img src="/LOGODOCTRINA.webp" alt="logo Ebenezer" className="inline-flex sm:hidden h-16 mb-4 invert-0 dark:invert" />
@@ -33,6 +33,18 @@ const Homepage = () => {
           </div>
         </div>
       </div>
+
+      <footer className="bg-neutral-800 text-white text-center py-4 flex justify-center gap-2 items-center fixed bottom-0 w-full">
+        <p>Sistema creado por Cristopher Paiz&nbsp;&nbsp;|&nbsp;&nbsp;Contáctame&nbsp;</p>
+        <div className="space-x-4 flex flex-row items-center">
+          <a href="https://wa.me/+50238639275" target="_blank" rel="noopener noreferrer">
+            <img src="/whatsapp.png" alt="WhatsApp" className="h-6 w-6 invert-0 dark:invert" />
+          </a>
+          <a href="https://www.facebook.com/choper.paiz" target="_blank" rel="noopener noreferrer">
+            <img src="/facebook.png" alt="Facebook" className="h-6 w-6 invert-0 dark:invert" />
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };

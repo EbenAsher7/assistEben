@@ -44,11 +44,11 @@ export function AddStudent({ value }) {
   // Verificar que nombre, apellidos y teléfono no estén vacíos
   const validateForm = () => {
     if (user.tipo === "Tutor") {
-      if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
+      if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null || prefijo === "") {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Los campos de nombres, apellidos, teléfono, curso y tutor son obligatorios.",
+          description: "Los campos de nombres, apellidos, prefijo, teléfono, curso y tutor son obligatorios.",
           duration: 2500,
         });
         return false;
@@ -57,11 +57,11 @@ export function AddStudent({ value }) {
         return true;
       }
     } else if (user.tipo === "Administrador") {
-      if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
+      if (name === "" || lastName === "" || prefijo === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Los campos de nombres, apellidos, teléfono, curso y tutor son obligatorios.",
+          description: "Los campos de nombres, apellidos, prefijo, teléfono, curso y tutor son obligatorios.",
           duration: 2500,
         });
         return false;

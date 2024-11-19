@@ -37,7 +37,7 @@ const Homepage = () => {
       <footer className="dark:bg-black/30 bg-white/50 dark:text-white text-black text-center -gap-1 py-2 sm:py-6 flex justify-between items-center fixed bottom-0 w-full z-[1000000000] px-4 sm:px-8 flex-col">
         <p className="text-xs sm:text-base">Sistema desarrollado como donativo para Iglesia Ebenezer.</p>
         <div className="sm:space-x-4 flex flex-row items-center justify-center">
-          <p className="text-xs sm:text-base">Puedes contactarme a través de estos medios: </p>
+          <p className="text-xs sm:text-base">Buscas un sistema similar, contáctame: </p>
           <a href="https://wa.me/+50238639275" target="_blank" rel="noopener noreferrer" className="p-2 flex items-center justify-center">
             <img src="/whatsapp.png" alt="WhatsApp" className="h-5 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
           </a>

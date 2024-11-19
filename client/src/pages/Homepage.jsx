@@ -34,7 +34,7 @@ const Homepage = () => {
         </div>
       </div>
 
-      <footer className="dark:bg-black/30 bg-white/50 dark:text-white text-black text-center py-4 sm:py-6 flex justify-between items-center fixed bottom-0 w-full z-[1000000000] px-4 sm:px-8 flex-col">
+      <footer className="dark:bg-black/30 bg-white/50 dark:text-white text-black text-center -gap-1 py-2 sm:py-6 flex justify-between items-center fixed bottom-0 w-full z-[1000000000] px-4 sm:px-8 flex-col">
         <p className="text-xs sm:text-base">Sistema desarrollado como donativo para Iglesia Ebenezer.</p>
         <div className="sm:space-x-4 flex flex-row items-center justify-center">
           <p className="text-xs sm:text-base">Puedes contactarme a través de estos medios: </p>

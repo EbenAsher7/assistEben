@@ -34,7 +34,7 @@ const Homepage = () => {
         </div>
       </div>
 
-      <footer className="bg-neutral-800 text-white text-center py-4 flex justify-center gap-2 items-center fixed bottom-0 w-full">
+      <footer className="bg-neutral-600 dark:bg-neutral-900 text-white text-center py-4 flex justify-center gap-2 items-center fixed bottom-0 w-full z-[1000000000]">
         <p>Sistema hecho por Cristopher Paiz&nbsp;&nbsp;|&nbsp;&nbsp;Contáctame&nbsp;</p>
         <div className="space-x-4 flex flex-row items-center">
           <a href="https://wa.me/+50238639275" target="_blank" rel="noopener noreferrer">

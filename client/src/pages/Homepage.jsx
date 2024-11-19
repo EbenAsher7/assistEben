@@ -3,7 +3,7 @@ import "./Homepage.css";
 
 const Homepage = () => {
   return (
-    <div className="flex flex-col min-h-dvh -mb-5 -mt-[60px] sm:-mt-[70px]">
+    <div className="flex flex-col min-h-dvh -mb-[100px] -mt-[100px]">
       {/* Fondo animado para el homepage */}
       <ul className="circles">
         <li className="dark:invert-0 invert"></li>
@@ -23,7 +23,7 @@ const Homepage = () => {
           <img src="/LOGODOCTRINA.webp" alt="logo Ebenezer" className="inline-flex sm:hidden h-16 mb-4 invert-0 dark:invert" />
         </div>
         <div className="flex flex-col gap-3 sm:-mt-24">
-          <div className="sm:min-w-[300px] sm:max-w-[700px] w-full">
+          <div className="sm:min-w-[300px] sm:max-w-[700px] w-full flex-1 flex-grow-0">
             <div className="sm:mb-5 px-5 sm:px-0">
               <h1 className="text-center font-serif font-extrabold text-4xl sm:text-6xl mb-2">Registrar asistencia</h1>
               <h2 className="text-center text-sm sm:text-xl font-bold mb-1">Escribe tu nombre y asegúrate que sea el correcto</h2>
@@ -34,14 +34,15 @@ const Homepage = () => {
         </div>
       </div>
 
-      <footer className="bg-neutral-600 dark:bg-black text-white text-center py-4 flex justify-center gap-2 items-center fixed bottom-0 w-full z-[1000000000]">
-        <p className="text-md">Sistema hecho por Cristopher Paiz&nbsp;&nbsp;|&nbsp;&nbsp;Contáctame&nbsp;</p>
-        <div className="space-x-4 flex flex-row items-center">
-          <a href="https://wa.me/+50238639275" target="_blank" rel="noopener noreferrer">
-            <img src="/whatsapp.png" alt="WhatsApp" className="h-6 w-6 invert" />
+      <footer className="dark:bg-black/30 bg-white/50 dark:text-white text-black text-center py-4 sm:py-6 flex justify-between items-center fixed bottom-0 w-full z-[1000000000] px-4 sm:px-8 flex-col">
+        <p className="text-xs sm:text-base">Este sistema ha sido desarrollado como un donativo para Iglesia Ebenezer.</p>
+        <div className="sm:space-x-4 flex flex-row items-center justify-center">
+          <p className="text-xs sm:text-base">Puedes contactarme a través de estos medios: </p>
+          <a href="https://wa.me/+50238639275" target="_blank" rel="noopener noreferrer" className="p-2 flex items-center justify-center">
+            <img src="/whatsapp.png" alt="WhatsApp" className="h-5 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
           </a>
-          <a href="https://www.facebook.com/choper.paiz" target="_blank" rel="noopener noreferrer">
-            <img src="/facebook.png" alt="Facebook" className="h-6 w-6 invert" />
+          <a href="https://www.facebook.com/choper.paiz" target="_blank" rel="noopener noreferrer" className="p-2 flex items-center justify-center">
+            <img src="/facebook.png" alt="Facebook" className="h-5 w-5 sm:h-6 sm:w-6 invert-0 dark:invert" />
           </a>
         </div>
       </footer>

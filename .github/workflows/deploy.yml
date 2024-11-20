@@ -36,6 +36,6 @@ jobs:
         with:
           project: "asistenciaebenezer"
           entrypoint: "index.js"
-          root: "./backend"
+          root: "/backend/backend"
           
           

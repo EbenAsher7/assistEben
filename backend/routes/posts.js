@@ -21,7 +21,6 @@ router.post('/addTutor', async (req, res) => {
       password,
       tipo,
       observaciones,
-      modulo_id,
       activo
     } = req.body
 
@@ -60,7 +59,7 @@ router.post('/addTutor', async (req, res) => {
 
     // Agregar el tutor
     const resultado = await turso.execute({
-      sql: 'INSERT INTO Tutores (nombres, apellidos, fecha_nacimiento, foto_url, telefono, direccion, username, password, tipo, observaciones, modulo_id, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      sql: 'INSERT INTO Tutores (nombres, apellidos, fecha_nacimiento, foto_url, telefono, direccion, username, password, tipo, observaciones, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       args: [
         nombres,
         apellidos,
@@ -72,7 +71,6 @@ router.post('/addTutor', async (req, res) => {
         hashedPassword,
         tipo,
         observaciones,
-        modulo_id,
         activo
       ]
     })

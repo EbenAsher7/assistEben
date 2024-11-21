@@ -97,19 +97,21 @@ router.post('/user/login', async (req, res) => {
 // Buscar alumno por nombres y apellidos "LIKE"
 router.post('/user/searchStudent', async (req, res) => {
   try {
-    const { search } = req.body;
+    const { search } = req.body
 
     // verificar que los datos requeridos estén presentes
     if (!search) {
-      return res.status(400).json({ error: 'Faltan datos requeridos' });
+      return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     // Divide el término de búsqueda en palabras individuales
-    const searchWords = search.split(' ');
+    const searchWords = search.split(' ')
 
     // Construir condiciones LIKE dinámicamente
-    const likeClauses = searchWords.map(word => `CONCAT(a.nombres, ' ', a.apellidos) LIKE ?`).join(' AND ');
-    const likeParams = searchWords.map(word => `%${word}%`);
+    const likeClauses = searchWords
+      .map((word) => "CONCAT(a.nombres, ' ', a.apellidos) LIKE ?")
+      .join(' AND ')
+    const likeParams = searchWords.map((word) => `%${word}%`)
 
     // Buscar el alumno y su tutor, solo en módulos activos
     const query = `
@@ -130,29 +132,29 @@ router.post('/user/searchStudent', async (req, res) => {
       WHERE
         ${likeClauses}
         AND m.activo = 1
-    `;
+    `
 
     const resultado = await turso.execute({
       sql: query,
       args: likeParams
-    });
+    })
 
-    const columns = resultado.columns;
-    const rows = resultado.rows;
+    const columns = resultado.columns
+    const rows = resultado.rows
 
     const students = rows.map((row) => {
-      const student = {};
+      const student = {}
       columns.forEach((col, index) => {
-        student[col] = row[index];
-      });
-      return student;
-    });
+        student[col] = row[index]
+      })
+      return student
+    })
 
-    res.status(200).json(students);
+    res.status(200).json(students)
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message })
   }
-});
+})
 
 // registramos asistencia
 router.post('/user/registerAttendance', async (req, res) => {
@@ -220,14 +222,30 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
   const { moduleId } = req.params
 
   try {
+    // Consulta a la base de datos para obtener los tutores del módulo
     const result = await turso.execute({
-      sql: 'SELECT id, nombres, apellidos, foto_url, telefono, tipo FROM tutores WHERE activo = 1 AND modulo_id = ?',
+      sql: `
+        SELECT
+          t.id,
+          t.nombres,
+          t.apellidos,
+          t.foto_url,
+          t.telefono,
+          t.tipo
+        FROM
+          Tutores t
+        INNER JOIN
+          TutoresModulos tm ON t.id = tm.tutor_id
+        WHERE
+          tm.modulo_id = ? AND t.activo = 1
+      `,
       args: [moduleId]
     })
 
     const columns = result.columns
     const rows = result.rows
 
+    // Transformar los datos en un formato adecuado
     const tutors = rows.map((row) => {
       const tutor = {}
       columns.forEach((col, index) => {

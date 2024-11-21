@@ -82,6 +82,7 @@ const CRSelect = ({
   error = "",
   onlySelectValues = false,
   keyValue = false,
+  require = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState([]);
@@ -207,9 +208,9 @@ const CRSelect = ({
     if (disable && disableText) return disableText;
     if (selectedItems.length === 0) return <span className={`${error ? "text-red-500" : "text-gray-400"}`}>{placeholder}</span>;
     if (multi) {
-      return selectedItems.map((item) => (
+      return selectedItems.map((item, index) => (
         <div
-          key={item[valueField]}
+          key={item[valueField + index]}
           className="inline-flex items-center rounded-full px-2 py-1 text-sm mr-1 mb-1"
           style={{ backgroundColor: color, color: "white" }}
         >
@@ -236,7 +237,12 @@ const CRSelect = ({
 
   return (
     <div className="relative w-full" ref={selectRef}>
-      {title && <label className={`block my-2 ${error ? "text-red-500" : "text-gray-700 dark:text-white"}`}>{title}</label>}
+      {title && (
+        <label className={`block my-2 ${error ? "text-red-500" : "text-gray-700 dark:text-white"}`}>
+          {title}
+          {require && <span className="ml-1 text-red-500">*</span>}
+        </label>
+      )}
       <div
         className={`relative w-full border rounded-md ${error ? "border-red-500" : "border-gray-300 dark:border-gray-500"} ${
           disable || loading ? "bg-gray-100 cursor-not-allowed opacity-70 saturate-50" : "cursor-pointer"
@@ -314,7 +320,7 @@ const CRSelect = ({
               <div className="py-2 text-center text-gray-500">No hay datos</div>
             ) : (
               filteredData.map((item, index) => (
-                <React.Fragment key={item[valueField]}>
+                <React.Fragment key={item[valueField + index]}>
                   <div
                     className={`py-2 pl-4 pr-2 hover:bg-opacity-10`}
                     style={{
@@ -368,6 +374,7 @@ CRSelect.propTypes = {
   error: PropTypes.string,
   onlySelectValues: PropTypes.bool,
   keyValue: PropTypes.bool,
+  require: PropTypes.bool,
 };
 
 export default CRSelect;

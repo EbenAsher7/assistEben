@@ -257,8 +257,10 @@ const MainProvider = ({ children }) => {
   const [nombresNEW, setNombresNEW] = useState("");
   const [apellidosNEW, setApellidosNEW] = useState("");
   const [fechaNacimientoNEW, setFechaNacimientoNEW] = useState("");
+  const [prefijoNEW, setPrefijoNEW] = useState("");
   const [telefonoNEW, setTelefonoNEW] = useState("");
   const [direccionNEW, setDireccionNEW] = useState("");
+  const [correoNEW, setCorreoNEW] = useState("");
   const [cursoSeleccionadoNEW, setCursoSeleccionadoNEW] = useState(null);
 
   //STEPPER
@@ -302,10 +304,14 @@ const MainProvider = ({ children }) => {
         setApellidosNEW,
         fechaNacimientoNEW,
         setFechaNacimientoNEW,
+        prefijoNEW,
+        setPrefijoNEW,
         telefonoNEW,
         setTelefonoNEW,
         direccionNEW,
         setDireccionNEW,
+        correoNEW,
+        setCorreoNEW,
         cursoSeleccionadoNEW,
         setCursoSeleccionadoNEW,
         //STEPPER

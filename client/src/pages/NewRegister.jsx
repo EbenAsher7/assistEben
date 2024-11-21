@@ -3,6 +3,9 @@ import { Input } from "@/components/ui/input";
 import MainContext from "../context/MainContext";
 import { Button } from "@/components/ui/button";
 
+import { prefijos } from "@/context/prefijos";
+import CRSelect from "@/components/Preguntas/CRSelect";
+
 export default function NewRegister() {
   const [isValid, setIsValid] = useState(false);
 
@@ -18,6 +21,10 @@ export default function NewRegister() {
     setFechaNacimientoNEW,
     setTelefonoNEW,
     setDireccionNEW,
+    correoNEW,
+    setCorreoNEW,
+    prefijoNEW,
+    setPrefijoNEW,
   } = useContext(MainContext);
 
   // Validar formulario en tiempo real
@@ -25,9 +32,10 @@ export default function NewRegister() {
     const isNombresValid = nombresNEW.length >= 3;
     const isApellidosValid = apellidosNEW.length >= 3;
     const isTelefonoValid = /^\d{7,}$/.test(telefonoNEW);
+    const isPrefijoValid = prefijoNEW?.length > 0 ? true : false;
 
-    setIsValid(isNombresValid && isApellidosValid && isTelefonoValid);
-  }, [nombresNEW, apellidosNEW, telefonoNEW]);
+    setIsValid(isNombresValid && isApellidosValid && isTelefonoValid && isPrefijoValid);
+  }, [nombresNEW, apellidosNEW, telefonoNEW, prefijoNEW]);
 
   const handleContinue = () => {
     if (isValid) {
@@ -36,6 +44,8 @@ export default function NewRegister() {
       setFechaNacimientoNEW(fechaNacimientoNEW);
       setTelefonoNEW(telefonoNEW);
       setDireccionNEW(direccionNEW);
+      setCorreoNEW(correoNEW);
+      setPrefijoNEW(prefijoNEW);
 
       navegarPaso(1);
     }
@@ -77,6 +87,9 @@ export default function NewRegister() {
             />
           </div>
           <div>
+            <CRSelect defaultValue={prefijoNEW} title="Prefijo telefónico" autoClose data={prefijos} setValue={setPrefijoNEW} keyValue require />
+          </div>
+          <div>
             <label htmlFor="telefono" className="block text-sm font-medium mb-1">
               Teléfono <span className="text-red-500">*</span>
             </label>
@@ -88,6 +101,20 @@ export default function NewRegister() {
               onChange={(e) => setTelefonoNEW(e.target.value)}
               autoComplete="off"
               type="number"
+            />
+          </div>
+          <div>
+            <label htmlFor="correo" className="block text-sm font-medium mb-1">
+              Correo Electrónico
+            </label>
+            <Input
+              type="email"
+              id="correo"
+              name="correo"
+              placeholder="Ingresa tu correo electrónico"
+              value={correoNEW}
+              onChange={(e) => setCorreoNEW(e.target.value)}
+              autoComplete="off"
             />
           </div>
           <div>

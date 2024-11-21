@@ -180,25 +180,26 @@ export function AddStudent({ value }) {
             <Label htmlFor="name">
               Nombres<span className="text-red-500">*</span>
             </Label>
-            <Input value={name} placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} />
+            <Input value={name} placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} autoComplete="off" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="name" className="-mt-1">
               Apellidos<span className="text-red-500">*</span>
             </Label>
-            <Input value={lastName} placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} />
+            <Input value={lastName} placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} autoComplete="off" />
           </div>
 
           <div className="space-y-1 flex flex-col">
             <CRDate title="Fecha de Nacimiento" setValue={setSelectedDate} placeholder="Seleccione la fecha de nacimiento" />
           </div>
           <div className="space-y-1">
-            <CRSelect title="Prefijo telefónico" autoClose data={prefijos} setValue={setPrefijo} />
+            <CRSelect title="Prefijo telefónico" autoClose data={prefijos} setValue={setPrefijo} keyValue />
             <br />
             <Label htmlFor="name">
               Teléfono<span className="text-red-500">*</span>
             </Label>
-            <Input value={phone} placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" />
+
+            <Input value={phone} placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" autoComplete="off" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="email" className="-mt-1">
@@ -234,7 +235,7 @@ export function AddStudent({ value }) {
           </div>
           <div className="space-y-1">
             <Label htmlFor="name">Observaciones</Label>
-            <Input value={observations} placeholder="Ingrese una observacion" onChange={(e) => setObservations(e.target.value)} />
+            <Input value={observations} placeholder="Ingrese una observacion" onChange={(e) => setObservations(e.target.value)} autoComplete="off" />
           </div>
         </CardContent>
         <Button className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex" onClick={handleGuardarDatos} disabled={loading}>

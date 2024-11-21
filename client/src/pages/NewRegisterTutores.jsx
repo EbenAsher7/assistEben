@@ -47,6 +47,7 @@ const NewRegisterTutores = () => {
   };
 
   const handleAccept = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`${URL_BASE}/api/user/registerAlumno`, {
         method: "POST",
@@ -88,6 +89,8 @@ const NewRegisterTutores = () => {
       setCursoSeleccionadoNEW(null);
     } catch (error) {
       toast({ title: "Error", description: error.message, duration: 2500 });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -204,22 +207,27 @@ const NewRegisterTutores = () => {
               </div>
               <hr />
             </div>
-            <DialogFooter className="gap-3">
-              <Button variant="outline" className="text-black dark:text-white inline-flex sm:hidden" onClick={handleCancel}>
+            <DialogFooter className="gap-3 relative">
+              {loading && <div className="absolute inset-0 bg-black/30 pointer-events-auto transition-opacity duration-300 z-50" />}
+              <Button variant="outline" className="text-black dark:text-white inline-flex sm:hidden" onClick={handleCancel} disabled={loading}>
                 Cancelar
               </Button>
-              <Button className="inline-flex sm:hidden" onClick={handleAccept}>
-                Aceptar
+              <Button className="inline-flex sm:hidden" onClick={handleAccept} disabled={loading}>
+                {loading ? <LoaderAE texto="Cargando..." /> : "Aceptar"}
               </Button>
-              <Button variant="destructive" className="text-black dark:text-white" onClick={handleResetPage}>
+              <Button variant="destructive" className="text-black dark:text-white" onClick={handleResetPage} disabled={loading}>
                 Reiniciar formulario
               </Button>
-              <Button variant="outline" className="text-black dark:text-white sm:inline-flex hidden" onClick={handleCancel}>
+              <Button variant="outline" className="text-black dark:text-white sm:inline-flex hidden" onClick={handleCancel} disabled={loading}>
                 Cancelar
               </Button>
-              <Button className="sm:inline-flex hidden" onClick={handleAccept}>
-                Aceptar
-              </Button>
+              <div className="relative w-full h-full">
+                {loading && <div className="absolute w-full h-full inset-0 bg-yellow-500 pointer-events-auto z-50" />}
+                <Button className="sm:inline-flex hidden" onClick={handleAccept} disabled={loading}>
+                  {loading ? <LoaderAE texto="Cargando..." /> : "Aceptar"}
+                </Button>
+              </div>
+              {loading && <div className="absolute inset-0 bg-transparent pointer-events-auto z-50" />}
             </DialogFooter>
           </DialogContent>
         </Dialog>

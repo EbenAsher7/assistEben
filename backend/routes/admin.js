@@ -34,19 +34,20 @@ router.get('/allTutorsByModule/:tutorID', async (req, res) => {
     // Consulta para obtener todos los módulos con sus respectivos tutores, excluyendo el tutor con el ID dado
     const result = await turso.execute({
       sql: `SELECT
-      m.id AS idModulo,
-      m.nombre AS nombreModulo,
-      t.id AS tutorId,
-      t.nombres AS tutorNombres,
-      t.apellidos AS tutorApellidos,
-      t.fecha_nacimiento AS tutorFechaNacimiento,
-      t.foto_url AS tutorFotoUrl,
-      t.telefono AS tutorTelefono,
-      t.direccion AS tutorDireccion,
-      t.tipo AS tutorTipo,
-      t.observaciones AS tutorObservaciones
+        m.id AS idModulo,
+        m.nombre AS nombreModulo,
+        t.id AS tutorId,
+        t.nombres AS tutorNombres,
+        t.apellidos AS tutorApellidos,
+        t.fecha_nacimiento AS tutorFechaNacimiento,
+        t.foto_url AS tutorFotoUrl,
+        t.telefono AS tutorTelefono,
+        t.direccion AS tutorDireccion,
+        t.tipo AS tutorTipo,
+        t.observaciones AS tutorObservaciones
       FROM Modulos m
-      LEFT JOIN Tutores t ON m.id = t.modulo_id
+      LEFT JOIN TutoresModulos tm ON m.id = tm.modulo_id
+      LEFT JOIN Tutores t ON tm.tutor_id = t.id
       WHERE t.activo = 1
       AND t.id != ? AND m.activo = 1`,
       args: [tutorID]

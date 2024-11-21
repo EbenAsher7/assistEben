@@ -36,6 +36,11 @@ app.use('/put', puts)
 // Rutas específicas que requieren tipos de usuarios particulares
 app.use('/admin', authMiddleware('Administrador'), admin)
 
+//  Add hola mundo API
+app.get('/', (req, res) => {
+  res.json({ mensaje: 'Hola mundo!' })
+})
+
 // Manejo de errores globales en Express
 app.use((err, req, res, next) => {
   console.error('Error en la aplicación:', err.stack)

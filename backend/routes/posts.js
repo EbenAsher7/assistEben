@@ -21,7 +21,8 @@ router.post('/addTutor', async (req, res) => {
       password,
       tipo,
       observaciones,
-      activo
+      activo,
+      modulo_id // Agregar el ID del módulo al que se asociará el tutor
     } = req.body
 
     // verificar que los datos requeridos estén presentes
@@ -31,7 +32,8 @@ router.post('/addTutor', async (req, res) => {
       !telefono ||
       !username ||
       !password ||
-      !tipo
+      !tipo ||
+      !modulo_id // Verificar que el ID del módulo esté presente
     ) {
       return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
@@ -54,7 +56,6 @@ router.post('/addTutor', async (req, res) => {
       throw new Error('Invalid SALT_ROUNDS value in environment variables')
     }
 
-    // Encriptar la contraseña
     const hashedPassword = await bcrypt.hash(password, saltRounds)
 
     // Agregar el tutor
@@ -79,9 +80,22 @@ router.post('/addTutor', async (req, res) => {
       return res.status(500).json({ error: 'No se pudo agregar el tutor' })
     }
 
+    // Agregar el tutor a la tabla TutoresModulos
+    const tutorId = resultado.lastInsertRowid
+    const resultadoModulo = await turso.execute({
+      sql: 'INSERT INTO TutoresModulos (tutor_id, modulo_id) VALUES (?, ?)',
+      args: [tutorId, modulo_id]
+    })
+
+    if (resultadoModulo.affectedRows === 0) {
+      return res
+        .status(500)
+        .json({ error: 'No se pudo asociar el tutor al módulo' })
+    }
+
     res.json({
       Success: 'Tutor agregado correctamente',
-      idTutor: resultado.lastInsertRowid.toString()
+      idTutor: tutorId.toString()
     })
   } catch (error) {
     res.status(500).json({ error: error.message })

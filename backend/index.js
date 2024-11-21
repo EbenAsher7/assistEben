@@ -21,6 +21,10 @@ app.use(express.json())
 // Configurar cookie-parser
 app.use(cookieParser())
 
+//  Add hola mundo API
+app.get('/helloWorld', (req, res) => {
+  res.json({ mensaje: 'Hola mundo!' })
+})
 // Ruta pública para el login
 app.use('/api', user)
 
@@ -35,11 +39,6 @@ app.use('/put', puts)
 
 // Rutas específicas que requieren tipos de usuarios particulares
 app.use('/admin', authMiddleware('Administrador'), admin)
-
-//  Add hola mundo API
-app.get('/', (req, res) => {
-  res.json({ mensaje: 'Hola mundo!' })
-})
 
 // Manejo de errores globales en Express
 app.use((err, req, res, next) => {

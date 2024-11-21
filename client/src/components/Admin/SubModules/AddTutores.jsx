@@ -34,7 +34,6 @@ const AddTutores = () => {
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
   const [tipo, setTipo] = useState("Normal");
-  const [moduloId, setModuloId] = useState(null);
   const [observaciones, setObservaciones] = useState("");
   const [activo] = useState(true);
 
@@ -42,11 +41,9 @@ const AddTutores = () => {
 
   const [resetForm, setResetForm] = useState(false);
 
-  const { fetchAllModulos, user } = useContext(MainContext);
+  const { user } = useContext(MainContext);
 
   const navigate = useNavigate();
-
-  const [modulosData, setModulosData] = useState([]);
 
   const { toast } = useToast();
 
@@ -59,6 +56,17 @@ const AddTutores = () => {
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
+
+    if (!nombres || !apellidos || !username || !password || !telefono || !tipo) {
+      setLoading(false);
+      return toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Los campos con asterisco son obligatorios.",
+        duration: 2500,
+      });
+    }
+
     const dataToSubmit = {
       nombres,
       apellidos,
@@ -70,7 +78,6 @@ const AddTutores = () => {
       direccion,
       tipo,
       observaciones,
-      modulo_id: moduloId,
       activo,
     };
 
@@ -102,7 +109,6 @@ const AddTutores = () => {
         setDireccion("");
         setTipo("Normal");
         setObservaciones("");
-        setModuloId(null);
         setResetForm(!resetForm);
         setLoading(false);
       } else {
@@ -130,15 +136,6 @@ const AddTutores = () => {
     }
   }, [nombres, apellidos]);
 
-  //cargar la lista de cursos
-  useEffect(() => {
-    if (user || user?.tipo === "Administrador") {
-      fetchAllModulos().then((data) => {
-        setModulosData(data);
-      });
-    }
-  }, [user]);
-
   if (!user) {
     navigate("/");
     return;
@@ -161,13 +158,29 @@ const AddTutores = () => {
           <label>
             Nombres<span className="text-red-500">*</span>
           </label>
-          <Input type="text" name="nombres" value={nombres} onChange={(e) => setNombres(e.target.value)} required placeholder="Nombres" />
+          <Input
+            type="text"
+            name="nombres"
+            value={nombres}
+            onChange={(e) => setNombres(e.target.value)}
+            required
+            placeholder="Nombres"
+            autoComplete="off"
+          />
         </div>
         <div>
           <label>
             Apellidos<span className="text-red-500">*</span>
           </label>
-          <Input type="text" name="apellidos" value={apellidos} onChange={(e) => setApellidos(e.target.value)} required placeholder="Apellidos" />
+          <Input
+            type="text"
+            name="apellidos"
+            value={apellidos}
+            onChange={(e) => setApellidos(e.target.value)}
+            required
+            placeholder="Apellidos"
+            autoComplete="off"
+          />
         </div>
         <div>
           <label>
@@ -179,43 +192,52 @@ const AddTutores = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value.toLowerCase().trim())}
             placeholder="Username"
+            autoComplete="off"
           />
         </div>
         <div>
           <label>
             Contraseña<span className="text-red-500">*</span>
           </label>
-          <Input type="text" name="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <Input type="text" name="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off" />
         </div>
         <div>
           <label>Fecha de Nacimiento</label>
-          <Input type="date" name="fecha_nacimiento" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} required />
+          <Input type="date" name="fecha_nacimiento" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} />
         </div>
         <div>
           <label>
             Teléfono<span className="text-red-500">*</span>
           </label>
-          <Input type="text" name="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" />
+          <Input type="text" name="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" autoComplete="off" />
         </div>
         <div>
           <label>Dirección</label>
-          <Input type="text" name="direccion" value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Dirección" />
+          <Input
+            type="text"
+            name="direccion"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+            placeholder="Dirección"
+            autoComplete="off"
+          />
         </div>
         <div>
           <label>Observaciones</label>
-          <Input type="text" name="observaciones" value={observaciones} onChange={(e) => setObservaciones(e.target.value)} placeholder="Observaciones" />
+          <Input
+            type="text"
+            name="observaciones"
+            value={observaciones}
+            onChange={(e) => setObservaciones(e.target.value)}
+            placeholder="Observaciones"
+            autoComplete="off"
+          />
         </div>
         <div>
           <label>
             Tipo de Usuario<span className="text-red-500">*</span>
           </label>
           {tipoData && <DropdownAE data={tipoData} title="Seleccionar tipo" setValueAE={setTipo} />}
-        </div>
-        <div>
-          <label>
-            Seleccione Módulo<span className="text-red-500">*</span>
-          </label>
-          {modulosData && <DropdownAE data={modulosData} title="Seleccionar módulo" setValueAE={setModuloId} />}
         </div>
         <div className="md:col-span-2">
           <Button type="submit" className="w-full mt-4">

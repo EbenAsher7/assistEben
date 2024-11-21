@@ -2,9 +2,10 @@ import { TabPanel, useTabs } from "react-headless-tabs";
 import ListaTutores from "./SubModules/ListaTutores";
 import AddTutores from "./SubModules/AddTutores";
 import { TabSelector } from "./TabsSelector";
+import AsingTutores from "./SubModules/AsingTutores";
 
 const AdminTutorNavbar = () => {
-  const [selectedTab, setSelectedTab] = useTabs(["listTutors", "newTutor"]);
+  const [selectedTab, setSelectedTab] = useTabs(["listTutors", "newTutor", "asignTutor"]);
 
   return (
     <>
@@ -15,6 +16,9 @@ const AdminTutorNavbar = () => {
         <TabSelector isActive={selectedTab === "newTutor"} onClick={() => setSelectedTab("newTutor")} color="orange">
           Agregar Tutor
         </TabSelector>
+        <TabSelector isActive={selectedTab === "asignTutor"} onClick={() => setSelectedTab("asignTutor")} color="orange">
+          Asignar Tutores
+        </TabSelector>
       </nav>
       <div className="p-4 w-full m-auto">
         <TabPanel render="lazy" hidden={selectedTab !== "listTutors"}>
@@ -22,6 +26,9 @@ const AdminTutorNavbar = () => {
         </TabPanel>
         <TabPanel render="lazy" hidden={selectedTab !== "newTutor"}>
           <AddTutores />
+        </TabPanel>
+        <TabPanel render="lazy" hidden={selectedTab !== "asignTutor"}>
+          <AsingTutores />
         </TabPanel>
       </div>
     </>

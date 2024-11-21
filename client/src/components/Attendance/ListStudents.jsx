@@ -263,7 +263,7 @@ export function ListStudents({ value }) {
   const { toast } = useToast();
   const allDataTableRef = useRef(null);
 
-  const { user, fetchModulos, fetchAllModulos } = useContext(MainContext);
+  const { user, fetchModulos } = useContext(MainContext);
 
   const handleStudentUpdate = (updatedStudent) => {
     setAlumnosCursos((prevAlumnos) =>
@@ -336,7 +336,7 @@ export function ListStudents({ value }) {
 
   useEffect(() => {
     if (user.tipo === "Administrador") {
-      fetchAllModulos(user.id).then((data) => {
+      fetchModulos(user.id).then((data) => {
         setCursos(data);
         setIsLoadingCursos(false);
       });
@@ -346,7 +346,7 @@ export function ListStudents({ value }) {
         setIsLoadingCursos(false);
       });
     }
-  }, [fetchModulos, user.id, fetchAllModulos, user.tipo]);
+  }, [fetchModulos, user.id, user.tipo]);
 
   useEffect(() => {
     if (cursoSeleccionado) {

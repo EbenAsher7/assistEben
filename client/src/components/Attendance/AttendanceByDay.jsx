@@ -37,7 +37,6 @@ export function AttendanceByDay({ value }) {
         const modulesData = await fetchModulos(user.id);
         if (modulesData) {
           setModules(modulesData);
-          console.log(modulesData);
         }
       }
     };

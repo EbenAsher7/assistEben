@@ -130,6 +130,8 @@ const AsingTutores = () => {
 
   return (
     <div className="p-6 text-gray-800 dark:text-gray-200 w-full sm:max-w-[900px] mx-auto">
+      <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Asignar tutores a módulos</h2>
+      <p className="mb-4 mt-2"> Seleccione un módulo y asigne tutores a él.</p>
       <DropdownAE data={modules} title="Seleccione un módulo" setValueAE={setSelectedModule} />
       {selectedModule && (
         <div className="mt-6">

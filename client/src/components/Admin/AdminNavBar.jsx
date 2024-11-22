@@ -26,7 +26,7 @@ const AdminNavBar = () => {
           </TabSelector>
         </nav>
         <div className="py-4 sm:w-[80%] w-full m-auto">
-          <TabPanel render="lazy" hidden={selectedTab !== "tutores"}>
+          <TabPanel unmount="idle" hidden={selectedTab !== "tutores"}>
             <AdminTutorNavbar />
           </TabPanel>
           <TabPanel render="lazy" hidden={selectedTab !== "modulos"}>

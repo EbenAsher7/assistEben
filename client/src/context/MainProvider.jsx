@@ -196,6 +196,35 @@ const MainProvider = ({ children }) => {
   };
 
   //Cargar lista de modulos
+  const fetchModulesAndTutors = async (id_module) => {
+    if (user) {
+      try {
+        const response = await fetch(`${URL_BASE}/api/modulesAndTutors/${id_module}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
+          duration: 2500,
+        });
+      }
+    }
+  };
+
+  //Cargar lista de modulos
   const fetchAllModulosCompleteData = async () => {
     if (user) {
       try {
@@ -218,6 +247,63 @@ const MainProvider = ({ children }) => {
           variant: "destructive",
           title: "Error",
           description: "Ocurrió un error al consultar los módulos disponibles.",
+          duration: 2500,
+        });
+      }
+    }
+  };
+
+  const deleteTutoresModulos = async (id_moduleTutors) => {
+    if (user) {
+      try {
+        const response = await fetch(`${URL_BASE}/api/modulesAndTutors/${id_moduleTutors}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
+          duration: 2500,
+        });
+      }
+    }
+  };
+
+  const addTutoresModulos = async (idModule, idTutor) => {
+    if (user) {
+      try {
+        const response = await fetch(`${URL_BASE}/api/modulesAndTutors`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: user?.token,
+          },
+          body: JSON.stringify({ idModule, idTutor }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          throw new Error("Failed to fetch");
+        }
+      } catch (error) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
           duration: 2500,
         });
       }
@@ -297,6 +383,9 @@ const MainProvider = ({ children }) => {
         fetchAllModulos,
         fetchAllModulosCompleteData,
         fetchAllModulosCompleteDataDeleted,
+        fetchModulesAndTutors,
+        deleteTutoresModulos,
+        addTutoresModulos,
         //NUEVO REGISTRO
         nombresNEW,
         setNombresNEW,

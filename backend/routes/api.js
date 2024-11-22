@@ -132,6 +132,64 @@ router.get('/tutors', async (req, res) => {
   }
 })
 
+router.delete('/modulesAndTutors/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    await turso.execute({
+      sql: 'DELETE FROM TutoresModulos WHERE id = ?',
+      args: [id]
+    })
+
+    res
+      .status(200)
+      .json({ message: 'Asignacion de modulos eliminados correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+router.post('/modulesAndTutors', async (req, res) => {
+  const { idTutor, idModule } = req.body
+  try {
+    await turso.execute({
+      sql: 'INSERT INTO TutoresModulos (tutor_id, modulo_id) VALUES (?, ?)',
+      args: [idTutor, idModule]
+    })
+
+    res
+      .status(201)
+      .json({ message: 'Asignacion de modulos creada correctamente' })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener TutoresModulos
+router.get('/modulesAndTutors/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const result = await turso.execute({
+      sql: 'SELECT * FROM TutoresModulos WHERE modulo_id = ?',
+      args: [id]
+    })
+
+    const columns = result.columns
+    const rows = result.rows
+
+    const tutorsModules = rows.map((row) => {
+      const tutorModule = {}
+      columns.forEach((col, index) => {
+        tutorModule[col] = row[index]
+      })
+      return tutorModule
+    })
+
+    res.status(200).json(tutorsModules)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 router.get('/students', async (req, res) => {
   try {
     const result = await turso.execute('SELECT * FROM alumnos')

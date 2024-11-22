@@ -142,7 +142,7 @@ const RegisterAttendance = () => {
     } else {
       return (
         <div className="flex justify-center items-center h-screen">
-          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">Ya has registrado una asistencia el día de hoy.</p>
+          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">Ya has registrado un máximo de 5 asistencias el día de hoy.</p>
         </div>
       );
     }
@@ -198,7 +198,9 @@ const RegisterAttendance = () => {
         </div>
       ) : (
         <div className="w-full flex flex-col items-center justify-center h-screen -mt-52">
-          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">¡Asistencia registrada correctamente!</p>
+          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">
+            ¡Asistencia registrada correctamente! Espera 5 segundos, serás redirigido al inicio
+          </p>
           <ConfettiExplosion />
         </div>
       )}

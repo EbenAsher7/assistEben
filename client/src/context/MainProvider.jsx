@@ -10,6 +10,7 @@ const MainProvider = ({ children }) => {
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState(null);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
+  const [maxAttendanceByDay, setMaxAttendanceByDay] = useState(5);
 
   // Estado para guardar el historial de asistencias
   const [attendanceHistory, setAttendanceHistory] = useState({});
@@ -83,8 +84,11 @@ const MainProvider = ({ children }) => {
       // Para tutores, verificar si el alumno específico ya está registrado hoy
       return !(storedHistory[today] && storedHistory[today].asistencias.some((a) => a.id === alumnoId));
     } else {
-      // Para usuarios no registrados, verificar si ya se hizo algún registro hoy
-      return !(storedHistory[today] && storedHistory[today].asistencias.length > 0);
+      // Para usuarios no registrados, verificar si ya se hizo algún registro hoy y si no se ha alcanzado el límite
+      const todayHistory = storedHistory[today] || { asistencias: [] };
+      const attendanceCount = todayHistory.asistencias.length;
+      return attendanceCount < maxAttendanceByDay;
+      // return !(storedHistory[today] && storedHistory[today].asistencias.length > 0);
     }
   };
 
@@ -403,6 +407,8 @@ const MainProvider = ({ children }) => {
         setCorreoNEW,
         cursoSeleccionadoNEW,
         setCursoSeleccionadoNEW,
+        maxAttendanceByDay,
+        setMaxAttendanceByDay,
         //STEPPER
         pasoActual,
         setPasoActual,

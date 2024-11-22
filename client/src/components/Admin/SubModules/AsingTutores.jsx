@@ -2,6 +2,7 @@ import MainContext from "@/context/MainContext";
 import { useContext, useEffect, useState } from "react";
 import DropdownAE from "@/components/DropdownAE";
 import { useToast } from "@/components/ui/use-toast";
+import LoaderAE from "@/components/LoaderAE";
 
 const AsingTutores = () => {
   const [modules, setModules] = useState([]);
@@ -40,7 +41,6 @@ const AsingTutores = () => {
   // Fetch tutores and tutoresModules when a module is selected
   useEffect(() => {
     if (!selectedModule) return;
-    console.log(selectedModule);
 
     const loadTutoresAndTutoresModules = async () => {
       setLoadingDetails(true);
@@ -136,7 +136,9 @@ const AsingTutores = () => {
           <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Módulo: {modules[selectedModule - 1].label}</h3>
           {loadingDetails ? (
             <div className="flex items-center justify-center mt-4">
-              <div className="text-lg text-gray-700 dark:text-gray-300">Cargando detalles...</div>
+              <div className="text-lg text-gray-700 dark:text-gray-300">
+                <LoaderAE texto="Cargando espere..." />
+              </div>
             </div>
           ) : (
             <>

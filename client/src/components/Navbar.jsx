@@ -154,8 +154,25 @@ const Navbar = memo(() => {
   return (
     <nav className="bg-white border-neutral-200 dark:bg-neutral-800 dark:border-neutral-500 fixed top-0 w-full z-50" ref={navbarRef}>
       <div className="w-full flex flex-wrap items-center justify-between p-2 sm:pl-4">
-        <Link to="/questions" className="flex items-center gap-2" onClick={closeNavbar}>
+        <Link to="/" className="flex items-center gap-2" onClick={closeNavbar}>
           <img src={LOGODOCTRINA} className="h-10 py-1 ml-2 dark:invert invert-0" alt="Logo Ministerios Ebenezer" />
+        </Link>
+
+        <Link to="/questions" className="font-bold flex flex-row gap-1 py-2 px-4 rounded-md dark:bg-neutral-600 bg-neutral-200">
+          Preguntas
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M0 0h24v24H0z" stroke="none" />
+            <path d="M8 9h8M8 13h6M14 18h-1l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4.5M19 22v.01M19 19a2.003 2.003 0 0 0 .914-3.782 1.98 1.98 0 0 0-2.414.483" />
+          </svg>
         </Link>
         <button
           onClick={toggleNavbar}

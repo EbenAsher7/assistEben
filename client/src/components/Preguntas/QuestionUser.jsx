@@ -123,6 +123,7 @@ export default function QuestionUser() {
         <div className="space-y-6">
           <h1 className="text-3xl font-bold text-foreground text-center">Preguntas del tema del: {obtenerFechaFormateada()}</h1>
           <p className="text-muted-foreground text-center italic opacity-50">Las preguntas serán anónimas</p>
+          <p className="text-center dark:text-purple-400 text-purple-700">** Solo puedes mandar una pregunta por día **</p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="relative">
               <Textarea

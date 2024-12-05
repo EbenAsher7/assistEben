@@ -131,6 +131,39 @@ const MainProvider = ({ children }) => {
     }
   };
 
+  //Cargar lista de tutores eliminados
+  const fetchTutoresDeleted = async () => {
+    try {
+      const response = await fetch(`${URL_BASE}/api/tutorsDeleted`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: user?.token,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Transformar los datos
+        const formattedData = data.map((tutor) => ({
+          value: tutor.id.toString(),
+          label: tutor.nombres + " " + tutor.apellidos,
+        }));
+        return formattedData;
+      } else {
+        throw new Error("Failed to fetch");
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Ocurrió un error al consultar los tutores eliminados.",
+        duration: 2500,
+      });
+    }
+  };
+
   //Cargar lista de modulos
   const fetchModulos = async (tutorID) => {
     if (tutorID) {
@@ -390,6 +423,7 @@ const MainProvider = ({ children }) => {
         fetchModulesAndTutors,
         deleteTutoresModulos,
         addTutoresModulos,
+        fetchTutoresDeleted,
         //NUEVO REGISTRO
         nombresNEW,
         setNombresNEW,

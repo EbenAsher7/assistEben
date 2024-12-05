@@ -132,6 +132,32 @@ router.get('/tutors', async (req, res) => {
   }
 })
 
+router.get('/tutorsDeleted', async (req, res) => {
+  try {
+    const result = await turso.execute('SELECT * FROM tutores where activo = 0')
+
+    const columns = result.columns
+    const rows = result.rows
+
+    const tutors = rows.map((row) => {
+      const tutor = {}
+      columns.forEach((col, index) => {
+        tutor[col] = row[index]
+      })
+      return tutor
+    })
+
+    // return all data except password
+    tutors.forEach((tutor) => {
+      delete tutor.password
+    })
+
+    res.status(200).json(tutors)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 router.delete('/modulesAndTutors/:id', async (req, res) => {
   const { id } = req.params
   try {

@@ -330,7 +330,7 @@ router.get('/preguntasAnonimas/:startDate/:endDate', async (req, res) => {
   try {
     // Consulta para obtener las preguntas dentro del rango de fechas
     const result = await turso.execute({
-      sql: 'SELECT id, pregunta, respondida FROM Preguntas WHERE fecha BETWEEN ? AND ?',
+      sql: 'SELECT id, pregunta, respondida FROM Preguntas WHERE fecha BETWEEN ? AND ? ORDER BY fecha DESC',
       args: [start, end]
     })
 

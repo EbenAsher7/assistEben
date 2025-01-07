@@ -3,6 +3,7 @@ import { useState, useEffect, useContext, useRef, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dices, ChevronUp, SquareCheckBig, Calendar, MessageSquareMore, MessageSquareReply, MailQuestion } from "lucide-react";
 import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
@@ -11,7 +12,62 @@ import LoaderAE from "../LoaderAE";
 import { useToast } from "../ui/use-toast";
 import CRDate from "../ui/CRDate";
 
-export default function QuestionsAdmin() {
+const translations = {
+  es: {
+    pageTitle: "Preguntas del día",
+    from: "al",
+    totalQuestions: "Total de preguntas",
+    totalAnswered: "Total Respondidas",
+    questionSays: "La pregunta dice:",
+    noQuestions: "No hay preguntas para mostrar",
+    random: "Aleatorio",
+    markAsAnswered: "Marcar como respondida",
+    answering: "Respondiendo...",
+    selectDates: "Para ver otras fechas, presiona el botón",
+    selectDateButton: "Seleccionar fechas",
+    availableQuestions: "Preguntas disponibles",
+    searchPlaceholder: "Buscar entre las preguntas...",
+    selectDate: "Seleccionar Fecha",
+    enterFirstDate: "Ingrese primer fecha",
+    enterSecondDate: "Ingrese segunda fecha",
+    firstDate: "Primer fecha",
+    secondDate: "Segunda fecha",
+    loadQuestions: "Cargar preguntas",
+    questionsList: "Lista de Preguntas",
+    datesRequired: "Las dos fechas son requeridas",
+    loadError: "Error al cargar las preguntas, intente nuevamente",
+    markError: "Error al marcar la pregunta como respondida",
+    noPermission: "No tienes permiso para ver esta página",
+  },
+  en: {
+    pageTitle: "Questions of the Day",
+    from: "to",
+    totalQuestions: "Total questions",
+    totalAnswered: "Total Answered",
+    questionSays: "The question says:",
+    noQuestions: "No questions to display",
+    random: "Random",
+    markAsAnswered: "Mark as answered",
+    answering: "Answering...",
+    selectDates: "To view other dates, press the button",
+    selectDateButton: "Select dates",
+    availableQuestions: "Available questions",
+    searchPlaceholder: "Search questions...",
+    selectDate: "Select Date",
+    enterFirstDate: "Enter first date",
+    enterSecondDate: "Enter second date",
+    firstDate: "First date",
+    secondDate: "Second date",
+    loadQuestions: "Load questions",
+    questionsList: "Questions List",
+    datesRequired: "Both dates are required",
+    loadError: "Error loading questions, please try again",
+    markError: "Error marking question as answered",
+    noPermission: "You don't have permission to view this page",
+  },
+};
+
+export function QuestionsAdmin() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(null);
   const [answeredQuestions, setAnsweredQuestions] = useState([]);
@@ -19,19 +75,15 @@ export default function QuestionsAdmin() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [isDateDrawerOpen, setIsDateDrawerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [language, setLanguage] = useState("es");
   const [loadingRespondida, setLoadingRespondida] = useState(false);
-
   const [selectedQuestionId, setSelectedQuestionId] = useState(null);
   const selectedQuestionRef = useRef(null);
-
   const [searchTerm, setSearchTerm] = useState("");
-
   const { toast } = useToast();
-
   const { user } = useContext(MainContext);
-
   const [preventNavigation, setPreventNavigation] = useState(false);
+  const t = translations[language];
 
   const obtenerFechaFormateada = (fecha) => {
     const dia = fecha.getDate().toString().padStart(2, "0");
@@ -40,7 +92,6 @@ export default function QuestionsAdmin() {
     return `${anio}-${mes}-${dia}`;
   };
 
-  // prevenir la navegación
   useEffect(() => {
     const handlePopState = (event) => {
       if (preventNavigation) {
@@ -60,7 +111,6 @@ export default function QuestionsAdmin() {
     };
   }, [preventNavigation]);
 
-  //VARIABLE DE FECHA
   const [selectedDate, setSelectedDate] = useState(obtenerFechaFormateada(new Date(new Date().setDate(new Date().getDate() - 2))));
   const [selectedDate2, setSelectedDate2] = useState(obtenerFechaFormateada(new Date(new Date().setDate(new Date().getDate() + 2))));
 
@@ -75,13 +125,11 @@ export default function QuestionsAdmin() {
         },
       });
       const data = await response.json();
-      console.log("data", data);
       if (data.length === 0) {
         setQuestions([]);
         setCurrentQuestion(null);
       } else {
         setQuestions(data);
-        // Seleccionar una pregunta aleatoria no respondida al cargar
         const unansweredQuestions = data.filter((q) => !q.respondida);
         if (unansweredQuestions.length > 0) {
           const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
@@ -90,14 +138,13 @@ export default function QuestionsAdmin() {
           setCurrentQuestion(null);
         }
       }
-      // Actualizar las preguntas respondidas basándose en el campo 'respondida'
       setAnsweredQuestions(data.filter((q) => q.respondida).map((q) => q.id));
     } catch (error) {
       console.error("Error al cargar las preguntas:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Error al cargar las preguntas, intente nuevamente",
+        description: t.loadError,
         duration: 3000,
       });
       setQuestions([]);
@@ -107,7 +154,6 @@ export default function QuestionsAdmin() {
     }
   };
 
-  // Modifica el useEffect para usar las fechas por defecto
   useEffect(() => {
     if (user && user?.tipo === "Administrador") {
       cargarPreguntas(selectedDate, selectedDate2);
@@ -123,7 +169,7 @@ export default function QuestionsAdmin() {
   if (!user || user.tipo !== "Administrador") {
     return (
       <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold text-center">No tienes permiso para ver esta página</h1>
+        <h1 className="text-2xl font-bold text-center">{t.noPermission}</h1>
       </div>
     );
   }
@@ -162,11 +208,9 @@ export default function QuestionsAdmin() {
         });
 
         if (response.ok) {
-          // Actualizar el estado local
           setQuestions((prevQuestions) => prevQuestions.map((q) => (q.id === currentQuestion.id ? { ...q, respondida: true } : q)));
           setAnsweredQuestions((prev) => [...prev, currentQuestion.id]);
 
-          // Seleccionar aleatoriamente la siguiente pregunta no respondida
           const unansweredQuestions = questions.filter((q) => !q.respondida && q.id !== currentQuestion.id);
           if (unansweredQuestions.length > 0) {
             const randomIndex = Math.floor(Math.random() * unansweredQuestions.length);
@@ -185,7 +229,7 @@ export default function QuestionsAdmin() {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Error al marcar la pregunta como respondida",
+          description: t.markError,
           duration: 2500,
         });
       } finally {
@@ -204,7 +248,7 @@ export default function QuestionsAdmin() {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Las dos fechas son requeridas",
+        description: t.datesRequired,
         duration: 2000,
       });
       return;
@@ -213,15 +257,15 @@ export default function QuestionsAdmin() {
     if (selectedDate && selectedDate2) {
       cargarPreguntas(selectedDate, selectedDate2);
       setIsDateDrawerOpen(false);
-      setPreventNavigation(false); // Añade esta línea
+      setPreventNavigation(false);
       setShowDatePicker(true);
     }
   };
 
-  // FILTRAR PREGUNTAS
   const filteredQuestions = useMemo(() => {
-    return questions?.filter((question) =>
-      question.pregunta
+    return questions?.filter((question) => {
+      const questionText = language === "es" ? question.pregunta : question.preguntaeng;
+      return questionText
         ?.toLowerCase()
         ?.normalize("NFD")
         ?.replace(/[\u0300-\u036f]/g, "")
@@ -230,9 +274,9 @@ export default function QuestionsAdmin() {
             ?.toLowerCase()
             ?.normalize("NFD")
             ?.replace(/[\u0300-\u036f]/g, "")
-        )
-    );
-  }, [questions, searchTerm]);
+        );
+    });
+  }, [questions, searchTerm, language]);
 
   const renderQuestions = (questionsToRender, align = "text-left", length = 40) => (
     <ul className="space-y-2">
@@ -250,7 +294,13 @@ export default function QuestionsAdmin() {
             onClick={() => handleQuestionClick(question)}
             disabled={question.respondida}
           >
-            {question?.pregunta?.length > 40 ? `${question?.pregunta?.slice(0, length)}...` : question.pregunta}
+            {language === "es"
+              ? question?.pregunta?.length > length
+                ? `${question?.pregunta?.slice(0, length)}...`
+                : question.pregunta
+              : question?.preguntaeng?.length > length
+              ? `${question?.preguntaeng?.slice(0, length)}...`
+              : question.preguntaeng}
           </button>
         </li>
       ))}
@@ -265,40 +315,47 @@ export default function QuestionsAdmin() {
         </div>
       ) : (
         <div className="flex flex-row">
-          {/* ################### PARTE PRINCIPAL ################### */}
           <div className="flex flex-col mt-24 sm:mt-0">
             <div className="flex flex-col sm:flex-row sm:gap-8 sm:justify-center sm:items-center">
               <MailQuestion className="sm:m-0 mx-auto -mb-2" size={70} />
               <div className="my-4">
-                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">Preguntas del día</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-center sm:text-left">{t.pageTitle}</h1>
                 <h1 className="sm:text-xl font-bold text-center sm:text-left">
-                  {selectedDate} {selectedDate && " al "} {selectedDate2}
+                  {selectedDate} {selectedDate && t.from} {selectedDate2}
                 </h1>
               </div>
             </div>
             <hr className="hidden sm:block sm:mb-3 sm:w-10/12 sm:mx-auto" />
-            {/* Nuevo: Mostrar total de preguntas y respondidas */}
+
+            <Tabs defaultValue="es" className="w-full" onValueChange={setLanguage}>
+              <TabsList className="grid w-[200px] grid-cols-2 mx-auto mb-4">
+                <TabsTrigger value="es">Español</TabsTrigger>
+                <TabsTrigger value="en">English</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
             <div className="flex flex-col space-y-0 opacity-80 italic -mt-1 mb-2 sm:flex-row sm:justify-center sm:gap-9 sm:items-center">
               <span className="mx-auto sm:m-0 italic gap-2 inline-flex">
-                Total de preguntas: <span className="text-lg font-bold">{String(questions?.length).padStart(3, " ")}</span> <MessageSquareMore />
+                {t.totalQuestions}: <span className="text-lg font-bold">{String(questions?.length).padStart(3, " ")}</span> <MessageSquareMore />
               </span>
               <span className="mx-auto sm:m-0 italic gap-2 inline-flex">
-                Total Respondidas:&nbsp; <span className="text-lg font-bold">{String(answeredQuestions?.length).padStart(3, " ")}</span>{" "}
+                {t.totalAnswered}: <span className="text-lg font-bold">{String(answeredQuestions?.length).padStart(3, " ")}</span>{" "}
                 <MessageSquareReply />
               </span>
             </div>
-            {/* ################### PREGUNTAS PRINCIPAL ################### */}
             <div className="flex flex-col sm:flex-row gap-1 w-full mb-5 ">
               <Card className="w-full sm:min-w-[800px] sm:max-w-[800px]">
                 <CardHeader>
-                  <CardTitle className="text-4xl font-extrabold">La pregunta dice:</CardTitle>
+                  <CardTitle className="text-4xl font-extrabold">{t.questionSays}</CardTitle>
                 </CardHeader>
                 <CardContent className="w-full min-h-[330px] h-[330px] relative">
                   <div className="flex flex-col justify-center items-center min-h-[230px] h-[230px]">
                     {currentQuestion ? (
-                      <p className="text-lg text-left p-2 sm:text-4xl">{currentQuestion.pregunta}</p>
+                      <p className="text-lg text-left p-2 sm:text-4xl">
+                        {language === "es" ? currentQuestion.pregunta : currentQuestion.preguntaeng}
+                      </p>
                     ) : (
-                      <p className="text-muted-foreground">No hay preguntas para mostrar</p>
+                      <p className="text-muted-foreground">{t.noQuestions}</p>
                     )}
                   </div>
                   <div className="flex gap-4 items-center justify-center absolute bottom-4 left-1/2 transform -translate-x-1/2">
@@ -308,7 +365,7 @@ export default function QuestionsAdmin() {
                       disabled={answeredQuestions.length === questions.length || questions.length === 0 || questions.length === 1}
                     >
                       <Dices />
-                      Aleatorio
+                      {t.random}
                     </Button>
                     <Button
                       className="gap-1 bg-pink-500 text-white dark:bg-pink-800 dark:text-white hover:bg-pink-600 dark:hover:bg-pink-700"
@@ -316,17 +373,14 @@ export default function QuestionsAdmin() {
                       disabled={!currentQuestion || currentQuestion.respondida || loadingRespondida}
                     >
                       <SquareCheckBig />
-                      <div className={`${loadingRespondida ? "hidden" : ""}`}>
-                        Marcar <span className="hidden sm:inline-flex">como pregunta</span> respondida
-                      </div>
-                      <div className={`${loadingRespondida ? "" : "hidden"}`}>Respondiendo...</div>
+                      <div className={`${loadingRespondida ? "hidden" : ""}`}>{t.markAsAnswered}</div>
+                      <div className={`${loadingRespondida ? "" : "hidden"}`}>{t.answering}</div>
                     </Button>
                   </div>
                 </CardContent>
               </Card>
             </div>
-            {/* ################### SELECCIONAR LA FECHA ################### */}
-            <p className="text-sm italic text-center mb-2 opacity-50 px-2">Para ver otras fechas, presiona el botón</p>
+            <p className="text-sm italic text-center mb-2 opacity-50 px-2">{t.selectDates}</p>
             <div className="mb-48 sm:mb-0">
               <Button
                 onClick={handleDatePickerClick}
@@ -337,21 +391,20 @@ export default function QuestionsAdmin() {
                 } text-white rounded-full px-6 py-3 transition-colors duration-300`}
               >
                 <Calendar className="h-5 w-5" />
-                {showDatePicker ? `${selectedDate ? selectedDate : ""} - ${selectedDate2 ? selectedDate2 : ""}` : "Seleccionar fechas"}
+                {showDatePicker ? `${selectedDate ? selectedDate : ""} - ${selectedDate2 ? selectedDate2 : ""}` : t.selectDateButton}
               </Button>
             </div>
           </div>
 
-          {/* ################### PREGUNTAS DESKTOP LADO DERECHO ################### */}
           <div className="hidden sm:block ">
             <Card className="sm:min-w-[250px] sm:max-w-[350px] ">
               <CardHeader>
-                <CardTitle>Preguntas disponibles</CardTitle>
+                <CardTitle>{t.availableQuestions}</CardTitle>
               </CardHeader>
               <CardContent>
                 <input
                   type="text"
-                  placeholder="Buscar entre las preguntas..."
+                  placeholder={t.searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full p-2 mb-4 border rounded-md dark:bg-gray-700 dark:border-gray-600"
@@ -360,7 +413,7 @@ export default function QuestionsAdmin() {
                   {filteredQuestions.length > 0 ? (
                     renderQuestions(filteredQuestions, "text-left", 80)
                   ) : (
-                    <p className="text-muted-foreground">No hay preguntas para mostrar</p>
+                    <p className="text-muted-foreground">{t.noQuestions}</p>
                   )}
                 </div>
               </CardContent>
@@ -369,7 +422,6 @@ export default function QuestionsAdmin() {
         </div>
       )}
 
-      {/* ################### SELECCIONAR FECHA ################### */}
       <Drawer
         open={isDateDrawerOpen}
         onOpenChange={(open) => {
@@ -378,22 +430,20 @@ export default function QuestionsAdmin() {
         }}
       >
         <DrawerContent className="w-full sm:w-[300px] sm:h-screen px-4 ">
-          <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-5">Seleccionar Fecha</DrawerTitle>
+          <DrawerTitle className="text-xl text-center font-extrabold text-black dark:text-white my-5">{t.selectDate}</DrawerTitle>
           <div className="w-10/12 m-auto sm:m-0 flex justify-center items-center flex-col pb-72">
-            {/* <label className="text-black dark:text-white font-[18px]">Ingrese primer fecha</label> */}
-            <CRDate title="Ingrese primer fecha" setValue={setSelectedDate} defaultValue={selectedDate} placeholder="Primer fecha" />
+            <CRDate title={t.enterFirstDate} setValue={setSelectedDate} defaultValue={selectedDate} placeholder={t.firstDate} />
             <div className="my-4"></div>
-            <CRDate title="Ingrese segunda fecha" setValue={setSelectedDate2} defaultValue={selectedDate2} placeholder="Segunda fecha" />
+            <CRDate title={t.enterSecondDate} setValue={setSelectedDate2} defaultValue={selectedDate2} placeholder={t.secondDate} />
             <div className="flex justify-end mt-6">
               <Button className="w-[300px] sm:w-[200px]" onClick={handleLoadQuestions}>
-                Cargar preguntas
+                {t.loadQuestions}
               </Button>
             </div>
           </div>
         </DrawerContent>
       </Drawer>
 
-      {/* ################### DRAWER MOBILE DE PREGUNTAS ################### */}
       <Drawer
         open={isDrawerOpen}
         onOpenChange={(open) => {
@@ -406,15 +456,15 @@ export default function QuestionsAdmin() {
             variant="outline"
             className="fixed bottom-0 left-1/2 transform -translate-x-1/2 py-8 px-8 rounded-t-xl rounded-b-none flex items-center justify-center bg-pink-500 text-white dark:bg-pink-600 dark:text-white sm:hidden"
           >
-            <ChevronUp className="h-6 w-6" /> &nbsp; Lista de Preguntas
+            <ChevronUp className="h-6 w-6" /> &nbsp; {t.questionsList}
           </Button>
         </DrawerTrigger>
         <DrawerContent className="max-h-[80vh]">
-          <DialogTitle className="text-xl text-center font-extrabold text-black dark:text-white">Preguntas disponibles</DialogTitle>
+          <DialogTitle className="text-xl text-center font-extrabold text-black dark:text-white">{t.availableQuestions}</DialogTitle>
           <div className="px-4 py-2">
             <input
               type="text"
-              placeholder="Buscar entre las preguntas..."
+              placeholder={t.searchPlaceholder}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full p-2 mb-1 border rounded-md dark:bg-gray-700 dark:border-gray-600"
@@ -424,7 +474,7 @@ export default function QuestionsAdmin() {
             {filteredQuestions.length > 0 ? (
               renderQuestions(filteredQuestions, "text-center", 40)
             ) : (
-              <p className="text-muted-foreground text-center">No hay preguntas para mostrar</p>
+              <p className="text-muted-foreground text-center">{t.noQuestions}</p>
             )}
           </div>
         </DrawerContent>
@@ -432,3 +482,5 @@ export default function QuestionsAdmin() {
     </div>
   );
 }
+
+export default QuestionsAdmin;

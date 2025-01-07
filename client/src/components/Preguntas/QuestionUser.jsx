@@ -183,8 +183,11 @@ export default function QuestionUser() {
       {mostrarModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg text-center space-y-4">
+            <hr />
             <h2 className="text-xl font-semibold">{t.languageSelect}</h2>
-            <p className="text-gray-600">{t.languageSelectSubtitle}</p>
+            <hr />
+            <p className="text-xl font-semibold text-gray-600">{t.languageSelectSubtitle}</p>
+            <hr />
             <div className="flex justify-around space-x-4">
               <button className="flex flex-col items-center" onClick={() => handleSeleccionIdioma("es")}>
                 <img src="/es.png" alt="España" className="w-12 h-12" />

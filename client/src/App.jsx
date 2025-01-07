@@ -13,6 +13,7 @@ import PageRegister from "./pages/PageRegister";
 import QuestionUser from "./components/Preguntas/QuestionUser";
 import QuestionsAdmin from "./components/Admin/QuestionsAdmin";
 import ProtectedRoute from "./pages/ProtectedRoute";
+import TutorialesPage from "./pages/TutorialesPage";
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
         <Route path="/newRegister" element={<PageRegister />} />
         <Route path="/admin" element={<Administration />} />
         <Route path="/questions" element={<QuestionUser />} />
+        <Route path="/tutoriales" element={<TutorialesPage />} />
         <Route
           path="/adminquestions"
           element={

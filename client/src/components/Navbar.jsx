@@ -87,6 +87,15 @@ const Navbar = memo(() => {
                 Ajustes
               </Link>
             </li>
+            <li className="text-black dark:text-white flex justify-center items-center">
+              <Link
+                to="/tutoriales"
+                className="bg-yellow-500 text-white dark:bg-yellow-700 w-full sm:w-auto px-10 py-2 flex justify-center rounded-md border-[1px] border-yellow-300 dark:border-yellow-800"
+                onClick={closeNavbar}
+              >
+                Tutoriales
+              </Link>
+            </li>
           </>
         )}
         <li className="text-black dark:text-white flex justify-center items-center">

@@ -75,6 +75,7 @@ export default function QuestionsAdmin() {
         },
       });
       const data = await response.json();
+      console.log("data", data);
       if (data.length === 0) {
         setQuestions([]);
         setCurrentQuestion(null);
@@ -219,16 +220,16 @@ export default function QuestionsAdmin() {
 
   // FILTRAR PREGUNTAS
   const filteredQuestions = useMemo(() => {
-    return questions.filter((question) =>
+    return questions?.filter((question) =>
       question.pregunta
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .includes(
+        ?.toLowerCase()
+        ?.normalize("NFD")
+        ?.replace(/[\u0300-\u036f]/g, "")
+        ?.includes(
           searchTerm
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
+            ?.toLowerCase()
+            ?.normalize("NFD")
+            ?.replace(/[\u0300-\u036f]/g, "")
         )
     );
   }, [questions, searchTerm]);

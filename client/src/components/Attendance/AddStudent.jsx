@@ -79,11 +79,12 @@ export function AddStudent({ value }) {
       try {
         // const adjustedDate = addDays(selectedDate, 1); // Ajusta la fecha sumando un día
         // const formattedDate = adjustedDate ? format(adjustedDate, "yyyy-MM-dd") : "";
+        console.log(prefijo);
         const dataFinal = {
           nombres: name,
           apellidos: lastName,
           fecha_nacimiento: selectedDate ?? "",
-          prefijo: prefijo,
+          prefijo: prefijo[0]?.value ?? "",
           telefono: phone,
           direccion: address ?? "",
           email: email ?? "",

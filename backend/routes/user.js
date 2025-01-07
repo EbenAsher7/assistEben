@@ -306,20 +306,36 @@ router.post('/user/registerAlumno', async (req, res) => {
 // Registrar nueva pregunta
 router.post('/user/preguntas/nueva', async (req, res) => {
   try {
-    const { pregunta } = req.body
+    const { pregunta, preguntaeng } = req.body
 
-    // Verificar que la pregunta esté presente
-    if (!pregunta) {
-      return res.status(400).json({ error: 'La pregunta es requerida' })
+    // Verificar que al menos uno de los dos campos esté presente
+    if (!pregunta && !preguntaeng) {
+      return res
+        .status(400)
+        .json({ error: 'Se requiere una pregunta en español o inglés' })
     }
 
-    // Insertar la nueva pregunta en la tabla Preguntas
+    // Verificar que no se envíen ambos campos simultáneamente
+    if (pregunta && preguntaeng) {
+      return res
+        .status(400)
+        .json({
+          error: 'Solo puedes enviar una pregunta a la vez, en español o inglés'
+        })
+    }
+
+    // Determinar el campo a insertar y construir la consulta SQL
+    const column = pregunta ? 'pregunta' : 'preguntaeng'
+    const value = pregunta || preguntaeng
+
+    // Insertar la pregunta en la tabla Preguntas
     const resultado = await turso.execute({
-      sql: `INSERT INTO Preguntas (pregunta, fecha)
+      sql: `INSERT INTO Preguntas (${column}, fecha)
             VALUES (?, date('now'))`,
-      args: [pregunta]
+      args: [value]
     })
 
+    // Verificar si la inserción fue exitosa
     if (resultado.affectedRows === 0) {
       return res.status(500).json({ error: 'No se pudo registrar la pregunta' })
     }

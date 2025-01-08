@@ -28,6 +28,27 @@ const TutorialesPage = () => {
   return (
     <div className="container mx-auto px-4 pb-8">
       <h1 className="text-3xl text-center font-bold mb-4">Tutoriales</h1>
+
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="text-center">
+          {/* Ícono SVG */}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-16 w-16 text-gray-600 mx-auto mb-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4H9m4 0h2m-6-4h6m5 4a9 9 0 11-6.32-8.47M12 3v3m6 6h3" />
+          </svg>
+
+          {/* Mensaje principal */}
+          <h1 className="text-3xl font-bold text-gray-700">En mantenimiento</h1>
+          <p className="text-gray-600 mt-2">Estamos trabajando en el sitio. Los videos se están agregando.</p>
+          <p className="text-gray-600 mt-2">Mientras tanto, aquí tienes algunos videos de prueba:</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {videos.map((video) => (
           <div key={video.id} className="relative">

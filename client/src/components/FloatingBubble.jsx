@@ -120,7 +120,7 @@ const FloattingBubble = () => {
         style={{
           position: "fixed",
           top: "22%",
-          right: 0,
+          right: 5,
           width: 60,
           height: 60,
           backgroundColor: "transparent",
@@ -138,7 +138,7 @@ const FloattingBubble = () => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="bg-transparent absolute size-[60px] rounded-full border-[4px] border-blue-600 pt-1 pb-1 pr-1 pl-3" />
+        <div className="bg-blue-100 border-2 border-blue-900 absolute size-[60px] rounded-full pt-1 pb-1 pr-1 pl-3" />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 448" width="2.5em" height="2.5em">
           <path
             fill="#005eca"

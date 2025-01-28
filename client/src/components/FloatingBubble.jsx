@@ -138,7 +138,7 @@ const FloattingBubble = () => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        <div className="bg-transparent absolute size-[60px] rounded-full border-2 border-blue-600 p-1" />
+        <div className="bg-transparent absolute size-[60px] rounded-full border-3 border-blue-600 pt-1 pb-1 pr-1 pl-2" />
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 448" width="2.5em" height="2.5em">
           <path
             fill="#005eca"

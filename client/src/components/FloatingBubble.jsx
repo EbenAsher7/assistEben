@@ -139,13 +139,16 @@ const FloattingBubble = () => {
         onTouchEnd={handleTouchEnd}
       >
         <div className="bg-transparent absolute size-[60px] rounded-full" />
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" className="bi bi-chat" viewBox="0 0 16 16">
-          <path d="M2 2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm0 1h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 448" width="1em" height="1em">
+          <path
+            fill="currentColor"
+            d="M96 0C43 0 0 43 0 96v320c0 53 43 96 96 96h320c17.7 0 32-14.3 32-32s-14.3-32-32-32v-64c17.7 0 32-14.3 32-32V32c0-17.7-14.3-32-32-32zm0 384h256v64H96c-17.7 0-32-14.3-32-32s14.3-32 32-32M208 80c0-8.8 7.2-16 16-16h32c8.8 0 16 7.2 16 16v48h48c8.8 0 16 7.2 16 16v32c0 8.8-7.2 16-16 16h-48v112c0 8.8-7.2 16-16 16h-32c-8.8 0-16-7.2-16-16V192h-48c-8.8 0-16-7.2-16-16v-32c0-8.8 7.2-16 16-16h48z"
+          ></path>
         </svg>
       </div>
 
       {isModalOpen && (
-        <div ref={modalRef} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div ref={modalRef} className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[99999999999999999999]">
           <div className="bg-white rounded-lg p-6 shadow-lg">
             <h2 className="text-lg font-semibold">¿Quieres ir a la Biblia?</h2>
             <div className="mt-4 flex justify-end">

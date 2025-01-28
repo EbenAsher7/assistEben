@@ -87,7 +87,7 @@ const FloattingBubble = () => {
   };
 
   const handleRedirect = () => {
-    window.location.href = "https://www.biblian.netlify.app";
+    window.location.href = "biblian.netlify.app";
   };
 
   const autoMoveToEdgeWithAnimation = () => {

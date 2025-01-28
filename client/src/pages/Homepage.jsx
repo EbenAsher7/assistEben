@@ -43,7 +43,7 @@ const Homepage = () => {
         {!showFooter && (
           <button
             onClick={() => setShowFooter(true)}
-            className="fixed bottom-4 left-4 p-3 rounded-full bg-orange-400 text-white text-xl shadow-lg z-[1000000001] bounce-animation"
+            className="fixed bottom-4 left-4 p-3 rounded-full bg-orange-300 text-white text-xl shadow-lg z-[1000000001] bounce-animation"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1536" width="1em" height="1em">
               <path

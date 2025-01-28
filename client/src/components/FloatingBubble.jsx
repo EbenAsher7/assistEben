@@ -120,7 +120,7 @@ const FloattingBubble = () => {
         style={{
           position: "fixed",
           top: "22%",
-          right: 5,
+          right: 10,
           width: 60,
           height: 60,
           backgroundColor: "transparent",

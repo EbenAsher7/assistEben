@@ -9,11 +9,12 @@ import { Button } from "../ui/button";
 import LoaderAE from "../LoaderAE";
 import RadarByDay from "./RadarByDay";
 import { DownloadTableExcel } from "react-export-table-to-excel";
-import CRDate from "../ui/CRDate";
 import CRSelect from "../Preguntas/CRSelect";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 export function AttendanceByDay({ value }) {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState("");
   const [selectedModule, setSelectedModule] = useState(null);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,14 +22,9 @@ export function AttendanceByDay({ value }) {
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
   const [allData, setAllData] = useState({ attendedStudents: [], notAttendedStudents: [] });
   const { toast } = useToast();
-
-  // REFS
   const tableRefAttended = useRef(null);
   const tableRefNotAttended = useRef(null);
-
-  // CONTEXTO
   const { user, fetchModulos } = useContext(MainContext);
-
   const [greeting, setGreeting] = useState("");
 
   useEffect(() => {
@@ -56,19 +52,18 @@ export function AttendanceByDay({ value }) {
   }, []);
 
   const loadData = async () => {
+    if (!selectedDate || !selectedModule) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "La fecha y el módulo son obligatorios",
+        duration: 2500,
+      });
+      return;
+    }
+    setLoading(true);
     try {
-      setLoading(true);
-      if (!selectedDate || !selectedModule) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "La fecha y el módulo son obligatorios",
-          duration: 2500,
-        });
-        return;
-      }
-
-      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutorAndModule/${selectedDate}/${user.id}/${selectedModule[0].value}`, {
+      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutorAndModule/${selectedDate}/${user.id}/${selectedModule}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -96,56 +91,8 @@ export function AttendanceByDay({ value }) {
     }
   };
 
-  // Calcular el número de estudiantes virtuales y presenciales
   const virtualCount = attendedStudents.filter((student) => student.TipoAsistencia === "Virtual").length;
   const presencialCount = attendedStudents.filter((student) => student.TipoAsistencia === "Presencial").length;
-
-  useEffect(() => {
-    if (tableRefAttended.current && tableRefNotAttended.current) {
-      tableRefAttended.current.innerHTML = renderTable(allData.attendedStudents, true);
-      tableRefNotAttended.current.innerHTML = renderTable(allData.notAttendedStudents, false);
-    }
-  }, [allData]);
-
-  const renderTable = (students, isAttended) => {
-    const headerRow = isAttended
-      ? `<tr>
-         <th>#</th>
-         <th>Nombre</th>
-         <th>Teléfono</th>
-         <th>Tipo de Asistencia</th>
-         <th>Pregunta</th>
-         <th>Correo</th>
-       </tr>`
-      : `<tr>
-         <th>#</th>
-         <th>Nombre</th>
-         <th>Teléfono</th>
-       </tr>`;
-
-    const rows = students
-      .map((student, index) => {
-        if (isAttended) {
-          return `<tr>
-        <td>${index + 1}</td>
-        <td>${student.AlumnoNombres}</td>
-        <td>${student.AlumnoTelefono}</td>
-        <td>${student.TipoAsistencia}</td>
-        <td>${student.Pregunta || ""}</td>
-        <td>${student.AlumnoEmail}</td>
-      </tr>`;
-        } else {
-          return `<tr>
-        <td>${index + 1}</td>
-        <td>${student.AlumnoNombres}</td>
-        <td>${student.AlumnoTelefono}</td>
-      </tr>`;
-        }
-      })
-      .join("");
-
-    return `<table><thead>${headerRow}</thead><tbody>${rows}</tbody></table>`;
-  };
 
   return (
     <TabsContent value={value}>
@@ -159,11 +106,28 @@ export function AttendanceByDay({ value }) {
         </div>
         <CardContent className="space-y-4">
           <div className="space-y-4 flex flex-col pt-1 sm:justify-center sm:items-center">
-            <CRDate title="Fecha de asistencia" setValue={setSelectedDate} placeholder="Seleccione una fecha de asistencia" />
-            <CRSelect title="Seleccione módulo" autoClose data={modules} setValue={setSelectedModule} placeholder="Seleccione un módulo" />
+            <div className="flex flex-col space-y-1 w-full sm:w-auto">
+              <Label htmlFor="attendanceDate">Fecha de asistencia</Label>
+              <Input
+                id="attendanceDate"
+                type="date"
+                value={selectedDate}
+                onChange={(e) => setSelectedDate(e.target.value)}
+                className="w-full sm:w-[330px]"
+              />
+            </div>
+            <div className="w-full sm:w-[330px]">
+              <CRSelect
+                title="Seleccione módulo"
+                data={modules}
+                value={selectedModule}
+                onChange={setSelectedModule}
+                placeholder="Seleccione un módulo"
+              />
+            </div>
           </div>
           <Button
-            disabled={loading || (!selectedDate?.length > 0 && !selectedModule?.length > 0)}
+            disabled={loading || !selectedDate || !selectedModule}
             onClick={loadData}
             className="w-full sm:w-[300px] m-auto justify-center flex"
           >
@@ -185,19 +149,22 @@ export function AttendanceByDay({ value }) {
             </div>
           )}
           {(attendedStudents.length > 0 || notAttendedStudents.length > 0) && <RadarByDay data={allData} />}
-          {/* Tabla de alumnos que asistieron */}
           {attendedStudents.length > 0 && (
             <div className="space-y-4 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-green-500 text-lg font-bold">Alumnos que asistieron:</h2>
-              <table className="w-full border-collapse border border-gray-200">
+              <table className="w-full border-collapse border border-gray-200" ref={tableRefAttended}>
                 <thead className="bg-green-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white min-w-[200px] max-w-[300px]">Nombre</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
-                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">Pregunta</th>
-                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">Correo</th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">
+                      Pregunta
+                    </th>
+                    <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">
+                      Correo
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -237,7 +204,6 @@ export function AttendanceByDay({ value }) {
                   ))}
                 </tbody>
               </table>
-              {/* Indicador de tipo de asistencia */}
               <div className="flex gap-8 pt-4 text-xl">
                 <div className="text-green-500 font-bold">
                   <span>Presenciales: </span>
@@ -250,11 +216,10 @@ export function AttendanceByDay({ value }) {
               </div>
             </div>
           )}
-          {/* Tabla de alumnos que no asistieron */}
           {notAttendedStudents.length > 0 && (
             <div className="space-y-4 pt-8 w-full sm:w-[700px] m-auto overflow-x-auto">
               <h2 className="text-red-500 text-lg font-bold">Alumnos que no asistieron:</h2>
-              <table className="w-full border-collapse border border-gray-200">
+              <table className="w-full border-collapse border border-gray-200" ref={tableRefNotAttended}>
                 <thead className="bg-red-500">
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
@@ -274,8 +239,6 @@ export function AttendanceByDay({ value }) {
               </table>
             </div>
           )}
-          <div className="hidden" style={{ display: "none" }} ref={tableRefAttended}></div>
-          <div className="hidden" style={{ display: "none" }} ref={tableRefNotAttended}></div>
         </CardContent>
       </Card>
     </TabsContent>

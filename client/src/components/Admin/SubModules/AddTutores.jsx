@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import DropdownAE from "../../DropdownAE"; // Asegúrate de que la ruta sea correcta
 import ImagenCloud from "@/components/ImagenCloud";
 import MainContext from "@/context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 import LoaderAE from "@/components/LoaderAE";
+import CRSelect from "@/components/Preguntas/CRSelect";
 
 function generateUsername(nombres, apellidos) {
   const userNameNew = `${nombres.slice(0, 3)}${apellidos.slice(0, 3)}`.toLowerCase();
@@ -33,18 +33,14 @@ const AddTutores = () => {
   const [fotoUrl, setFotoUrl] = useState("");
   const [telefono, setTelefono] = useState("");
   const [direccion, setDireccion] = useState("");
-  const [tipo, setTipo] = useState("Normal");
+  const [tipo, setTipo] = useState(null);
   const [observaciones, setObservaciones] = useState("");
   const [activo] = useState(true);
-
   const [loading, setLoading] = useState(false);
-
   const [resetForm, setResetForm] = useState(false);
 
   const { user } = useContext(MainContext);
-
   const navigate = useNavigate();
-
   const { toast } = useToast();
 
   const tipoData = [
@@ -54,11 +50,8 @@ const AddTutores = () => {
   ];
 
   const handleSubmit = async (e) => {
-    setLoading(true);
     e.preventDefault();
-
     if (!nombres || !apellidos || !username || !password || !telefono || !tipo) {
-      setLoading(false);
       return toast({
         variant: "destructive",
         title: "Error",
@@ -67,6 +60,7 @@ const AddTutores = () => {
       });
     }
 
+    setLoading(true);
     const dataToSubmit = {
       nombres,
       apellidos,
@@ -84,21 +78,12 @@ const AddTutores = () => {
     try {
       const response = await fetch(`${URL_BASE}/post/addTutor`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
+        headers: { "Content-Type": "application/json", Authorization: user?.token },
         body: JSON.stringify(dataToSubmit),
       });
 
       if (response.ok) {
-        toast({
-          title: "Éxito",
-          description: "El Tutor ha sido registrado correctamente.",
-          duration: 2500,
-        });
-
-        // reset formulario
+        toast({ title: "Éxito", description: "El Tutor ha sido registrado correctamente.", duration: 2500 });
         setNombres("");
         setApellidos("");
         setUsername("");
@@ -107,45 +92,38 @@ const AddTutores = () => {
         setFotoUrl("");
         setTelefono("");
         setDireccion("");
-        setTipo("Normal");
+        setTipo(null);
         setObservaciones("");
-        setResetForm(!resetForm);
-        setLoading(false);
+        setResetForm((prev) => !prev);
       } else {
-        throw new Error("Failed to fetch");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch");
       }
     } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: `Ocurrió un error: ${error.message}`, duration: 2500 });
+    } finally {
       setLoading(false);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al guardar los datos." + error,
-        duration: 2500,
-      });
     }
   };
 
-  //si nombre o apellido cambian y son mas de 3 set username
   useEffect(() => {
     if (nombres.length >= 3 && apellidos.length >= 3) {
       setUsername(generateUsername(nombres, apellidos));
-    }
-
-    if (nombres.length < 3 || apellidos.length < 3) {
+    } else {
       setUsername("");
     }
   }, [nombres, apellidos]);
 
   if (!user) {
     navigate("/");
-    return;
+    return null;
   }
 
   return (
     <div className="px-8 border-[1px] rounded-md mt-2 pt-2 pb-8 mb-4">
       {loading && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <LoaderAE texto="Guardando módulo..." />
+          <LoaderAE texto="Guardando tutor..." />
         </div>
       )}
       <h1 className="text-2xl text-center font-extrabold my-4">Añadir nuevo tutor</h1>
@@ -158,86 +136,46 @@ const AddTutores = () => {
           <label>
             Nombres<span className="text-red-500">*</span>
           </label>
-          <Input
-            type="text"
-            name="nombres"
-            value={nombres}
-            onChange={(e) => setNombres(e.target.value)}
-            required
-            placeholder="Nombres"
-            autoComplete="off"
-          />
+          <Input value={nombres} onChange={(e) => setNombres(e.target.value)} required placeholder="Nombres" autoComplete="off" />
         </div>
         <div>
           <label>
             Apellidos<span className="text-red-500">*</span>
           </label>
-          <Input
-            type="text"
-            name="apellidos"
-            value={apellidos}
-            onChange={(e) => setApellidos(e.target.value)}
-            required
-            placeholder="Apellidos"
-            autoComplete="off"
-          />
+          <Input value={apellidos} onChange={(e) => setApellidos(e.target.value)} required placeholder="Apellidos" autoComplete="off" />
         </div>
         <div>
           <label>
             Nombre de usuario<span className="text-red-500">*</span>
           </label>
-          <Input
-            type="text"
-            name="Nombre de usuario"
-            value={username}
-            onChange={(e) => setUsername(e.target.value.toLowerCase().trim())}
-            placeholder="Username"
-            autoComplete="off"
-          />
+          <Input value={username} onChange={(e) => setUsername(e.target.value.toLowerCase().trim())} placeholder="Username" autoComplete="off" />
         </div>
         <div>
           <label>
             Contraseña<span className="text-red-500">*</span>
           </label>
-          <Input type="text" name="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off" />
+          <Input value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="off" />
         </div>
         <div>
           <label>Fecha de Nacimiento</label>
-          <Input type="date" name="fecha_nacimiento" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} />
+          <Input type="date" value={fechaNacimiento} onChange={(e) => setFechaNacimiento(e.target.value)} />
         </div>
         <div>
           <label>
             Teléfono<span className="text-red-500">*</span>
           </label>
-          <Input type="text" name="telefono" value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" autoComplete="off" />
+          <Input value={telefono} onChange={(e) => setTelefono(e.target.value)} placeholder="Teléfono" autoComplete="off" />
         </div>
         <div>
           <label>Dirección</label>
-          <Input
-            type="text"
-            name="direccion"
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
-            placeholder="Dirección"
-            autoComplete="off"
-          />
+          <Input value={direccion} onChange={(e) => setDireccion(e.target.value)} placeholder="Dirección" autoComplete="off" />
         </div>
         <div>
           <label>Observaciones</label>
-          <Input
-            type="text"
-            name="observaciones"
-            value={observaciones}
-            onChange={(e) => setObservaciones(e.target.value)}
-            placeholder="Observaciones"
-            autoComplete="off"
-          />
+          <Input value={observaciones} onChange={(e) => setObservaciones(e.target.value)} placeholder="Observaciones" autoComplete="off" />
         </div>
         <div>
-          <label>
-            Tipo de Usuario<span className="text-red-500">*</span>
-          </label>
-          {tipoData && <DropdownAE data={tipoData} title="Seleccionar tipo" setValueAE={setTipo} />}
+          <CRSelect title="Tipo de Usuario" data={tipoData} setValue={setTipo} reset={resetForm} require />
         </div>
         <div className="md:col-span-2">
           <Button type="submit" className="w-full mt-4">

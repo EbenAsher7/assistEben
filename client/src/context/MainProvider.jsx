@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import MainContext from "./MainContext";
 import { URL_BASE } from "@/config/config";
@@ -6,73 +6,73 @@ import { useToast } from "@/components/ui/use-toast";
 
 const MainProvider = ({ children }) => {
   const { toast } = useToast();
-  // Variables de estado
   const [isLogin, setIsLogin] = useState(false);
   const [user, setUser] = useState(null);
+  const [appSettings, setAppSettings] = useState(null);
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState(null);
   const [maxAttendanceByDay, setMaxAttendanceByDay] = useState(5);
-
-  // Estado para guardar el historial de asistencias
   const [attendanceHistory, setAttendanceHistory] = useState({});
-  // Estado para guardar el último registro de asistencia
-  // const [lastAttendance, setLastAttendance] = useState(null);
 
-  // Verificar usuario al cargar la app
+  const fetchAppSettings = useCallback(async () => {
+    try {
+      const response = await fetch(`${URL_BASE}/public/settings`);
+      if (response.ok) {
+        const data = await response.json();
+        setAppSettings(data);
+      } else {
+        throw new Error("API failed to provide settings.");
+      }
+    } catch (error) {
+      setAppSettings({
+        asistencia_activa: true,
+        registro_activo: true,
+        preguntas_activas: true,
+        registro_completo_activo: true,
+      });
+    }
+  }, []);
+
   useEffect(() => {
-    // Cargar isLogin desde el localStorage
+    fetchAppSettings();
+  }, [fetchAppSettings]);
+
+  useEffect(() => {
     const storedIsLogin = localStorage.getItem("isLogin");
     if (storedIsLogin !== null) {
       setIsLogin(JSON.parse(storedIsLogin));
     }
-
-    // Cargar user desde el localStorage
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-
-    // Verificar si la sesión ha expirado
     const loginExpiration = localStorage.getItem("loginExpiration");
     if (loginExpiration) {
       const expirationTime = parseInt(loginExpiration, 10);
       const now = new Date().getTime();
       if (now > expirationTime) {
-        // Sesión expirada, limpiar localStorage y mostrar notificación
-        localStorage.removeItem("user");
-        localStorage.removeItem("isLogin");
-        localStorage.removeItem("loginTimestamp");
-        localStorage.removeItem("loginExpiration");
+        localStorage.clear();
         alert("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
         setIsLogin(false);
         setUser(null);
-        // Puedes redirigir al usuario a la página de inicio de sesión aquí si es necesario
       }
     }
   }, []);
 
-  // Actualizar localStorage cuando setUser cambie
   useEffect(() => {
     if (user === null || user === undefined) {
-      // Si user es un objeto vacío, limpiar timestamps y isLogin
+      localStorage.removeItem("user");
       localStorage.removeItem("loginTimestamp");
       localStorage.removeItem("loginExpiration");
-      localStorage.removeItem("isLogin");
-      localStorage.removeItem("user");
+      localStorage.setItem("isLogin", "false");
     } else {
-      // Guardar user en el localStorage
       localStorage.setItem("user", JSON.stringify(user));
-      // Guardar fecha de inicio con expiración de 6 días
       const now = new Date();
-      const expiration = new Date(now.getTime() + 6 * 24 * 60 * 60 * 1000); // 6 días
+      const expiration = new Date(now.getTime() + 6 * 24 * 60 * 60 * 1000);
       localStorage.setItem("loginTimestamp", now.getTime().toString());
       localStorage.setItem("loginExpiration", expiration.getTime().toString());
+      localStorage.setItem("isLogin", "true");
     }
   }, [user]);
-
-  // Guardar isLogin en el localStorage
-  useEffect(() => {
-    localStorage.setItem("isLogin", JSON.stringify(isLogin));
-  }, [isLogin]);
 
   const checkAttendanceStatus = (alumnoId) => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -81,14 +81,11 @@ const MainProvider = ({ children }) => {
     const storedHistory = JSON.parse(localStorage.getItem("attendanceHistory")) || {};
 
     if (isTutor) {
-      // Para tutores, verificar si el alumno específico ya está registrado hoy
       return !(storedHistory[today] && storedHistory[today].asistencias.some((a) => a.id === alumnoId));
     } else {
-      // Para usuarios no registrados, verificar si ya se hizo algún registro hoy y si no se ha alcanzado el límite
       const todayHistory = storedHistory[today] || { asistencias: [] };
       const attendanceCount = todayHistory.asistencias.length;
       return attendanceCount < maxAttendanceByDay;
-      // return !(storedHistory[today] && storedHistory[today].asistencias.length > 0);
     }
   };
 
@@ -99,7 +96,6 @@ const MainProvider = ({ children }) => {
     }
   }, []);
 
-  //Cargar lista de Tutores
   const fetchTutores = async () => {
     try {
       const response = await fetch(`${URL_BASE}/api/tutors`, {
@@ -112,26 +108,23 @@ const MainProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-        // Transformar los datos
-        const formattedData = data.map((tutor) => ({
+        return data.map((tutor) => ({
           value: tutor.id.toString(),
           label: tutor.nombres + " " + tutor.apellidos,
         }));
-        return formattedData;
       } else {
-        throw new Error("Failed to fetch");
+        throw new Error("Failed to fetch tutors");
       }
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Ocurrió un error al consultar los módulos disponibles.",
+        description: "Ocurrió un error al consultar los tutores.",
         duration: 2500,
       });
     }
   };
 
-  //Cargar lista de tutores eliminados
   const fetchTutoresDeleted = async () => {
     try {
       const response = await fetch(`${URL_BASE}/api/tutorsDeleted`, {
@@ -144,15 +137,13 @@ const MainProvider = ({ children }) => {
 
       if (response.ok) {
         const data = await response.json();
-
-        // Transformar los datos
-        const formattedData = data.map((tutor) => ({
+        return data.map((tutor) => ({
+          ...tutor,
           value: tutor.id.toString(),
           label: tutor.nombres + " " + tutor.apellidos,
         }));
-        return formattedData;
       } else {
-        throw new Error("Failed to fetch");
+        throw new Error("Failed to fetch deleted tutors");
       }
     } catch (error) {
       toast({
@@ -164,7 +155,6 @@ const MainProvider = ({ children }) => {
     }
   };
 
-  //Cargar lista de modulos
   const fetchModulos = async (tutorID) => {
     if (tutorID) {
       try {
@@ -178,27 +168,24 @@ const MainProvider = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
-          // Transformar los datos
-          const formattedData = data.map((curso) => ({
+          return data.map((curso) => ({
             value: curso.id.toString(),
             label: curso.nombre,
           }));
-          return formattedData;
         } else {
-          throw new Error("Failed to fetch");
+          throw new Error("Failed to fetch modules");
         }
       } catch (error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Ocurrió un error al consultar los módulos disponibles.",
+          description: "Ocurrió un error al consultar los módulos.",
           duration: 2500,
         });
       }
     }
   };
 
-  //Cargar lista de modulos
   const fetchAllModulos = async () => {
     if (user) {
       try {
@@ -212,27 +199,24 @@ const MainProvider = ({ children }) => {
 
         if (response.ok) {
           const data = await response.json();
-          // Transformar los datos
-          const formattedData = data.map((curso) => ({
+          return data.map((curso) => ({
             value: curso.id.toString(),
             label: curso.nombre,
           }));
-          return formattedData;
         } else {
-          throw new Error("Failed to fetch");
+          throw new Error("Failed to fetch all modules");
         }
       } catch (error) {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Ocurrió un error al consultar los módulos disponibles.",
+          description: "Ocurrió un error al consultar los módulos.",
           duration: 2500,
         });
       }
     }
   };
 
-  //Cargar lista de modulos
   const fetchModulesAndTutors = async (id_module) => {
     if (user) {
       try {
@@ -261,7 +245,6 @@ const MainProvider = ({ children }) => {
     }
   };
 
-  //Cargar lista de modulos
   const fetchAllModulosCompleteData = async () => {
     if (user) {
       try {
@@ -347,7 +330,6 @@ const MainProvider = ({ children }) => {
     }
   };
 
-  //Cargar lista de modulos
   const fetchAllModulosCompleteDataDeleted = async () => {
     if (user) {
       try {
@@ -376,7 +358,6 @@ const MainProvider = ({ children }) => {
     }
   };
 
-  //DATOS PARA EL REGISTRO NUEVO
   const [nombresNEW, setNombresNEW] = useState("");
   const [apellidosNEW, setApellidosNEW] = useState("");
   const [fechaNacimientoNEW, setFechaNacimientoNEW] = useState("");
@@ -384,25 +365,33 @@ const MainProvider = ({ children }) => {
   const [telefonoNEW, setTelefonoNEW] = useState("");
   const [direccionNEW, setDireccionNEW] = useState("");
   const [correoNEW, setCorreoNEW] = useState("");
+  const [iglesiaNEW, setIglesiaNEW] = useState("");
+  const [pastorNEW, setPastorNEW] = useState("");
+  const [privilegioNEW, setPrivilegioNEW] = useState("");
+  const [paisNEW, setPaisNEW] = useState("");
   const [cursoSeleccionadoNEW, setCursoSeleccionadoNEW] = useState(null);
+  const [step, setStep] = useState(0);
 
-  //STEPPER
-  const [pasoActual, setPasoActual] = useState(0);
-
-  const navegarPaso = (direccion) => {
-    if (direccion === -100) {
-      setPasoActual(0);
-      return 0;
-    }
-
-    const LENGTHSTEPS = 3;
-    setPasoActual((prevPaso) => {
-      const nuevoPaso = prevPaso + direccion;
-      return Math.max(0, Math.min(nuevoPaso, LENGTHSTEPS - 1));
-    });
+  const navigateStep = (direction) => {
+    setStep((prev) => Math.max(0, Math.min(prev + direction, 2)));
   };
 
-  // RETURN
+  const resetRegistrationForm = useCallback(() => {
+    setNombresNEW("");
+    setApellidosNEW("");
+    setFechaNacimientoNEW("");
+    setPrefijoNEW("");
+    setTelefonoNEW("");
+    setDireccionNEW("");
+    setCorreoNEW("");
+    setIglesiaNEW("");
+    setPastorNEW("");
+    setPrivilegioNEW("");
+    setPaisNEW("");
+    setCursoSeleccionadoNEW(null);
+    setStep(0);
+  }, []);
+
   return (
     <MainContext.Provider
       value={{
@@ -410,6 +399,8 @@ const MainProvider = ({ children }) => {
         setIsLogin,
         user,
         setUser,
+        appSettings,
+        fetchAppSettings,
         alumnoSeleccionado,
         setAlumnoSeleccionado,
         attendanceHistory,
@@ -424,7 +415,6 @@ const MainProvider = ({ children }) => {
         deleteTutoresModulos,
         addTutoresModulos,
         fetchTutoresDeleted,
-        //NUEVO REGISTRO
         nombresNEW,
         setNombresNEW,
         apellidosNEW,
@@ -439,14 +429,21 @@ const MainProvider = ({ children }) => {
         setDireccionNEW,
         correoNEW,
         setCorreoNEW,
+        iglesiaNEW,
+        setIglesiaNEW,
+        pastorNEW,
+        setPastorNEW,
+        privilegioNEW,
+        setPrivilegioNEW,
+        paisNEW,
+        setPaisNEW,
         cursoSeleccionadoNEW,
         setCursoSeleccionadoNEW,
         maxAttendanceByDay,
         setMaxAttendanceByDay,
-        //STEPPER
-        pasoActual,
-        setPasoActual,
-        navegarPaso,
+        step,
+        navigateStep,
+        resetRegistrationForm,
       }}
     >
       {children}

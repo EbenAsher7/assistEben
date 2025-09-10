@@ -3,6 +3,100 @@ import { turso } from '../database/connection.js'
 
 const router = express.Router()
 
+// --- Endpoints de Configuración ---
+
+// Obtener todas las configuraciones
+router.get('/settings', async (req, res) => {
+  try {
+    const result = await turso.execute('SELECT * FROM Configuracion')
+    const settings = result.rows.reduce((acc, row) => {
+      acc[row.clave] = row.valor === 'true'
+      return acc
+    }, {})
+    res.status(200).json(settings)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Actualizar configuraciones
+router.put('/settings', async (req, res) => {
+  const settings = req.body
+  try {
+    const promises = Object.entries(settings).map(([clave, valor]) => {
+      return turso.execute({
+        sql: 'UPDATE Configuracion SET valor = ? WHERE clave = ?',
+        args: [valor.toString(), clave]
+      })
+    })
+    await Promise.all(promises)
+    res.status(200).json({ message: 'Configuración actualizada correctamente' })
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: 'Hubo un error al actualizar la configuración' })
+  }
+})
+
+// --- Endpoint para Alumnos sin Asignar ---
+
+// Obtener alumnos sin módulo o tutor, con paginación y búsqueda
+router.get('/unassigned-students', async (req, res) => {
+  const page = parseInt(req.query.page) || 1
+  const limit = parseInt(req.query.limit) || 10
+  const searchTerm = req.query.search || ''
+  const offset = (page - 1) * limit
+
+  try {
+    let countSql =
+      'SELECT COUNT(*) as total FROM Alumnos WHERE modulo_id IS NULL OR tutor_id IS NULL'
+    let dataSql =
+      'SELECT id, nombres, apellidos, telefono, pais, iglesia FROM Alumnos WHERE modulo_id IS NULL OR tutor_id IS NULL'
+
+    const args = []
+    const countArgs = []
+
+    if (searchTerm) {
+      const searchCondition =
+        '(nombres LIKE ? OR apellidos LIKE ? OR telefono LIKE ?)'
+      countSql += ` AND ${searchCondition}`
+      dataSql += ` AND ${searchCondition}`
+      const likeTerm = `%${searchTerm}%`
+      args.push(likeTerm, likeTerm, likeTerm)
+      countArgs.push(likeTerm, likeTerm, likeTerm)
+    }
+
+    dataSql += ' ORDER BY id DESC LIMIT ? OFFSET ?'
+    args.push(limit, offset)
+
+    const [dataResult, countResult] = await Promise.all([
+      turso.execute({ sql: dataSql, args: args }),
+      turso.execute({ sql: countSql, args: countArgs })
+    ])
+
+    const total = countResult.rows[0].total
+    const totalPages = Math.ceil(total / limit)
+
+    const students = dataResult.rows.map((row) => ({
+      id: row.id,
+      nombres: row.nombres,
+      apellidos: row.apellidos,
+      telefono: row.telefono,
+      pais: row.pais,
+      iglesia: row.iglesia
+    }))
+
+    res.status(200).json({
+      students,
+      currentPage: page,
+      totalPages,
+      totalStudents: total
+    })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
 // Obtener los módulos disponibles
 router.get('/modules', async (req, res) => {
   try {

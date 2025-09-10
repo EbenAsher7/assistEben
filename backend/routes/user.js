@@ -1,14 +1,13 @@
+/* eslint-disable camel_case */
 import express from 'express'
 import { turso } from '../database/connection.js'
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import bcrypt from 'bcrypt'
 dotenv.config()
-/* eslint-disable camelcase */
 
 const router = express.Router()
 
-// Ejemplo de ruta GET
 router.post('/user/login', async (req, res) => {
   try {
     const { username, password } = req.body
@@ -23,7 +22,6 @@ router.post('/user/login', async (req, res) => {
 
     const user = result.rows[0]
 
-    // Verificar si el usuario está deshabilitado
     if (user.activo === 0) {
       return res.status(403).json({
         error:
@@ -31,7 +29,6 @@ router.post('/user/login', async (req, res) => {
       })
     }
 
-    // Verificar la contraseña
     const hashedPassword = user.password
     const match = await bcrypt.compare(password, hashedPassword)
     if (!match) {
@@ -63,7 +60,6 @@ router.post('/user/login', async (req, res) => {
       expiresIn: '6d'
     })
 
-    // return cookie
     res.cookie('token', token, {
       maxAge: 1000 * 60 * 60 * 24 * 6,
       sameSite: 'none',
@@ -94,26 +90,21 @@ router.post('/user/login', async (req, res) => {
   }
 })
 
-// Buscar alumno por nombres y apellidos "LIKE"
 router.post('/user/searchStudent', async (req, res) => {
   try {
     const { search } = req.body
 
-    // verificar que los datos requeridos estén presentes
     if (!search) {
       return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
-    // Divide el término de búsqueda en palabras individuales
     const searchWords = search.split(' ')
 
-    // Construir condiciones LIKE dinámicamente
     const likeClauses = searchWords
       .map((word) => "CONCAT(a.nombres, ' ', a.apellidos) LIKE ?")
       .join(' AND ')
     const likeParams = searchWords.map((word) => `%${word}%`)
 
-    // Buscar el alumno y su tutor, solo en módulos activos
     const query = `
       SELECT
         a.id,
@@ -133,11 +124,16 @@ router.post('/user/searchStudent', async (req, res) => {
         ${likeClauses}
         AND m.activo = 1
     `
-
-    const resultado = await turso.execute({
-      sql: query,
-      args: likeParams
-    })
+    let resultado = null
+    try {
+      resultado = await turso.execute({
+        sql: query,
+        args: likeParams
+      })
+    } catch (error) {
+      console.error('Error al buscar estudiantes:', error)
+      return res.status(500).json({ error: 'Error interno del servidor' })
+    }
 
     const columns = resultado.columns
     const rows = resultado.rows
@@ -156,17 +152,14 @@ router.post('/user/searchStudent', async (req, res) => {
   }
 })
 
-// registramos asistencia
 router.post('/user/registerAttendance', async (req, res) => {
   try {
     const { alumno_id, fecha, pregunta, tipo } = req.body
 
-    // verificar que los datos requeridos estén presentes
     if (!alumno_id || !fecha || !tipo) {
       return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
-    // Verificar que el alumno exista
     const alumno = await turso.execute({
       sql: 'SELECT * FROM Alumnos WHERE id = ? AND activo = "Activo"',
       args: [alumno_id]
@@ -176,7 +169,6 @@ router.post('/user/registerAttendance', async (req, res) => {
       return res.status(400).json({ error: 'Alumno no existe' })
     }
 
-    // Agregar la asistencia
     const resultado = await turso.execute({
       sql: 'INSERT INTO Asistencias (alumno_id, fecha, pregunta, tipo) VALUES (?, ?, ?, ?)',
       args: [alumno_id, fecha, pregunta, tipo]
@@ -200,7 +192,6 @@ router.get('/user/modules', async (req, res) => {
       'SELECT id, nombre, descripcion, fecha_inicio, fecha_fin, horarioFin, horarioInicio, foto_url FROM modulos WHERE activo = 1'
     )
 
-    // Transformar los datos en el formato deseado
     const columns = result.columns
     const rows = result.rows
 
@@ -222,7 +213,6 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
   const { moduleId } = req.params
 
   try {
-    // Consulta a la base de datos para obtener los tutores del módulo
     const result = await turso.execute({
       sql: `
         SELECT
@@ -245,7 +235,6 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
     const columns = result.columns
     const rows = result.rows
 
-    // Transformar los datos en un formato adecuado
     const tutors = rows.map((row) => {
       const tutor = {}
       columns.forEach((col, index) => {
@@ -260,36 +249,45 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
   }
 })
 
-// Registrar nuevo alumno PENDIENTE
 router.post('/user/registerAlumno', async (req, res) => {
   try {
     const {
       nombres,
       apellidos,
       fechaNacimiento,
+      prefijo,
       telefono,
       direccion,
+      email,
+      iglesia,
+      pastor,
+      privilegio,
+      pais,
       tutor,
       modulo
     } = req.body
 
-    // Verificar que los datos requeridos estén presentes
-    if (!nombres || !apellidos || !telefono || !tutor || !modulo) {
+    if (!nombres || !apellidos || !telefono || !prefijo || !pais) {
       return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
-    // Insertar el nuevo alumno en la tabla Alumnos
     const resultado = await turso.execute({
-      sql: `INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, telefono, direccion, tutor_id, modulo_id, activo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, 'Pendiente')`,
+      sql: `INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, prefijoNumero, telefono, direccion, email, iglesia, pastor, privilegio, pais, tutor_id, modulo_id, activo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')`,
       args: [
         nombres,
         apellidos,
-        fechaNacimiento,
+        fechaNacimiento || null,
+        prefijo,
         telefono,
-        direccion,
-        tutor,
-        modulo
+        direccion || null,
+        email || null,
+        iglesia || null,
+        pastor || null,
+        privilegio || null,
+        pais,
+        tutor || null,
+        modulo || null
       ]
     })
 
@@ -303,39 +301,31 @@ router.post('/user/registerAlumno', async (req, res) => {
   }
 })
 
-// Registrar nueva pregunta
 router.post('/user/preguntas/nueva', async (req, res) => {
   try {
     const { pregunta, preguntaeng } = req.body
 
-    // Verificar que al menos uno de los dos campos esté presente
     if (!pregunta && !preguntaeng) {
       return res
         .status(400)
         .json({ error: 'Se requiere una pregunta en español o inglés' })
     }
 
-    // Verificar que no se envíen ambos campos simultáneamente
     if (pregunta && preguntaeng) {
-      return res
-        .status(400)
-        .json({
-          error: 'Solo puedes enviar una pregunta a la vez, en español o inglés'
-        })
+      return res.status(400).json({
+        error: 'Solo puedes enviar una pregunta a la vez, en español o inglés'
+      })
     }
 
-    // Determinar el campo a insertar y construir la consulta SQL
     const column = pregunta ? 'pregunta' : 'preguntaeng'
     const value = pregunta || preguntaeng
 
-    // Insertar la pregunta en la tabla Preguntas
     const resultado = await turso.execute({
       sql: `INSERT INTO Preguntas (${column}, fecha)
             VALUES (?, date('now'))`,
       args: [value]
     })
 
-    // Verificar si la inserción fue exitosa
     if (resultado.affectedRows === 0) {
       return res.status(500).json({ error: 'No se pudo registrar la pregunta' })
     }

@@ -7,7 +7,7 @@ import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import { format } from "date-fns";
-import { DropdownAE } from "../DropdownAE";
+import CRSelect from "../Preguntas/CRSelect";
 import PropTypes from "prop-types";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -27,10 +27,10 @@ const PendantStudents = ({ value }) => {
 
   useEffect(() => {
     fetchModulos(user.id).then((data) => {
-      setCursos(data);
+      setCursos(data || []);
       setIsLoadingCursos(false);
     });
-  }, [fetchModulos]);
+  }, [fetchModulos, user.id]);
 
   useEffect(() => {
     const fetchPendingStudents = async () => {
@@ -62,7 +62,6 @@ const PendantStudents = ({ value }) => {
         setIsLoadingStudents(false);
       }
     };
-
     fetchPendingStudents();
   }, [cursoSeleccionado, user.id, user.token, toast]);
 
@@ -89,9 +88,10 @@ const PendantStudents = ({ value }) => {
           description: "Solicitud aceptada correctamente.",
           duration: 2500,
         });
+        setPendingStudents((prev) => prev.filter((student) => student.AlumnoID !== selectedStudent.AlumnoID));
         setObservations("");
         setSelectedStudent(null);
-        setCursoSeleccionado(null);
+        setIsDialogOpen(false);
       } else {
         throw new Error("Failed to accept request");
       }
@@ -126,8 +126,14 @@ const PendantStudents = ({ value }) => {
           <hr />
         </div>
         <h2 className="text-xl font-extrabold text-center mb-2">Seleccione un curso para filtrar</h2>
-        <div className={`w-8/12 m-auto flex justify-center ${cursoSeleccionado ? "mb-4" : "mb-4"}`}>
-          <DropdownAE data={cursos} title="Seleccione" setValueAE={setCursoSeleccionado} disabled={isLoadingCursos} />
+        <div className="w-8/12 m-auto flex justify-center mb-4">
+          <CRSelect
+            data={cursos}
+            placeholder="Seleccione un curso"
+            value={cursoSeleccionado}
+            onChange={setCursoSeleccionado}
+            disabled={isLoadingCursos}
+          />
         </div>
         {isLoadingStudents ? (
           <LoaderAE />
@@ -153,53 +159,37 @@ const PendantStudents = ({ value }) => {
                       <TableCell>{student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd") : "---"}</TableCell>
                       <TableCell>{student.AlumnoObservaciones}</TableCell>
                       <TableCell>
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                        <Dialog
+                          open={isDialogOpen && selectedStudent?.AlumnoID === student.AlumnoID}
+                          onOpenChange={(isOpen) => {
+                            if (!isOpen) {
+                              setSelectedStudent(null);
+                            }
+                            setIsDialogOpen(isOpen);
+                          }}
+                        >
                           <DialogTrigger asChild>
-                            <Button
-                              onClick={() => {
-                                setSelectedStudent(student);
-                                setObservations("");
-                                setIsDialogOpen(true);
-                              }}
-                            >
-                              Aceptar Registro
-                            </Button>
+                            <Button onClick={() => setSelectedStudent(student)}>Aceptar Registro</Button>
                           </DialogTrigger>
                           <DialogContent className="sm:max-w-[425px] text-black dark:text-white">
                             <DialogHeader>
                               <DialogTitle>
-                                Aceptar solicitud de: {selectedStudent?.AlumnoNombres} {selectedStudent?.AlumnoApellidos}
+                                Aceptar solicitud de: {student.AlumnoNombres} {student.AlumnoApellidos}
                               </DialogTitle>
                               <DialogDescription>Agregue observaciones si es necesario.</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
-                              <div className="grid grid-cols-1 items-center gap-4">
-                                <Textarea
-                                  placeholder="Escriba sus observaciones aquí."
-                                  value={observations}
-                                  onChange={(e) => setObservations(e.target.value)}
-                                />
-                              </div>
+                              <Textarea
+                                placeholder="Escriba sus observaciones aquí."
+                                value={observations}
+                                onChange={(e) => setObservations(e.target.value)}
+                              />
                             </div>
                             <DialogFooter>
-                              <Button
-                                className="text-black dark:text-white"
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                  setSelectedStudent(null);
-                                  setIsDialogOpen(false);
-                                }}
-                              >
+                              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
                                 Cancelar
                               </Button>
-                              <Button
-                                type="button"
-                                onClick={() => {
-                                  handleAcceptRequest();
-                                  setIsDialogOpen(false);
-                                }}
-                              >
+                              <Button type="button" onClick={handleAcceptRequest}>
                                 Aceptar registro
                               </Button>
                             </DialogFooter>

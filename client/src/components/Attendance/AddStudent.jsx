@@ -6,15 +6,10 @@ import { useContext, useEffect, useState } from "react";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
-import { DropdownAE } from "../DropdownAE";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { CalendarAE } from "../CalendarAE";
 import { Button } from "../ui/button";
-// import { format, addDays } from "date-fns"; // Importa addDays
-import CRDate from "../ui/CRDate";
 import CRSelect from "../Preguntas/CRSelect";
-
 import { prefijos } from "@/context/prefijos";
 
 export function AddStudent({ value }) {
@@ -23,75 +18,56 @@ export function AddStudent({ value }) {
   const [cursos, setCursos] = useState([]);
   const [cursoSelected, setCursoSelected] = useState(null);
   const [tutorSelected, setTutorSelected] = useState(null);
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState("");
   const [prefijo, setPrefijo] = useState("");
   const [email, setEmail] = useState("");
   const { toast } = useToast();
 
-  // UseState para todos los inputs
   const [name, setName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [observations, setObservations] = useState("");
   const [activo, setActivo] = useState("Activo");
-
   const [tutores, setTutores] = useState([]);
+  const [reset, setReset] = useState(false);
 
-  // CONTEXTO
   const { user, fetchModulos, fetchAllModulos, fetchTutores } = useContext(MainContext);
 
-  // Verificar que nombre, apellidos y teléfono no estén vacíos
   const validateForm = () => {
-    if (user.tipo === "Tutor") {
-      if (name === "" || lastName === "" || phone === "" || cursoSelected === null || tutorSelected === null || prefijo === "") {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Los campos de nombres, apellidos, prefijo, teléfono, curso y tutor son obligatorios.",
-          duration: 2500,
-        });
-        return false;
-      } else {
-        setActivo("Activo");
-        return true;
-      }
-    } else if (user.tipo === "Administrador") {
-      if (name === "" || lastName === "" || prefijo === "" || phone === "" || cursoSelected === null || tutorSelected === null) {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Los campos de nombres, apellidos, prefijo, teléfono, curso y tutor son obligatorios.",
-          duration: 2500,
-        });
-        return false;
-      } else {
-        setActivo("Activo");
-        return true;
-      }
+    const requiredFieldsAdmin = [name, lastName, phone, cursoSelected, tutorSelected, prefijo];
+    const requiredFieldsTutor = [name, lastName, phone, cursoSelected, prefijo];
+    const fieldsToCheck = user.tipo === "Administrador" ? requiredFieldsAdmin : requiredFieldsTutor;
+
+    if (fieldsToCheck.some((field) => !field || field === "")) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Por favor, complete todos los campos obligatorios (*).",
+        duration: 2500,
+      });
+      return false;
     }
+    setActivo("Activo");
+    return true;
   };
 
-  // Función para guardar los datos
   const handleGuardarDatos = async () => {
     if (validateForm()) {
       setLoading(true);
       try {
-        // const adjustedDate = addDays(selectedDate, 1); // Ajusta la fecha sumando un día
-        // const formattedDate = adjustedDate ? format(adjustedDate, "yyyy-MM-dd") : "";
-        console.log(prefijo);
         const dataFinal = {
           nombres: name,
           apellidos: lastName,
-          fecha_nacimiento: selectedDate ?? "",
-          prefijo: prefijo[0]?.value ?? "",
+          fecha_nacimiento: selectedDate,
+          prefijo: prefijo,
           telefono: phone,
-          direccion: address ?? "",
-          email: email ?? "",
-          tutor_id: parseInt(user?.id),
+          direccion: address,
+          email: email,
+          tutor_id: user.tipo === "Administrador" ? parseInt(tutorSelected) : parseInt(user?.id),
           modulo_id: parseInt(cursoSelected),
           activo: activo,
-          observaciones: observations ?? "",
+          observaciones: observations,
         };
 
         const response = await fetch(`${URL_BASE}/post/addStudent`, {
@@ -110,7 +86,6 @@ export function AddStudent({ value }) {
             duration: 2500,
           });
 
-          // reset formulario
           setName("");
           setLastName("");
           setPhone("");
@@ -120,7 +95,8 @@ export function AddStudent({ value }) {
           setObservations("");
           setTutorSelected(null);
           setCursoSelected(null);
-          setSelectedDate(new Date());
+          setSelectedDate("");
+          setReset((prev) => !prev);
         } else {
           throw new Error("Failed to fetch");
         }
@@ -138,22 +114,28 @@ export function AddStudent({ value }) {
   };
 
   useEffect(() => {
-    if (user.tipo === "Administrador") {
-      fetchAllModulos(user.id).then((data) => {
-        setCursos(data);
-      });
+    const loadData = async () => {
+      setLoadingData(true);
+      if (user.tipo === "Administrador") {
+        const modulesData = await fetchAllModulos();
+        const tutorsData = await fetchTutores();
+        setCursos(modulesData || []);
+        setTutores(tutorsData || []);
+      } else if (user.tipo === "Tutor") {
+        const modulesData = await fetchModulos(user.id);
+        setCursos(modulesData || []);
+      }
+      setLoadingData(false);
+    };
+    loadData();
+  }, [user.id, user.tipo, fetchModulos, fetchAllModulos, fetchTutores]);
 
-      fetchTutores().then((data) => {
-        setTutores(data);
-        setLoadingData(false);
-      });
-    } else if (user.tipo === "Tutor") {
-      fetchModulos(user.id).then((data) => {
-        setCursos(data);
-        setLoadingData(false);
-      });
-    }
-  }, [fetchModulos, user.id, fetchAllModulos, user.tipo]);
+  const prefijosFormateados = prefijos[0]
+    ? Object.entries(prefijos[0]).map(([label, value]) => ({
+        value: value,
+        label: `${label} (${value})`,
+      }))
+    : [];
 
   if (loadingData) {
     return (
@@ -170,7 +152,7 @@ export function AddStudent({ value }) {
       <Card>
         <CardHeader>
           <CardTitle>Añadir Alumno</CardTitle>
-          <CardDescription>añadir un nuevo alumno</CardDescription>
+          <CardDescription>Añadir un nuevo alumno</CardDescription>
           <h1 className="text-red-500 text-sm italic font-normal text-center mb-8">*Solo los campos con asterisco son OBLIGATORIOS</h1>
         </CardHeader>
         <div className="sm:w-[96%] m-auto h-2 mb-2">
@@ -184,63 +166,51 @@ export function AddStudent({ value }) {
             <Input value={name} placeholder="Ingrese sus nombres" onChange={(e) => setName(e.target.value)} autoComplete="off" />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="name" className="-mt-1">
+            <Label htmlFor="lastName">
               Apellidos<span className="text-red-500">*</span>
             </Label>
             <Input value={lastName} placeholder="Ingrese sus apellidos" onChange={(e) => setLastName(e.target.value)} autoComplete="off" />
           </div>
 
           <div className="space-y-1 flex flex-col">
-            <CRDate title="Fecha de Nacimiento" setValue={setSelectedDate} placeholder="Seleccione la fecha de nacimiento" />
+            <Label htmlFor="fechaNacimiento">Fecha de Nacimiento</Label>
+            <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <CRSelect title="Prefijo telefónico" autoClose data={prefijos} setValue={setPrefijo} keyValue />
-            <br />
-            <Label htmlFor="name">
+            <CRSelect title="Prefijo telefónico" data={prefijosFormateados} setValue={setPrefijo} reset={reset} require />
+            <Label htmlFor="phone">
               Teléfono<span className="text-red-500">*</span>
             </Label>
-
             <Input value={phone} placeholder="Ingrese el teléfono" onChange={(e) => setPhone(e.target.value)} type="number" autoComplete="off" />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="email" className="-mt-1">
-              Correo Electrónico
-            </Label>
+            <Label htmlFor="email">Correo Electrónico</Label>
             <Input type="email" value={email} placeholder="Ingrese el correo electronico" onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="name">Dirección</Label>
+            <Label htmlFor="address">Dirección</Label>
             <Input value={address} placeholder="Ingrese la dirección" onChange={(e) => setAddress(e.target.value)} />
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="name">
-              Tutor<span className="text-red-500">*</span>
-            </Label>
             {user.tipo === "Tutor" ? (
-              <DropdownAE
-                data={[]}
-                title="Seleccione un tutor"
-                setValueAE={setTutorSelected}
-                disable
-                defaultValue={user?.nombres + " " + user?.apellidos}
-              />
+              <div>
+                <Label>Tutor</Label>
+                <Input value={`${user?.nombres} ${user?.apellidos}`} disabled />
+              </div>
             ) : (
-              <DropdownAE data={tutores} title="Seleccione un tutor" setValueAE={setTutorSelected} />
+              <CRSelect title="Tutor" data={tutores} setValue={setTutorSelected} reset={reset} require />
             )}
           </div>
           <div className="space-y-1 flex flex-col">
-            <Label htmlFor="name">
-              Curso<span className="text-red-500">*</span>
-            </Label>
-            <DropdownAE data={cursos} title="Seleccione un curso" setValueAE={setCursoSelected} />
+            <CRSelect title="Curso" data={cursos} setValue={setCursoSelected} reset={reset} require />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="name">Observaciones</Label>
+            <Label htmlFor="observations">Observaciones</Label>
             <Input value={observations} placeholder="Ingrese una observacion" onChange={(e) => setObservations(e.target.value)} autoComplete="off" />
           </div>
         </CardContent>
         <Button className="w-11/12 sm:w-[680px] m-auto mt-4 mb-12 px-24 flex" onClick={handleGuardarDatos} disabled={loading}>
-          {loading ? "Cargando..." : "Guardar"}
+          {loading ? "Guardando..." : "Guardar"}
         </Button>
       </Card>
     </TabsContent>

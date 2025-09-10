@@ -11,11 +11,10 @@ import LoaderAE from "../LoaderAE";
 import MainContext from "../../context/MainContext";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
-import { DropdownAE } from "../DropdownAE";
-import { format } from "date-fns";
+import CRSelect from "../Preguntas/CRSelect";
+import { format, addDays } from "date-fns";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { addDays } from "date-fns";
 import { DownloadTableExcel } from "react-export-table-to-excel";
 
 function EditStudentDialog({ student, onStudentUpdate }) {
@@ -45,50 +44,24 @@ function EditStudentDialog({ student, onStudentUpdate }) {
       newFechaNacimiento = format(addDays(new Date(newFechaNacimiento), 1), "yyyy-MM-dd");
     }
 
-    const updatedFormData = {
-      ...formData,
-      AlumnoFechaNacimiento: newFechaNacimiento,
-    };
+    const updatedFormData = { ...formData, AlumnoFechaNacimiento: newFechaNacimiento };
 
     try {
       const response = await fetch(`${URL_BASE}/put/updateStudent/${updatedFormData.AlumnoID}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
+        headers: { "Content-Type": "application/json", Authorization: user?.token },
         body: JSON.stringify(updatedFormData),
       });
 
       if (response.ok) {
-        toast({
-          title: "Éxito",
-          description: "Estudiante actualizado correctamente.",
-          duration: 2500,
-        });
+        toast({ title: "Éxito", description: "Estudiante actualizado correctamente.", duration: 2500 });
         setIsOpen(false);
-        //sumar 1 dia a la fecha antes de actualizar
-        const fecha = new Date(updatedFormData?.AlumnoFechaNacimiento);
-        fecha.setDate(fecha.getDate() + 1);
-        updatedFormData.AlumnoFechaNacimiento = fecha;
-
-        if (updatedFormData.AlumnoFechaNacimiento) {
-          const fecha = new Date(updatedFormData.AlumnoFechaNacimiento);
-          fecha.setDate(fecha.getDate() + 1);
-          updatedFormData.AlumnoFechaNacimiento = fecha;
-        }
-
-        onStudentUpdate(updatedFormData);
+        onStudentUpdate({ ...updatedFormData, AlumnoFechaNacimiento: newFechaNacimiento ? new Date(newFechaNacimiento) : null });
       } else {
         throw new Error("Falló al actualizar");
       }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al actualizar el estudiante.",
-        duration: 2500,
-      });
+      toast({ variant: "destructive", title: "Error", description: "Ocurrió un error al actualizar el estudiante.", duration: 2500 });
     } finally {
       setIsLoading(false);
     }
@@ -145,7 +118,13 @@ function EditStudentDialog({ student, onStudentUpdate }) {
               <Label htmlFor="AlumnoFechaNacimiento" className="text-right">
                 Fecha de Nacimiento
               </Label>
-              <Input id="AlumnoFechaNacimiento" type="date" value={formData.AlumnoFechaNacimiento} onChange={handleInputChange} className="col-span-3" />
+              <Input
+                id="AlumnoFechaNacimiento"
+                type="date"
+                value={formData.AlumnoFechaNacimiento}
+                onChange={handleInputChange}
+                className="col-span-3"
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="AlumnoObservaciones" className="text-right">
@@ -173,35 +152,22 @@ function DeleteStudentDialog({ student, onStudentDelete }) {
 
   const handleDelete = async () => {
     setIsLoading(true);
-
     try {
       const response = await fetch(`${URL_BASE}/put/updateStudent/${student.AlumnoID}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
+        headers: { "Content-Type": "application/json", Authorization: user?.token },
         body: JSON.stringify({ AlumnoActivo: "Inactivo" }),
       });
 
       if (response.ok) {
-        toast({
-          title: "Éxito",
-          description: "Estudiante eliminado correctamente.",
-          duration: 2500,
-        });
+        toast({ title: "Éxito", description: "Estudiante eliminado correctamente.", duration: 2500 });
         setIsOpen(false);
         onStudentDelete(student.AlumnoID);
       } else {
         throw new Error("Falló al eliminar");
       }
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al eliminar el estudiante.",
-        duration: 2500,
-      });
+      toast({ variant: "destructive", title: "Error", description: "Ocurrió un error al eliminar el estudiante.", duration: 2500 });
     } finally {
       setIsLoading(false);
     }
@@ -259,20 +225,17 @@ export function ListStudents({ value }) {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState(null);
   const [isLoadingCursos, setIsLoadingCursos] = useState(true);
-  const [allStudents, setAllStudents] = useState([]);
   const { toast } = useToast();
   const allDataTableRef = useRef(null);
 
   const { user, fetchModulos } = useContext(MainContext);
 
   const handleStudentUpdate = (updatedStudent) => {
-    setAlumnosCursos((prevAlumnos) =>
-      prevAlumnos.map((alumno) => (alumno.AlumnoID === updatedStudent.AlumnoID ? { ...alumno, ...updatedStudent } : alumno))
-    );
+    setAlumnosCursos((prev) => prev.map((alumno) => (alumno.AlumnoID === updatedStudent.AlumnoID ? { ...alumno, ...updatedStudent } : alumno)));
   };
 
   const handleStudentDelete = (studentId) => {
-    setAlumnosCursos((prevAlumnos) => prevAlumnos.filter((alumno) => alumno.AlumnoID !== studentId));
+    setAlumnosCursos((prev) => prev.filter((alumno) => alumno.AlumnoID !== studentId));
   };
 
   const columns = [
@@ -286,29 +249,14 @@ export function ListStudents({ value }) {
       ),
       cell: ({ row }) => <div className="capitalize">{`${row.original.AlumnoNombres} ${row.original.AlumnoApellidos}`}</div>,
     },
-    {
-      accessorKey: "AlumnoTelefono",
-      header: "Teléfono",
-      cell: ({ row }) => <div>{row.getValue("AlumnoTelefono")}</div>,
-    },
+    { accessorKey: "AlumnoTelefono", header: "Teléfono" },
     {
       accessorKey: "AlumnoFechaNacimiento",
       header: "Fecha de Nacimiento",
-      cell: ({ row }) => {
-        const fechaNacimiento = row.getValue("AlumnoFechaNacimiento");
-        return <div>{fechaNacimiento ? format(new Date(fechaNacimiento), "dd/MM/yyyy") : "No disponible"}</div>;
-      },
+      cell: ({ row }) => (row.getValue("AlumnoFechaNacimiento") ? format(new Date(row.getValue("AlumnoFechaNacimiento")), "dd/MM/yyyy") : "N/A"),
     },
-    {
-      accessorKey: "AlumnoObservaciones",
-      header: "Observaciones",
-      cell: ({ row }) => <div>{row.getValue("AlumnoObservaciones")}</div>,
-    },
-    {
-      accessorKey: "AlumnoActivo",
-      header: "Estado",
-      cell: ({ row }) => <div>{row.getValue("AlumnoActivo")}</div>,
-    },
+    { accessorKey: "AlumnoObservaciones", header: "Observaciones" },
+    { accessorKey: "AlumnoActivo", header: "Estado" },
     {
       id: "actions",
       cell: ({ row }) => (
@@ -319,6 +267,7 @@ export function ListStudents({ value }) {
       ),
     },
   ];
+
   const table = useReactTable({
     data: alumnosCursos,
     columns,
@@ -328,25 +277,15 @@ export function ListStudents({ value }) {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    state: {
-      sorting,
-      columnFilters,
-    },
+    state: { sorting, columnFilters },
   });
 
   useEffect(() => {
-    if (user.tipo === "Administrador") {
-      fetchModulos(user.id).then((data) => {
-        setCursos(data);
-        setIsLoadingCursos(false);
-      });
-    } else if (user.tipo === "Tutor") {
-      fetchModulos(user.id).then((data) => {
-        setCursos(data);
-        setIsLoadingCursos(false);
-      });
-    }
-  }, [fetchModulos, user.id, user.tipo]);
+    fetchModulos(user.id).then((data) => {
+      setCursos(data || []);
+      setIsLoadingCursos(false);
+    });
+  }, [user.id, fetchModulos]);
 
   useEffect(() => {
     if (cursoSeleccionado) {
@@ -354,32 +293,20 @@ export function ListStudents({ value }) {
         setIsLoadingAlumnos(true);
         try {
           const response = await fetch(`${URL_BASE}/get/getStudentsByModuleAndTutor/${cursoSeleccionado}/${user.id}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: user?.token,
-            },
+            headers: { Authorization: user?.token },
           });
-
           if (response.ok) {
             const data = await response.json();
-            setAlumnosCursos(data.length ? data : []);
-            setAllStudents(data.length ? data : []); // Guardamos todos los estudiantes
+            setAlumnosCursos(data || []);
           } else {
             throw new Error("Failed to fetch");
           }
         } catch (error) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Ocurrió un error al consultar los alumnos del curso.",
-            duration: 2500,
-          });
+          toast({ variant: "destructive", title: "Error", description: "Ocurrió un error al consultar los alumnos.", duration: 2500 });
         } finally {
           setIsLoadingAlumnos(false);
         }
       };
-
       fetchData();
     }
   }, [cursoSeleccionado, user.id, user.token, toast]);
@@ -405,18 +332,16 @@ export function ListStudents({ value }) {
           <hr />
         </div>
         <h2 className="text-xl font-extrabold text-center mb-2">Seleccione un curso para filtrar</h2>
-        <div className={`w-8/12 m-auto flex flex-col justify-center ${cursoSeleccionado && !isLoadingAlumnos ? "mb-4" : "mb-4 "}`}>
-          {cursos && <DropdownAE data={cursos} title="Seleccione" setValueAE={setCursoSeleccionado} disabled={isLoadingAlumnos} />}
-          {/* BOTON PARA DESCARGAR EXCEL */}
-
-          {cursoSeleccionado && (
+        <div className="w-8/12 m-auto flex flex-col justify-center mb-4">
+          <CRSelect data={cursos} placeholder="Seleccione un curso" setValue={setCursoSeleccionado} disabled={isLoadingAlumnos} />
+          {cursoSeleccionado && alumnosCursos.length > 0 && (
             <div className="flex w-full justify-center items-center my-2">
               <DownloadTableExcel
-                filename={`Lista de Estudiantes - ${cursos[cursoSeleccionado]?.label} - ${new Date().toLocaleDateString("es-GT")}`}
-                sheet={`Estudiantes ${cursos[cursoSeleccionado]?.label}`}
-                currentTableRef={allDataTableRef?.current}
+                filename={`Lista de Estudiantes - ${cursos.find((c) => c.value === cursoSeleccionado)?.label}`}
+                sheet="Estudiantes"
+                currentTableRef={allDataTableRef.current}
               >
-                <button className="bg-green-500 text-white dark:bg-green-700 dark:text-white px-4 py-2 rounded-md m-auto">Exportar a excel</button>
+                <button className="bg-green-500 text-white dark:bg-green-700 px-4 py-2 rounded-md">Exportar a Excel</button>
               </DownloadTableExcel>
             </div>
           )}
@@ -427,23 +352,19 @@ export function ListStudents({ value }) {
               <LoaderAE />
             ) : (
               <>
-                <div className="flex items-center">
-                  <Input
-                    placeholder="Filtrar por nombre..."
-                    value={table.getColumn("AlumnoNombres")?.getFilterValue() ?? ""}
-                    onChange={(event) => table.getColumn("AlumnoNombres")?.setFilterValue(event.target.value)}
-                    className="max-w-sm"
-                  />
-                </div>
+                <Input
+                  placeholder="Filtrar por nombre..."
+                  value={table.getColumn("AlumnoNombres")?.getFilterValue() ?? ""}
+                  onChange={(event) => table.getColumn("AlumnoNombres")?.setFilterValue(event.target.value)}
+                  className="max-w-sm"
+                />
                 <div className="rounded-md border">
                   <Table>
                     <TableHeader>
                       {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                           {headerGroup.headers.map((header) => (
-                            <TableHead key={header.id}>
-                              {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                            </TableHead>
+                            <TableHead key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</TableHead>
                           ))}
                         </TableRow>
                       ))}
@@ -467,47 +388,40 @@ export function ListStudents({ value }) {
                     </TableBody>
                   </Table>
                 </div>
-                {/* TABLA INVISIBLE PARA EXPORTAR DATOS */}
-                <div style={{ display: "none" }}>
+                <div className="hidden">
                   <Table ref={allDataTableRef}>
                     <TableHeader>
                       <TableRow>
-                        {columns.map((column) => (
-                          <TableHead key={column.accessorKey || column.id}>
-                            {typeof column.header === "string" ? column.header : column.accessorKey}
-                          </TableHead>
-                        ))}
+                        {/* Define headers for excel export */}
+                        <TableHead>Nombre Completo</TableHead>
+                        <TableHead>Teléfono</TableHead>
+                        <TableHead>Fecha de Nacimiento</TableHead>
+                        <TableHead>Observaciones</TableHead>
+                        <TableHead>Estado</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {allStudents.map((student) => (
+                      {alumnosCursos.map((student) => (
                         <TableRow key={student.AlumnoID}>
-                          {columns.map((column) => (
-                            <TableCell key={column.accessorKey || column.id}>
-                              {column.accessorKey === "AlumnoNombres"
-                                ? `${student.AlumnoNombres} ${student.AlumnoApellidos}`
-                                : column.accessorKey === "AlumnoFechaNacimiento"
-                                ? student.AlumnoFechaNacimiento
-                                  ? format(new Date(student.AlumnoFechaNacimiento), "dd/MM/yyyy")
-                                  : "No disponible"
-                                : student[column.accessorKey]}
-                            </TableCell>
-                          ))}
+                          <TableCell>{`${student.AlumnoNombres} ${student.AlumnoApellidos}`}</TableCell>
+                          <TableCell>{student.AlumnoTelefono}</TableCell>
+                          <TableCell>
+                            {student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "dd/MM/yyyy") : "N/A"}
+                          </TableCell>
+                          <TableCell>{student.AlumnoObservaciones}</TableCell>
+                          <TableCell>{student.AlumnoActivo}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </div>
-                {/* TABLA INVISIBLE PARA EXPORTAR DATOS */}
                 <div className="flex items-center justify-end space-x-2 py-4">
-                  <div className="space-x-2">
-                    <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
-                      Anterior
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
-                      Siguiente
-                    </Button>
-                  </div>
+                  <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+                    Anterior
+                  </Button>
+                  <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+                    Siguiente
+                  </Button>
                 </div>
               </>
             )}
@@ -518,16 +432,6 @@ export function ListStudents({ value }) {
   );
 }
 
-ListStudents.propTypes = {
-  value: PropTypes.string.isRequired,
-};
-
-EditStudentDialog.propTypes = {
-  student: PropTypes.object.isRequired,
-  onStudentUpdate: PropTypes.func.isRequired,
-};
-
-DeleteStudentDialog.propTypes = {
-  student: PropTypes.object.isRequired,
-  onStudentDelete: PropTypes.func.isRequired,
-};
+ListStudents.propTypes = { value: PropTypes.string.isRequired };
+EditStudentDialog.propTypes = { student: PropTypes.object.isRequired, onStudentUpdate: PropTypes.func.isRequired };
+DeleteStudentDialog.propTypes = { student: PropTypes.object.isRequired, onStudentDelete: PropTypes.func.isRequired };

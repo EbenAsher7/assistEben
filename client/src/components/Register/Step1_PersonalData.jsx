@@ -68,9 +68,9 @@ const Step1_PersonalData = ({ isLastStep }) => {
   useEffect(() => {
     const validate = () => {
       const newErrors = {};
-      if (nombresNEW.trim().length < 3) newErrors.nombres = "El nombre es obligatorio (mín. 3 caracteres).";
+      if (nombresNEW.trim().length < 6) newErrors.nombres = "El nombre es obligatorio (mín. 6 caracteres).";
       if (apellidosNEW.trim().length < 3) newErrors.apellidos = "El apellido es obligatorio (mín. 3 caracteres).";
-      if (!/^\d{7,}$/.test(telefonoNEW)) newErrors.telefono = "El teléfono debe tener al menos 7 dígitos.";
+      if (!/^\d{6,}$/.test(telefonoNEW)) newErrors.telefono = "El teléfono debe ser un número válido.";
       if (!prefijoNEW) newErrors.prefijo = "Seleccione un prefijo.";
       if (!paisNEW) newErrors.pais = "El país es obligatorio.";
       if (!/\S+@\S+\.\S+/.test(correoNEW)) newErrors.correo = "Ingrese un correo electrónico válido.";

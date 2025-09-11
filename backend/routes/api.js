@@ -108,7 +108,27 @@ router.get('/Allmodules', async (req, res) => {
 
 router.get('/tutors', async (req, res) => {
   try {
-    const result = await turso.execute('SELECT * FROM tutores where activo = 1')
+    const result = await turso.execute(`
+      SELECT
+        t.id,
+        t.nombres,
+        t.apellidos,
+        t.fecha_nacimiento,
+        t.foto_url,
+        t.telefono,
+        t.direccion,
+        t.username,
+        t.password,
+        t.tipo,
+        t.observaciones,
+        t.activo,
+        GROUP_CONCAT(m.nombre, ', ') AS modulos
+      FROM Tutores t
+      LEFT JOIN TutoresModulos tm ON t.id = tm.tutor_id
+      LEFT JOIN Modulos m ON tm.modulo_id = m.id AND m.activo = 1
+      WHERE t.activo = 1
+      GROUP BY t.id
+    `)
 
     const columns = result.columns
     const rows = result.rows
@@ -121,7 +141,6 @@ router.get('/tutors', async (req, res) => {
       return tutor
     })
 
-    // return all data except password
     tutors.forEach((tutor) => {
       delete tutor.password
     })
@@ -147,7 +166,6 @@ router.get('/tutorsDeleted', async (req, res) => {
       return tutor
     })
 
-    // return all data except password
     tutors.forEach((tutor) => {
       delete tutor.password
     })

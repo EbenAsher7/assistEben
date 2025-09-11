@@ -117,6 +117,19 @@ const Settings = () => {
               onCheckedChange={() => handleToggle("permitir_correos_duplicados")}
             />
           </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="permitir-telefonos-duplicados-switch" className="flex flex-col space-y-1 pr-4">
+              <span>Permitir Teléfonos Duplicados</span>
+              <span className="font-normal leading-snug text-muted-foreground">
+                Si está activo, se podrán registrar varios alumnos con el mismo número de teléfono.
+              </span>
+            </Label>
+            <Switch
+              id="permitir-telefonos-duplicados-switch"
+              checked={settings?.permitir_telefonos_duplicados}
+              onCheckedChange={() => handleToggle("permitir_telefonos_duplicados")}
+            />
+          </div>
         </div>
       </div>
     </div>

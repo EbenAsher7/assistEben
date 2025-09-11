@@ -41,7 +41,6 @@ const Step1_PersonalData = ({ isLastStep }) => {
 
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
-  const [isValid, setIsValid] = useState(false);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -65,43 +64,27 @@ const Step1_PersonalData = ({ isLastStep }) => {
     setTouched((prev) => ({ ...prev, [id]: true }));
   };
 
-  useEffect(() => {
-    const validate = () => {
-      const newErrors = {};
-      if (nombresNEW.trim().length < 6) newErrors.nombres = "El nombre es obligatorio (mín. 6 caracteres).";
-      if (apellidosNEW.trim().length < 3) newErrors.apellidos = "El apellido es obligatorio (mín. 3 caracteres).";
-      if (!/^\d{6,}$/.test(telefonoNEW)) newErrors.telefono = "El teléfono debe ser un número válido.";
-      if (!prefijoNEW) newErrors.prefijo = "Seleccione un prefijo.";
-      if (!paisNEW) newErrors.pais = "El país es obligatorio.";
-      if (!/\S+@\S+\.\S+/.test(correoNEW)) newErrors.correo = "Ingrese un correo electrónico válido.";
-      if (!iglesiaNEW.trim()) newErrors.iglesia = "El nombre de la iglesia es obligatorio.";
-      if (!pastorNEW.trim()) newErrors.pastor = "El nombre del pastor es obligatorio.";
-      if (!privilegioNEW.trim()) newErrors.privilegio = "El privilegio es obligatorio.";
-      if (!modalidadNEW) newErrors.modalidad = "Seleccione una modalidad.";
-      return newErrors;
-    };
+  const validateForm = () => {
+    const newErrors = {};
+    if (nombresNEW.trim().length < 6) newErrors.nombres = "El nombre es obligatorio (mín. 6 caracteres).";
+    if (apellidosNEW.trim().length < 3) newErrors.apellidos = "El apellido es obligatorio (mín. 3 caracteres).";
+    if (!/^\d{6,}$/.test(telefonoNEW)) newErrors.telefono = "El teléfono debe ser un número válido.";
+    if (!prefijoNEW) newErrors.prefijo = "Seleccione un prefijo.";
+    if (!paisNEW) newErrors.pais = "El país es obligatorio.";
+    if (!/\S+@\S+\.\S+/.test(correoNEW)) newErrors.correo = "Ingrese un correo electrónico válido.";
+    if (!iglesiaNEW.trim()) newErrors.iglesia = "El nombre de la iglesia es obligatorio.";
+    if (!pastorNEW.trim()) newErrors.pastor = "El nombre del pastor es obligatorio.";
+    if (!privilegioNEW.trim()) newErrors.privilegio = "El privilegio es obligatorio.";
+    if (!modalidadNEW) newErrors.modalidad = "Seleccione una modalidad.";
+    return newErrors;
+  };
 
-    const validationErrors = validate();
+  useEffect(() => {
+    const validationErrors = validateForm();
     setErrors(validationErrors);
-    setIsValid(Object.keys(validationErrors).length === 0);
   }, [nombresNEW, apellidosNEW, telefonoNEW, prefijoNEW, paisNEW, correoNEW, iglesiaNEW, pastorNEW, privilegioNEW, modalidadNEW]);
 
   const handleFinalSubmit = async () => {
-    if (!isValid) {
-      setTouched({
-        nombres: true,
-        apellidos: true,
-        telefono: true,
-        prefijo: true,
-        correo: true,
-        pais: true,
-        iglesia: true,
-        pastor: true,
-        privilegio: true,
-        modalidad: true,
-      });
-      return;
-    }
     setLoading(true);
     try {
       const response = await fetch(`${URL_BASE}/api/user/registerAlumno`, {
@@ -141,6 +124,36 @@ const Step1_PersonalData = ({ isLastStep }) => {
     }
   };
 
+  const handleNextClick = () => {
+    const currentErrors = validateForm();
+    if (Object.keys(currentErrors).length === 0) {
+      if (isLastStep) {
+        handleFinalSubmit();
+      } else {
+        navigateStep(1);
+      }
+    } else {
+      setTouched({
+        nombres: true,
+        apellidos: true,
+        telefono: true,
+        prefijo: true,
+        correo: true,
+        pais: true,
+        iglesia: true,
+        pastor: true,
+        privilegio: true,
+        modalidad: true,
+      });
+      toast({
+        variant: "destructive",
+        title: "Campos Incompletos",
+        description: "Por favor, complete todos los campos obligatorios marcados en rojo.",
+        duration: 3000,
+      });
+    }
+  };
+
   return (
     <>
       {loading && (
@@ -151,7 +164,7 @@ const Step1_PersonalData = ({ isLastStep }) => {
       <fieldset disabled={loading} className="w-full justify-center flex items-center">
         <div className="container mx-auto px-4 mb-6 rounded-md">
           <h3 className="text-xl font-extrabold text-center pb-6 px-4">Ingresa tus datos personales</h3>
-          <h1 className="text-red-500 text-sm italic font-normal text-center mb-8">* Todos los campos son obligatorios</h1>
+          <h1 className="text-red-500 text-sm italic font-normal text-center mb-8">* Los campos con asterisco son obligatorios</h1>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-4 gap-y-2">
             <div className="mb-2">
@@ -279,15 +292,9 @@ const Step1_PersonalData = ({ isLastStep }) => {
           </div>
 
           <div className="flex justify-center mt-8">
-            {isLastStep ? (
-              <Button onClick={handleFinalSubmit} disabled={!isValid || loading} className="px-8 py-6">
-                Finalizar Registro
-              </Button>
-            ) : (
-              <Button onClick={() => navigateStep(1)} disabled={!isValid} className="px-8 py-6">
-                Siguiente
-              </Button>
-            )}
+            <Button onClick={handleNextClick} disabled={loading} className="px-8 py-6 disabled:opacity-70">
+              {isLastStep ? "Finalizar Registro" : "Siguiente"}
+            </Button>
           </div>
         </div>
       </fieldset>

@@ -27,8 +27,6 @@ import ImagenCloud from "@/components/ImagenCloud";
 const ListaTutores = () => {
   const [tutors, setTutors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedTutor, setSelectedTutor] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const { toast } = useToast();
@@ -75,8 +73,12 @@ const ListaTutores = () => {
       cell: ({ row }) => `${row.original.nombres} ${row.original.apellidos}`,
     },
     { accessorKey: "telefono", header: "Teléfono" },
-    { accessorKey: "direccion", header: "Dirección" },
     { accessorKey: "tipo", header: "Tipo" },
+    {
+      accessorKey: "modulos",
+      header: "Módulos Asignados",
+      cell: ({ row }) => row.original.modulos || "Sin asignar",
+    },
     {
       id: "actions",
       cell: ({ row }) => (

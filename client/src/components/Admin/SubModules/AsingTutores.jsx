@@ -3,6 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import CRSelect from "@/components/Preguntas/CRSelect";
 import { useToast } from "@/components/ui/use-toast";
 import LoaderAE from "@/components/LoaderAE";
+import { Input } from "@/components/ui/input";
 
 const AsingTutores = () => {
   const [modules, setModules] = useState([]);
@@ -12,6 +13,7 @@ const AsingTutores = () => {
   const [checkboxState, setCheckboxState] = useState({});
   const [loadingModules, setLoadingModules] = useState(true);
   const [loadingDetails, setLoadingDetails] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { fetchAllModulos, fetchTutores, fetchModulesAndTutors, deleteTutoresModulos, addTutoresModulos } = useContext(MainContext);
   const { toast } = useToast();
@@ -85,6 +87,8 @@ const AsingTutores = () => {
     }
   };
 
+  const filteredTutores = tutores.filter((tutor) => tutor.label.toLowerCase().includes(searchTerm.toLowerCase()));
+
   if (loadingModules) {
     return <LoaderAE texto="Cargando módulos..." />;
   }
@@ -101,6 +105,7 @@ const AsingTutores = () => {
             <LoaderAE texto="Cargando detalles..." />
           ) : (
             <>
+              <Input placeholder="Buscar tutor..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="my-4 max-w-sm" />
               <table className="w-full mt-4 border border-gray-300 dark:border-gray-700">
                 <thead>
                   <tr className="bg-gray-100 dark:bg-gray-800">
@@ -109,7 +114,7 @@ const AsingTutores = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {tutores.map((tutor) => (
+                  {filteredTutores.map((tutor) => (
                     <tr key={tutor.value} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="py-2 px-4 border-b">{tutor.label}</td>
                       <td className="py-2 px-4 border-b text-center">

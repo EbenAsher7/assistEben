@@ -225,6 +225,25 @@ router.post('/addStudent', async (req, res) => {
       }
     }
 
+    // Verificar configuración de teléfonos duplicados
+    const phoneSettings = await turso.execute(
+      "SELECT valor FROM Configuracion WHERE clave = 'permitir_telefonos_duplicados'"
+    )
+    const permitirDuplicadosTelefono =
+      phoneSettings.rows.length > 0 && phoneSettings.rows[0].valor === 'true'
+
+    if (!permitirDuplicadosTelefono) {
+      const phoneExists = await turso.execute({
+        sql: 'SELECT id FROM Alumnos WHERE prefijoNumero = ? AND telefono = ?',
+        args: [prefijo, telefono]
+      })
+      if (phoneExists.rows.length > 0) {
+        return res
+          .status(409)
+          .json({ error: 'El número de teléfono ya está en uso.' })
+      }
+    }
+
     // Verificar que el tutor exista
     const tutor = await turso.execute({
       sql: 'SELECT * FROM Tutores WHERE id = ? AND activo = 1',

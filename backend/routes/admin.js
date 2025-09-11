@@ -10,12 +10,7 @@ router.get('/settings', async (req, res) => {
   try {
     const result = await turso.execute('SELECT * FROM Configuracion')
     const settings = result.rows.reduce((acc, row) => {
-      // Manejar el nuevo setting de correos duplicados
-      if (row.clave === 'permitir_correos_duplicados') {
-        acc[row.clave] = row.valor === 'true'
-      } else {
-        acc[row.clave] = row.valor === 'true'
-      }
+      acc[row.clave] = row.valor === 'true'
       return acc
     }, {})
     res.status(200).json(settings)
@@ -28,9 +23,12 @@ router.get('/settings', async (req, res) => {
 router.put('/settings', async (req, res) => {
   const settings = req.body
   try {
-    // Asegurarse de que la nueva clave exista en la BD
     await turso.execute({
       sql: `INSERT OR IGNORE INTO Configuracion (clave, valor) VALUES ('permitir_correos_duplicados', 'true')`,
+      args: []
+    })
+    await turso.execute({
+      sql: `INSERT OR IGNORE INTO Configuracion (clave, valor) VALUES ('permitir_telefonos_duplicados', 'true')`,
       args: []
     })
 
@@ -62,7 +60,7 @@ router.get('/unassigned-students', async (req, res) => {
     let countSql =
       'SELECT COUNT(*) as total FROM Alumnos WHERE modulo_id IS NULL OR tutor_id IS NULL'
     let dataSql =
-      'SELECT id, nombres, apellidos, telefono, pais, iglesia FROM Alumnos WHERE modulo_id IS NULL OR tutor_id IS NULL'
+      'SELECT id, nombres, apellidos, telefono, pais, iglesia, modalidad, prefijoNumero FROM Alumnos WHERE modulo_id IS NULL OR tutor_id IS NULL'
 
     const args = []
     const countArgs = []
@@ -81,7 +79,7 @@ router.get('/unassigned-students', async (req, res) => {
     args.push(limit, offset)
 
     const [dataResult, countResult] = await Promise.all([
-      turso.execute({ sql: dataSql, args: args }),
+      turso.execute({ sql: dataSql, args }),
       turso.execute({ sql: countSql, args: countArgs })
     ])
 
@@ -94,7 +92,9 @@ router.get('/unassigned-students', async (req, res) => {
       apellidos: row.apellidos,
       telefono: row.telefono,
       pais: row.pais,
-      iglesia: row.iglesia
+      iglesia: row.iglesia,
+      modalidad: row.modalidad,
+      prefijoNumero: row.prefijoNumero
     }))
 
     res.status(200).json({
@@ -103,6 +103,25 @@ router.get('/unassigned-students', async (req, res) => {
       totalPages,
       totalStudents: total
     })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener detalles completos de un alumno por ID
+router.get('/student/:id', async (req, res) => {
+  const { id } = req.params
+  try {
+    const result = await turso.execute({
+      sql: 'SELECT * FROM Alumnos WHERE id = ?',
+      args: [id]
+    })
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Alumno no encontrado' })
+    }
+
+    res.status(200).json(result.rows[0])
   } catch (error) {
     res.status(500).json({ error: error.message })
   }

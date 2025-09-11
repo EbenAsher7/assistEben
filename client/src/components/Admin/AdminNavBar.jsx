@@ -3,14 +3,15 @@ import { TabSelector } from "../Admin/TabsSelector";
 import AdminTutorNavbar from "./AdminTutorNavbar";
 import AdminModuleNavbar from "./AdminModuleNavbar";
 import ChartsModuleNavbar from "./ChartsModuleNavbar";
-import Settings from "./SubModules/Settings"; // Importamos el nuevo componente
+import Settings from "./SubModules/Settings";
+import AdminListsNavbar from "./AdminListsNavbar"; // Importamos el nuevo componente
 import { useContext } from "react";
 import MainContext from "@/context/MainContext";
 
 const AdminNavBar = () => {
   const { user } = useContext(MainContext);
 
-  const [selectedTab, setSelectedTab] = useTabs(["tutores", "modulos", "analytics", "settings"]); // Añadimos 'settings'
+  const [selectedTab, setSelectedTab] = useTabs(["tutores", "modulos", "analytics", "listados", "settings"]);
 
   if (user) {
     return (
@@ -26,7 +27,9 @@ const AdminNavBar = () => {
           <TabSelector isActive={selectedTab === "analytics"} onClick={() => setSelectedTab("analytics")} color="green">
             Gráficas
           </TabSelector>
-          {/* Nuevo Tab de Ajustes */}
+          <TabSelector isActive={selectedTab === "listados"} onClick={() => setSelectedTab("listados")} color="violet">
+            Listados
+          </TabSelector>
           <TabSelector isActive={selectedTab === "settings"} onClick={() => setSelectedTab("settings")} color="blue">
             Ajustes
           </TabSelector>
@@ -41,7 +44,9 @@ const AdminNavBar = () => {
           <TabPanel render="lazy" hidden={selectedTab !== "analytics"}>
             <ChartsModuleNavbar />
           </TabPanel>
-          {/* Nuevo Panel para Ajustes */}
+          <TabPanel render="lazy" hidden={selectedTab !== "listados"}>
+            <AdminListsNavbar />
+          </TabPanel>
           <TabPanel render="lazy" hidden={selectedTab !== "settings"}>
             <Settings />
           </TabPanel>

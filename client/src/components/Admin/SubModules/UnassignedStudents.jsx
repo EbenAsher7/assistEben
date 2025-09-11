@@ -117,10 +117,14 @@ const UnassignedStudents = () => {
       const response = await fetch(`${URL_BASE}/put/updateStudent/${selectedStudent.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", Authorization: user?.token },
-        body: JSON.stringify({ tutor_id: selectedTutorId, modulo_id: selectedModuleId }),
+        body: JSON.stringify({
+          tutor_id: selectedTutorId,
+          modulo_id: selectedModuleId,
+          AlumnoActivo: "Activo",
+        }),
       });
       if (!response.ok) throw new Error("Falló la asignación.");
-      toast({ title: "Éxito", description: "Alumno asignado correctamente." });
+      toast({ title: "Éxito", description: "Alumno asignado y activado correctamente." });
       setIsAssignModalOpen(false);
       fetchUnassignedStudents(currentPage, debouncedSearch);
     } catch (error) {
@@ -182,7 +186,7 @@ const UnassignedStudents = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        {student.prefijoNumero ? `${student.prefijoNumero} ` : ""}
+                        {student.prefijoNumero ? `+${student.prefijoNumero} ` : ""}
                         {student.telefono}
                       </TableCell>
                       <TableCell>{student.pais}</TableCell>
@@ -268,7 +272,7 @@ const UnassignedStudents = () => {
                 </div>
                 <strong>Teléfono:</strong>
                 <span>
-                  {selectedStudentDetails.prefijoNumero ? `${selectedStudentDetails.prefijoNumero} ` : ""}
+                  {selectedStudentDetails.prefijoNumero ? `+${selectedStudentDetails.prefijoNumero} ` : ""}
                   {selectedStudentDetails.telefono}
                 </span>
                 <strong>Email:</strong>

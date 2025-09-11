@@ -79,7 +79,7 @@ router.get('/unassigned-students', async (req, res) => {
     args.push(limit, offset)
 
     const [dataResult, countResult] = await Promise.all([
-      turso.execute({ sql: dataSql, args }),
+      turso.execute({ sql: dataSql, args: args }),
       turso.execute({ sql: countSql, args: countArgs })
     ])
 
@@ -126,6 +126,68 @@ router.get('/student/:id', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
+
+// --- Endpoints de Listados para Exportación ---
+
+// Obtener TODOS los tutores
+router.get('/listados/tutores', async (req, res) => {
+  try {
+    const result = await turso.execute(`
+      SELECT
+        t.id, t.nombres, t.apellidos, t.fecha_nacimiento, t.telefono, t.direccion, t.username, t.tipo,
+        CASE t.activo WHEN 1 THEN 'Activo' ELSE 'Inactivo' END AS estado,
+        GROUP_CONCAT(m.nombre, ', ') AS modulos
+      FROM Tutores t
+      LEFT JOIN TutoresModulos tm ON t.id = tm.tutor_id
+      LEFT JOIN Modulos m ON tm.modulo_id = m.id
+      GROUP BY t.id
+      ORDER BY t.nombres, t.apellidos
+    `)
+    res.status(200).json(result.rows)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener TODOS los alumnos
+router.get('/listados/alumnos', async (req, res) => {
+  try {
+    const result = await turso.execute(`
+      SELECT
+        a.id, a.nombres, a.apellidos, a.fecha_nacimiento,
+        a.prefijoNumero || ' ' || a.telefono AS telefono_completo,
+        a.direccion, a.email, a.iglesia, a.pastor, a.privilegio, a.pais, a.modalidad,
+        a.activo AS estado,
+        t.nombres || ' ' || t.apellidos AS tutor_asignado,
+        m.nombre AS modulo_asignado
+      FROM Alumnos a
+      LEFT JOIN Tutores t ON a.tutor_id = t.id
+      LEFT JOIN Modulos m ON a.modulo_id = m.id
+      ORDER BY a.nombres, a.apellidos
+    `)
+    res.status(200).json(result.rows)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// Obtener TODOS los módulos
+router.get('/listados/modulos', async (req, res) => {
+  try {
+    const result = await turso.execute(`
+      SELECT
+        m.id, m.nombre, m.descripcion, m.fecha_inicio, m.fecha_fin, m.horarioInicio, m.horarioFin,
+        CASE m.activo WHEN 1 THEN 'Activo' ELSE 'Inactivo' END AS estado
+      FROM Modulos m
+      ORDER BY m.nombre
+    `)
+    res.status(200).json(result.rows)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+})
+
+// --- Endpoints Antiguos (Se mantienen por compatibilidad) ---
 
 // Obtener los módulos disponibles
 router.get('/modules', async (req, res) => {

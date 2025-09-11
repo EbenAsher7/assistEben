@@ -175,7 +175,7 @@ const AddTutores = () => {
           <Input value={observaciones} onChange={(e) => setObservaciones(e.target.value)} placeholder="Observaciones" autoComplete="off" />
         </div>
         <div>
-          <CRSelect title="Tipo de Usuario" data={tipoData} setValue={setTipo} reset={resetForm} require />
+          <CRSelect title="Tipo de Usuario" data={tipoData} onChange={setTipo} value={tipo} reset={resetForm} require hideSearch={true} />
         </div>
         <div className="md:col-span-2">
           <Button type="submit" className="w-full mt-4">

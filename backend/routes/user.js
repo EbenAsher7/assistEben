@@ -1,4 +1,4 @@
-/* eslint-disable camel_case */
+/* eslint-disable camelcase */
 import express from 'express'
 import { turso } from '../database/connection.js'
 import jwt from 'jsonwebtoken'
@@ -263,17 +263,25 @@ router.post('/user/registerAlumno', async (req, res) => {
       pastor,
       privilegio,
       pais,
+      modalidad,
       tutor,
       modulo
     } = req.body
 
-    if (!nombres || !apellidos || !telefono || !prefijo || !pais) {
+    if (
+      !nombres ||
+      !apellidos ||
+      !telefono ||
+      !prefijo ||
+      !pais ||
+      !modalidad
+    ) {
       return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
     const resultado = await turso.execute({
-      sql: `INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, prefijoNumero, telefono, direccion, email, iglesia, pastor, privilegio, pais, tutor_id, modulo_id, activo)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')`,
+      sql: `INSERT INTO Alumnos (nombres, apellidos, fecha_nacimiento, prefijoNumero, telefono, direccion, email, iglesia, pastor, privilegio, pais, modalidad, tutor_id, modulo_id, activo)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Pendiente')`,
       args: [
         nombres,
         apellidos,
@@ -286,6 +294,7 @@ router.post('/user/registerAlumno', async (req, res) => {
         pastor || null,
         privilegio || null,
         pais,
+        modalidad,
         tutor || null,
         modulo || null
       ]

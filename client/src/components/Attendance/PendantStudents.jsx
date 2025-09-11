@@ -140,12 +140,13 @@ const PendantStudents = ({ value }) => {
         ) : (
           cursoSeleccionado &&
           (pendingStudents.length > 0 ? (
-            <div className="sm:w-[90%] w-11/12 m-auto justify-center border-[1px] mb-14 rounded-lg">
+            <div className="sm:w-[90%] w-11/12 m-auto justify-center border-[1px] mb-14 rounded-lg overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Teléfono</TableHead>
+                    <TableHead>Modalidad</TableHead>
                     <TableHead>Fecha de Nacimiento</TableHead>
                     <TableHead>Observaciones</TableHead>
                     <TableHead>Acciones</TableHead>
@@ -156,6 +157,7 @@ const PendantStudents = ({ value }) => {
                     <TableRow key={student.AlumnoID}>
                       <TableCell className="capitalize">{`${student.AlumnoNombres} ${student.AlumnoApellidos}`}</TableCell>
                       <TableCell>{student.AlumnoTelefono}</TableCell>
+                      <TableCell>{student.Modalidad}</TableCell>
                       <TableCell>{student.AlumnoFechaNacimiento ? format(new Date(student.AlumnoFechaNacimiento), "yyyy-MM-dd") : "---"}</TableCell>
                       <TableCell>{student.AlumnoObservaciones}</TableCell>
                       <TableCell>
@@ -176,6 +178,9 @@ const PendantStudents = ({ value }) => {
                               <DialogTitle>
                                 Aceptar solicitud de: {student.AlumnoNombres} {student.AlumnoApellidos}
                               </DialogTitle>
+                              <DialogDescription>
+                                Modalidad: <span className="font-bold">{student.Modalidad}</span>
+                              </DialogDescription>
                               <DialogDescription>Agregue observaciones si es necesario.</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">

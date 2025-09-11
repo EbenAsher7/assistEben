@@ -162,7 +162,8 @@ router.get(
               Alumnos.activo AS AlumnoActivo,
               Alumnos.observaciones AS AlumnoObservaciones,
               Alumnos.email AS AlumnoEmail,
-              Alumnos.prefijoNumero AS AlumnoPrefijoNumero
+              Alumnos.prefijoNumero AS AlumnoPrefijoNumero,
+              Alumnos.modalidad AS Modalidad
             FROM
               Alumnos
             JOIN

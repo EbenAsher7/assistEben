@@ -7,10 +7,8 @@ import { ListStudents } from "@/components/Attendance/ListStudents";
 import { AttendanceByDay } from "@/components/Attendance/AttendanceByDay";
 import { AttendanceByMonth } from "@/components/Attendance/AttendanceByMonth";
 import { AddStudent } from "@/components/Attendance/AddStudent";
-import PendantStudents from "@/components/Attendance/PendantStudents";
 
 const Attendance = () => {
-  // CONTEXTO
   const { user } = useContext(MainContext);
 
   return (
@@ -26,14 +24,12 @@ const Attendance = () => {
                 <TabsTrigger value="AddStudent">Añadir Alumno</TabsTrigger>
                 <TabsTrigger value="asisDia">Asistencia por Día</TabsTrigger>
                 <TabsTrigger value="asisMes">Asistencia por Mes</TabsTrigger>
-                <TabsTrigger value="pendientes">Pendientes</TabsTrigger>
               </TabsList>
             </div>
             <ListStudents value="listado" />
             <AddStudent value="AddStudent" />
             <AttendanceByDay value="asisDia" />
             <AttendanceByMonth value="asisMes" />
-            <PendantStudents value="pendientes" />
           </Tabs>
         </div>
       </div>

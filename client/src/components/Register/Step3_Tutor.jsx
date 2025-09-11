@@ -25,13 +25,14 @@ const Step3_Tutor = () => {
 
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [selectedTutor, setSelectedTutor] = useState(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!cursoSeleccionadoNEW) {
-      navigateStep(-1); // Regresar si no hay módulo seleccionado
+      navigateStep(-1);
       return;
     }
     const fetchTutors = async () => {
@@ -51,7 +52,7 @@ const Step3_Tutor = () => {
   }, [cursoSeleccionadoNEW, navigateStep, toast]);
 
   const handleFinalSubmit = async () => {
-    setLoading(true);
+    setSubmitting(true);
     try {
       const response = await fetch(`${URL_BASE}/api/user/registerAlumno`, {
         method: "POST",
@@ -85,48 +86,55 @@ const Step3_Tutor = () => {
     } catch (error) {
       toast({ title: "Error", description: error.message, duration: 2500 });
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="px-2">
-      <h3 className="text-xl font-extrabold text-center pb-2 px-4">Selecciona tu tutor asignado</h3>
-      <h2 className="text-sm italic font-semibold text-center pb-6 px-4 text-red-500">
-        *** Si aún no tienes un tutor, solicítalo y luego regresa aquí para seleccionarlo. ***
-      </h2>
-      {loading ? (
-        <LoaderAE texto="Cargando tutores..." />
-      ) : tutors.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {tutors.map((tutor) => (
-            <div
-              key={tutor.id}
-              className={`border rounded-lg overflow-hidden cursor-pointer shadow-lg p-4 transition-transform ease-in ${
-                selectedTutor?.id === tutor.id ? "bg-blue-100 border-blue-400 dark:bg-blue-900 dark:border-blue-600 scale-105" : "border-gray-300"
-              }`}
-              onClick={() => setSelectedTutor(tutor)}
-            >
-              <img src={tutor.foto_url} alt={`${tutor.nombres} ${tutor.apellidos}`} className="size-44 object-cover mx-auto mb-4 rounded-full" />
-              <div className="space-y-2">
-                <h4 className="text-2xl font-extrabold text-center">{`${tutor.nombres} ${tutor.apellidos}`}</h4>
-                <p className="text-center">Tutor(a)</p>
-              </div>
-            </div>
-          ))}
+    <>
+      {submitting && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+          <LoaderAE texto="Finalizando registro..." />
         </div>
-      ) : (
-        <p>No hay tutores disponibles para este módulo.</p>
       )}
-      <div className="flex justify-center my-4 gap-2">
-        <Button onClick={() => navigateStep(-1)} className="px-8 py-6">
-          Anterior
-        </Button>
-        <Button onClick={handleFinalSubmit} disabled={!selectedTutor || loading} className="px-8 py-6">
-          {loading ? <LoaderAE texto="Enviando..." /> : "Finalizar Registro"}
-        </Button>
-      </div>
-    </div>
+      <fieldset disabled={submitting} className="px-2">
+        <h3 className="text-xl font-extrabold text-center pb-2 px-4">Selecciona tu tutor asignado</h3>
+        <h2 className="text-sm italic font-semibold text-center pb-6 px-4 text-red-500">
+          *** Si aún no tienes un tutor, solicítalo y luego regresa aquí para seleccionarlo. ***
+        </h2>
+        {loading ? (
+          <LoaderAE texto="Cargando tutores..." />
+        ) : tutors.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {tutors.map((tutor) => (
+              <div
+                key={tutor.id}
+                className={`border rounded-lg overflow-hidden cursor-pointer shadow-lg p-4 transition-transform ease-in ${
+                  selectedTutor?.id === tutor.id ? "bg-blue-100 border-blue-400 dark:bg-blue-900 dark:border-blue-600 scale-105" : "border-gray-300"
+                }`}
+                onClick={() => setSelectedTutor(tutor)}
+              >
+                <img src={tutor.foto_url} alt={`${tutor.nombres} ${tutor.apellidos}`} className="size-44 object-cover mx-auto mb-4 rounded-full" />
+                <div className="space-y-2">
+                  <h4 className="text-2xl font-extrabold text-center">{`${tutor.nombres} ${tutor.apellidos}`}</h4>
+                  <p className="text-center">Tutor(a)</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p>No hay tutores disponibles para este módulo.</p>
+        )}
+        <div className="flex justify-center my-4 gap-2">
+          <Button onClick={() => navigateStep(-1)} className="px-8 py-6">
+            Anterior
+          </Button>
+          <Button onClick={handleFinalSubmit} disabled={!selectedTutor || loading} className="px-8 py-6">
+            Finalizar Registro
+          </Button>
+        </div>
+      </fieldset>
+    </>
   );
 };
 

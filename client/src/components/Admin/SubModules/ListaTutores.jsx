@@ -1,13 +1,14 @@
 import { useContext, useEffect, useState } from "react";
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
 import MainContext from "@/context/MainContext";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,176 +25,164 @@ import CRSelect from "@/components/Preguntas/CRSelect";
 import ImagenCloud from "@/components/ImagenCloud";
 
 const ListaTutores = () => {
-  const [isLoadingTutors, setIsLoadingTutors] = useState(false);
-  const [tutorsByModule, setTutorsByModule] = useState([]);
+  const [tutors, setTutors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedTutor, setSelectedTutor] = useState(null);
-  const [selectedTipoTutorEdit, setSelectedTipoTutorEdit] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentTutorId, setCurrentTutorId] = useState(null);
-  const [newImageProfile, setNewImageProfile] = useState("");
-
+  const [sorting, setSorting] = useState([]);
+  const [columnFilters, setColumnFilters] = useState([]);
   const { toast } = useToast();
   const { user } = useContext(MainContext);
 
   useEffect(() => {
-    if (user && user.tipo) {
-      const fetchData = async () => {
-        setIsLoadingTutors(true);
-        try {
-          const response = await fetch(`${URL_BASE}/admin/allTutorsByModule/${user.id}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: user?.token,
-            },
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            setTutorsByModule(data.length ? data : []);
-          } else {
-            throw new Error("Failed to fetch");
-          }
-        } catch (error) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Ocurrió un error al consultar los tutores.",
-            duration: 2500,
-          });
-        } finally {
-          setIsLoadingTutors(false);
-        }
-      };
-
-      fetchData();
+    const fetchAllTutors = async () => {
+      setIsLoading(true);
+      try {
+        const response = await fetch(`${URL_BASE}/api/tutors`, {
+          headers: { Authorization: user?.token },
+        });
+        if (!response.ok) throw new Error("No se pudieron cargar los tutores.");
+        const data = await response.json();
+        setTutors(data);
+      } catch (error) {
+        toast({ variant: "destructive", title: "Error", description: error.message });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (user?.token) {
+      fetchAllTutors();
     }
   }, [user, toast]);
 
-  const handleEdit = (tutor) => {
-    setSelectedTutor(tutor);
-    setCurrentTutorId(tutor.id);
-    setSelectedTipoTutorEdit(tutor.tipo);
-    setIsModalOpen(true);
+  const handleTutorUpdate = (updatedTutor) => {
+    setTutors((prev) => prev.map((tutor) => (tutor.id === updatedTutor.id ? { ...tutor, ...updatedTutor } : tutor)));
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedTutor(null);
-    setCurrentTutorId(null);
-    setSelectedTipoTutorEdit(null);
+  const handleTutorDelete = (tutorId) => {
+    setTutors((prev) => prev.filter((tutor) => tutor.id !== tutorId));
   };
+
+  const columns = [
+    {
+      accessorKey: "nombres",
+      header: ({ column }) => (
+        <Button variant="ghost" onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          Nombre
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => `${row.original.nombres} ${row.original.apellidos}`,
+    },
+    { accessorKey: "telefono", header: "Teléfono" },
+    { accessorKey: "direccion", header: "Dirección" },
+    { accessorKey: "tipo", header: "Tipo" },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex space-x-2">
+          <EditTutorDialog tutor={row.original} onTutorUpdate={handleTutorUpdate} />
+          <DeleteTutorDialog tutorId={row.original.id} onTutorDelete={handleTutorDelete} />
+        </div>
+      ),
+    },
+  ];
+
+  const table = useReactTable({
+    data: tutors,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    state: { sorting, columnFilters },
+  });
+
+  if (isLoading) {
+    return <LoaderAE texto="Cargando tutores..." />;
+  }
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center py-4">
+        <Input
+          placeholder="Filtrar por nombre, apellidos, teléfono..."
+          value={table.getColumn("nombres")?.getFilterValue() ?? ""}
+          onChange={(event) => table.getColumn("nombres")?.setFilterValue(event.target.value)}
+          className="max-w-sm"
+        />
+      </div>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead key={header.id}>{flexRender(header.column.columnDef.header, header.getContext())}</TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow key={row.id}>
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  No se encontraron resultados.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+          Anterior
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+          Siguiente
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+const EditTutorDialog = ({ tutor, onTutorUpdate }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [formData, setFormData] = useState(tutor);
+  const [newImageProfile, setNewImageProfile] = useState("");
+  const { user } = useContext(MainContext);
+  const { toast } = useToast();
 
   const handleSaveChanges = async () => {
-    if (!selectedTutor) {
-      return;
-    }
-
-    if (!selectedTipoTutorEdit) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Seleccione un tipo de tutor.",
-        duration: 2500,
-      });
-      return;
-    }
-
     const updatedTutor = {
-      nombres: document.getElementById("name").value,
-      apellidos: document.getElementById("surname").value,
-      telefono: document.getElementById("phone").value,
-      direccion: document.getElementById("address").value,
-      tipo: selectedTipoTutorEdit,
-      foto_url: newImageProfile === "" ? selectedTutor.foto_url : newImageProfile,
+      ...formData,
+      foto_url: newImageProfile || formData.foto_url,
     };
 
     try {
-      const response = await fetch(`${URL_BASE}/put/updateTutor/${selectedTutor.id}`, {
+      const response = await fetch(`${URL_BASE}/put/updateTutor/${tutor.id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
+        headers: { "Content-Type": "application/json", Authorization: user?.token },
         body: JSON.stringify(updatedTutor),
       });
-
-      if (response.ok) {
-        toast({
-          title: "Éxito",
-          description: "Se actualizaron los datos del tutor.",
-          duration: 2500,
-        });
-
-        setTutorsByModule((prevTutorsByModule) =>
-          prevTutorsByModule.map((module) => ({
-            ...module,
-            Tutores: module.Tutores.map((tutor) => (tutor.id === selectedTutor.id ? { ...tutor, ...updatedTutor } : tutor)),
-          }))
-        );
-
-        handleCloseModal();
-      } else {
-        throw new Error("Failed to update");
-      }
+      if (!response.ok) throw new Error("Falló al actualizar");
+      toast({ title: "Éxito", description: "Datos del tutor actualizados." });
+      onTutorUpdate(updatedTutor);
+      setIsOpen(false);
     } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al actualizar los datos del tutor.",
-        duration: 2500,
-      });
+      toast({ variant: "destructive", title: "Error", description: error.message });
     }
   };
-
-  const handleDelete = async (tutorId) => {
-    if (!tutorId) {
-      return;
-    }
-
-    const deleteTutor = {
-      activo: "0",
-    };
-
-    try {
-      const response = await fetch(`${URL_BASE}/put/updateTutor/${tutorId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: user?.token,
-        },
-        body: JSON.stringify(deleteTutor),
-      });
-
-      if (response.ok) {
-        toast({
-          title: "Éxito",
-          description: "Se eliminó el tutor.",
-          duration: 2500,
-        });
-
-        setTutorsByModule((prevTutorsByModule) =>
-          prevTutorsByModule.map((module) => ({
-            ...module,
-            Tutores: module.Tutores.filter((tutor) => tutor.id !== tutorId),
-          }))
-        );
-      } else {
-        throw new Error("Failed to delete");
-      }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Ocurrió un error al eliminar el tutor." + error,
-        duration: 2500,
-      });
-    }
-  };
-
-  if (isLoadingTutors) {
-    return <LoaderAE />;
-  }
 
   const tipoDeTutor = [
     { value: "Tutor", label: "Tutor" },
@@ -202,126 +191,83 @@ const ListaTutores = () => {
   ];
 
   return (
-    <>
-      <Accordion type="multiple" className="w-full sm:w-[80%] m-auto">
-        {tutorsByModule.length > 0 ? (
-          tutorsByModule.map((module) => (
-            <AccordionItem key={module.idModulo} value={`item-${module.idModulo}`}>
-              <AccordionTrigger className="bg-purple-300 dark:bg-indigo-700 px-4">{module.nombreModulo}</AccordionTrigger>
-              <AccordionContent>
-                <Table className="text-black dark:text-white border-[1px] rounded-xl mt-2">
-                  <TableCaption className="italic mb-3">Lista de tutores para {module.nombreModulo}</TableCaption>
-                  <TableHeader>
-                    <TableRow className="bg-cyan-200 dark:bg-cyan-900">
-                      <TableHead>Nombre</TableHead>
-                      <TableHead>Apellidos</TableHead>
-                      <TableHead>Teléfono</TableHead>
-                      <TableHead>Dirección</TableHead>
-                      <TableHead>Tipo</TableHead>
-                      <TableHead>Acciones</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="text-black dark:text-white">
-                    {module.Tutores.map((tutor) => (
-                      <TableRow
-                        key={tutor.id}
-                        className="odd:bg-indigo-300/20 even:bg-indigo-300/50 dark:odd:bg-indigo-500/10 dark:even:bg-indigo-500/20"
-                      >
-                        <TableCell>{tutor.nombres}</TableCell>
-                        <TableCell>{tutor.apellidos}</TableCell>
-                        <TableCell>{tutor.telefono}</TableCell>
-                        <TableCell>{tutor.direccion}</TableCell>
-                        <TableCell>{tutor.tipo}</TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button className="bg-blue-500" onClick={() => handleEdit(tutor)}>
-                              Editar
-                            </Button>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button variant="destructive">Eliminar</Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
-                                  <AlertDialogDescription>Esta acción no se puede deshacer. ¿Quieres continuar?</AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete(tutor.id)}>Eliminar</AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
-          ))
-        ) : (
-          <div>
-            <h1 className="text-center font-extrabold text-xl mt-4">No hay tutores asignados para mostrar.</h1>
-          </div>
-        )}
-      </Accordion>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm">
+          Editar
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Editar Tutor</DialogTitle>
+          <DialogDescription>Realiza los cambios necesarios y guarda.</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <ImagenCloud url={formData.foto_url} rounded setURLUpload={setNewImageProfile} upload />
+          <Label htmlFor="nombres">Nombre</Label>
+          <Input id="nombres" value={formData.nombres} onChange={(e) => setFormData({ ...formData, nombres: e.target.value })} />
+          <Label htmlFor="apellidos">Apellidos</Label>
+          <Input id="apellidos" value={formData.apellidos} onChange={(e) => setFormData({ ...formData, apellidos: e.target.value })} />
+          <Label htmlFor="telefono">Teléfono</Label>
+          <Input id="telefono" value={formData.telefono} onChange={(e) => setFormData({ ...formData, telefono: e.target.value })} />
+          <Label htmlFor="direccion">Dirección</Label>
+          <Input id="direccion" value={formData.direccion} onChange={(e) => setFormData({ ...formData, direccion: e.target.value })} />
+          <CRSelect
+            title="Tipo"
+            data={tipoDeTutor}
+            value={formData.tipo}
+            onChange={(value) => setFormData({ ...formData, tipo: value })}
+            hideSearch={true}
+          />
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setIsOpen(false)}>
+            Cancelar
+          </Button>
+          <Button onClick={handleSaveChanges}>Guardar Cambios</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-      {selectedTutor && (
-        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader className="text-black dark:text-white">
-              <DialogTitle>Editar tutor</DialogTitle>
-              <DialogDescription>Realiza los cambios necesarios y guarda.</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4 text-black dark:text-white">
-              <ImagenCloud url={selectedTutor.foto_url} rounded setURLUpload={setNewImageProfile} upload />
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Nombre
-                </Label>
-                <Input id="name" defaultValue={selectedTutor?.nombres} className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="surname" className="text-right">
-                  Apellidos
-                </Label>
-                <Input id="surname" defaultValue={selectedTutor?.apellidos} className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="phone" className="text-right">
-                  Teléfono
-                </Label>
-                <Input id="phone" defaultValue={selectedTutor?.telefono} className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="address" className="text-right">
-                  Dirección
-                </Label>
-                <Input id="address" defaultValue={selectedTutor?.direccion} className="col-span-3" />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="type" className="text-right">
-                  Tipo
-                </Label>
-                <div className="col-span-3">
-                  <CRSelect data={tipoDeTutor} setValue={setSelectedTipoTutorEdit} defaultValue={selectedTutor?.tipo} />
-                </div>
-              </div>
-            </div>
-            <DialogFooter className="gap-2">
-              <Button variant="outline" className="bg-red-500 text-white dark:bg-red-500" onClick={handleCloseModal}>
-                Cancelar
-              </Button>
-              <Button type="submit" className="bg-green-500 text-white dark:bg-green-500" onClick={handleSaveChanges}>
-                Guardar cambios
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      )}
-    </>
+const DeleteTutorDialog = ({ tutorId, onTutorDelete }) => {
+  const { user } = useContext(MainContext);
+  const { toast } = useToast();
+
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`${URL_BASE}/put/updateTutor/${tutorId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", Authorization: user?.token },
+        body: JSON.stringify({ activo: "0" }),
+      });
+      if (!response.ok) throw new Error("Falló al eliminar");
+      toast({ title: "Éxito", description: "Tutor eliminado correctamente." });
+      onTutorDelete(tutorId);
+    } catch (error) {
+      toast({ variant: "destructive", title: "Error", description: error.message });
+    }
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="destructive" size="sm">
+          Eliminar
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
+          <AlertDialogDescription>Esta acción marcará al tutor como inactivo. ¿Quieres continuar?</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete}>Eliminar</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 

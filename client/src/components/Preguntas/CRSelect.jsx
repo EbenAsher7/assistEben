@@ -16,12 +16,11 @@ const CRSelect = ({
   emptyText = "No se encontraron resultados.",
   disabled = false,
   require = false,
+  hideSearch = false,
 }) => {
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = (currentValue) => {
-    // Si el valor seleccionado es el mismo que ya está, no hacemos nada,
-    // o podrías optar por deseleccionar si es necesario.
     onChange(currentValue === value ? "" : currentValue);
     setOpen(false);
   };
@@ -45,7 +44,7 @@ const CRSelect = ({
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
           <Command>
-            <CommandInput placeholder={searchPlaceholder} />
+            {!hideSearch && <CommandInput placeholder={searchPlaceholder} />}
             <CommandList>
               <CommandEmpty>{emptyText}</CommandEmpty>
               <CommandGroup>
@@ -79,6 +78,7 @@ CRSelect.propTypes = {
   emptyText: PropTypes.string,
   disabled: PropTypes.bool,
   require: PropTypes.bool,
+  hideSearch: PropTypes.bool,
 };
 
 export default CRSelect;

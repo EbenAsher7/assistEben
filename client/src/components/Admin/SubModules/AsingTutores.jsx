@@ -75,7 +75,6 @@ const AsingTutores = () => {
       ]);
 
       toast({ variant: "success", title: "Éxito", description: "Cambios guardados correctamente.", duration: 2500 });
-      // Re-fetch data to ensure UI is in sync with the database
       const updatedTutoresModules = await fetchModulesAndTutors(selectedModule);
       setTutoresModules(updatedTutoresModules || []);
     } catch (error) {
@@ -94,7 +93,7 @@ const AsingTutores = () => {
     <div className="p-6 text-gray-800 dark:text-gray-200 w-full sm:max-w-[900px] mx-auto">
       <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Asignar tutores a módulos</h2>
       <p className="mb-4 mt-2"> Seleccione un módulo y asigne tutores a él.</p>
-      <CRSelect data={modules} placeholder="Seleccione un módulo" setValue={setSelectedModule} />
+      <CRSelect data={modules} placeholder="Seleccione un módulo" value={selectedModule} onChange={setSelectedModule} />
       {selectedModule && (
         <div className="mt-6">
           <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Módulo: {modules.find((m) => m.value === selectedModule)?.label}</h3>

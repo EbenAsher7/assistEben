@@ -333,7 +333,14 @@ export function ListStudents({ value }) {
         </div>
         <h2 className="text-xl font-extrabold text-center mb-2">Seleccione un curso para filtrar</h2>
         <div className="w-8/12 m-auto flex flex-col justify-center mb-4">
-          <CRSelect data={cursos} placeholder="Seleccione un curso" setValue={setCursoSeleccionado} disabled={isLoadingAlumnos} />
+          <CRSelect
+            data={cursos}
+            placeholder="Seleccione un curso"
+            onChange={setCursoSeleccionado}
+            value={cursoSeleccionado}
+            disabled={isLoadingAlumnos}
+            hideSearch={true}
+          />
           {cursoSeleccionado && alumnosCursos.length > 0 && (
             <div className="flex w-full justify-center items-center my-2">
               <DownloadTableExcel
@@ -392,7 +399,6 @@ export function ListStudents({ value }) {
                   <Table ref={allDataTableRef}>
                     <TableHeader>
                       <TableRow>
-                        {/* Define headers for excel export */}
                         <TableHead>Nombre Completo</TableHead>
                         <TableHead>Teléfono</TableHead>
                         <TableHead>Fecha de Nacimiento</TableHead>

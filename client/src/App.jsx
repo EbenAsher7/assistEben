@@ -7,9 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import Profile from "./pages/Profile";
 import Attendance from "./pages/Attendance";
 import RegisterAttendance from "./pages/RegisterAttendance";
-import OldRegister from "./pages/OldRegister";
 import Administration from "./pages/Administration";
-import PageRegister from "./pages/PageRegister";
 import QuestionUser from "./components/Preguntas/QuestionUser";
 import QuestionsAdmin from "./components/Admin/QuestionsAdmin";
 import ProtectedRoute from "./pages/ProtectedRoute";
@@ -23,9 +21,8 @@ const App = () => {
       <Toaster />
       <Routes>
         <Route path="/" element={<Homepage />} />
+        <Route path="/newRegister" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/oldRegister" element={<OldRegister />} />
-        <Route path="/newRegister" element={<PageRegister />} />
         <Route path="/questions" element={<QuestionUser />} />
 
         <Route

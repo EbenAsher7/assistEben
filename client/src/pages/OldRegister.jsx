@@ -82,7 +82,7 @@ export default function OldRegister() {
             <CRSelect
               title="Prefijo telefónico"
               data={prefijosFormateados}
-              setValue={setPrefijoNEW}
+              onChange={setPrefijoNEW}
               defaultValue={prefijoNEW}
               require
               placeholder="Seleccione un prefijo"

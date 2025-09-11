@@ -177,7 +177,7 @@ export function AddStudent({ value }) {
             <Input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} />
           </div>
           <div className="space-y-1">
-            <CRSelect title="Prefijo telefónico" data={prefijosFormateados} setValue={setPrefijo} reset={reset} require />
+            <CRSelect title="Prefijo telefónico" value={prefijo} data={prefijosFormateados} onChange={setPrefijo} reset={reset} require />
             <Label htmlFor="phone">
               Teléfono<span className="text-red-500">*</span>
             </Label>
@@ -198,11 +198,11 @@ export function AddStudent({ value }) {
                 <Input value={`${user?.nombres} ${user?.apellidos}`} disabled />
               </div>
             ) : (
-              <CRSelect title="Tutor" data={tutores} setValue={setTutorSelected} reset={reset} require />
+              <CRSelect title="Tutor" data={tutores} value={tutorSelected} onChange={setTutorSelected} reset={reset} require />
             )}
           </div>
           <div className="space-y-1 flex flex-col">
-            <CRSelect title="Curso" data={cursos} setValue={setCursoSelected} reset={reset} require />
+            <CRSelect title="Curso" value={cursoSelected} data={cursos} onChange={setCursoSelected} reset={reset} require hideSearch={true} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="observations">Observaciones</Label>

@@ -104,6 +104,19 @@ const Settings = () => {
               onCheckedChange={() => handleToggle("registro_completo_activo")}
             />
           </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="permitir-correos-duplicados-switch" className="flex flex-col space-y-1 pr-4">
+              <span>Permitir Correos Duplicados</span>
+              <span className="font-normal leading-snug text-muted-foreground">
+                Si está activo, se podrán registrar varios alumnos con el mismo correo.
+              </span>
+            </Label>
+            <Switch
+              id="permitir-correos-duplicados-switch"
+              checked={settings?.permitir_correos_duplicados}
+              onCheckedChange={() => handleToggle("permitir_correos_duplicados")}
+            />
+          </div>
         </div>
       </div>
     </div>

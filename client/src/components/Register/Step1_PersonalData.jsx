@@ -120,7 +120,11 @@ const Step1_PersonalData = ({ isLastStep }) => {
           modalidad: modalidadNEW,
         }),
       });
-      if (!response.ok) throw new Error("Falló el registro.");
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Falló el registro.");
+      }
 
       toast({
         variant: "success",

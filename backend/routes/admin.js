@@ -10,7 +10,12 @@ router.get('/settings', async (req, res) => {
   try {
     const result = await turso.execute('SELECT * FROM Configuracion')
     const settings = result.rows.reduce((acc, row) => {
-      acc[row.clave] = row.valor === 'true'
+      // Manejar el nuevo setting de correos duplicados
+      if (row.clave === 'permitir_correos_duplicados') {
+        acc[row.clave] = row.valor === 'true'
+      } else {
+        acc[row.clave] = row.valor === 'true'
+      }
       return acc
     }, {})
     res.status(200).json(settings)
@@ -23,6 +28,12 @@ router.get('/settings', async (req, res) => {
 router.put('/settings', async (req, res) => {
   const settings = req.body
   try {
+    // Asegurarse de que la nueva clave exista en la BD
+    await turso.execute({
+      sql: `INSERT OR IGNORE INTO Configuracion (clave, valor) VALUES ('permitir_correos_duplicados', 'true')`,
+      args: []
+    })
+
     const promises = Object.entries(settings).map(([clave, valor]) => {
       return turso.execute({
         sql: 'UPDATE Configuracion SET valor = ? WHERE clave = ?',

@@ -18,6 +18,7 @@ export function AttendanceByDay({ value }) {
   const [selectedModule, setSelectedModule] = useState(null);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
   const [attendedStudents, setAttendedStudents] = useState([]);
   const [notAttendedStudents, setNotAttendedStudents] = useState([]);
   const [allData, setAllData] = useState({ attendedStudents: [], notAttendedStudents: [] });
@@ -62,6 +63,7 @@ export function AttendanceByDay({ value }) {
       return;
     }
     setLoading(true);
+    setDataLoaded(false);
     try {
       const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutorAndModule/${selectedDate}/${user.id}/${selectedModule}`, {
         method: "GET",
@@ -88,11 +90,14 @@ export function AttendanceByDay({ value }) {
       });
     } finally {
       setLoading(false);
+      setDataLoaded(true);
     }
   };
 
   const virtualCount = attendedStudents.filter((student) => student.TipoAsistencia === "Virtual").length;
   const presencialCount = attendedStudents.filter((student) => student.TipoAsistencia === "Presencial").length;
+
+  const noData = dataLoaded && !loading && attendedStudents.length === 0 && notAttendedStudents.length === 0;
 
   return (
     <TabsContent value={value}>
@@ -134,6 +139,9 @@ export function AttendanceByDay({ value }) {
             {loading ? <LoaderAE /> : "Mostrar asistencias registradas"}
           </Button>
           <br />
+
+          {noData && <p className="text-center font-bold text-lg">No hay asistencias registradas para este día.</p>}
+
           {attendedStudents.length > 0 && notAttendedStudents.length > 0 && !loading && (
             <div className="flex flex-col sm:flex-row justify-center items-center gap-2">
               <DownloadTableExcel filename="asistieron" sheet="Asistieron" currentTableRef={tableRefAttended.current}>

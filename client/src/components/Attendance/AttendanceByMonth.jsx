@@ -81,6 +81,7 @@ export function AttendanceByMonth({ value }) {
     }
 
     setIsAttendanceLoading(true);
+    setIsDataLoaded(false);
     try {
       const response = await fetch(
         `${URL_BASE}/get/getAttendanceByMonthAndTutor/${selectedMonth}/${selectedYear}/${user.id}/${selectedCurso}/${selectedDay}`,
@@ -98,7 +99,6 @@ export function AttendanceByMonth({ value }) {
         setAllData(data);
         setAttendedStudents(data.reduce((acc, curr) => acc + curr.Asistencias, 0));
         setNotAttendedStudents(data.reduce((acc, curr) => acc + curr.Inasistencias, 0));
-        setIsDataLoaded(true);
       } else {
         throw new Error("Failed to fetch");
       }
@@ -111,6 +111,7 @@ export function AttendanceByMonth({ value }) {
       });
     } finally {
       setIsAttendanceLoading(false);
+      setIsDataLoaded(true);
     }
   }, [selectedMonth, selectedYear, selectedCurso, selectedDay, user.id, user.token, toast, canShowButton]);
 
@@ -123,6 +124,8 @@ export function AttendanceByMonth({ value }) {
     if (ratio >= 0.4) return "#E67E22"; // Naranja
     return "#E74C3C"; // Rojo
   };
+
+  const noData = isDataLoaded && !isAttendanceLoading && allData.length === 0;
 
   if (isInitialLoading) {
     return (
@@ -164,6 +167,8 @@ export function AttendanceByMonth({ value }) {
           <Button className="w-full sm:w-auto mt-4 sm:px-24" onClick={handleCargarDatos} disabled={isAttendanceLoading || !canShowButton}>
             {isAttendanceLoading ? "Cargando..." : "Mostrar Asistencias"}
           </Button>
+
+          {noData && <p className="text-center font-bold text-lg mt-4">No hay asistencias registradas para este mes.</p>}
 
           {isDataLoaded && allData.length > 0 && (
             <>

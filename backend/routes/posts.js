@@ -206,6 +206,25 @@ router.post('/addStudent', async (req, res) => {
       return res.status(400).json({ error: 'Faltan datos requeridos' })
     }
 
+    // Verificar configuración de correos duplicados
+    const settings = await turso.execute(
+      "SELECT valor FROM Configuracion WHERE clave = 'permitir_correos_duplicados'"
+    )
+    const permitirDuplicados =
+      settings.rows.length > 0 && settings.rows[0].valor === 'true'
+
+    if (!permitirDuplicados && email) {
+      const emailExists = await turso.execute({
+        sql: 'SELECT id FROM Alumnos WHERE email = ?',
+        args: [email]
+      })
+      if (emailExists.rows.length > 0) {
+        return res
+          .status(409)
+          .json({ error: 'El correo electrónico ya está en uso.' })
+      }
+    }
+
     // Verificar que el tutor exista
     const tutor = await turso.execute({
       sql: 'SELECT * FROM Tutores WHERE id = ? AND activo = 1',

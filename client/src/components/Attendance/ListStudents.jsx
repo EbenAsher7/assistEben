@@ -281,16 +281,20 @@ export function ListStudents({ value }) {
   });
 
   useEffect(() => {
-    fetchModulos(user.id).then((data) => {
-      setCursos(data || []);
-      setIsLoadingCursos(false);
-    });
-  }, [user.id, fetchModulos]);
+    if (user?.id) {
+      setIsLoadingCursos(true);
+      fetchModulos(user.id).then((data) => {
+        setCursos(data || []);
+        setIsLoadingCursos(false);
+      });
+    }
+  }, [user?.id, fetchModulos]);
 
   useEffect(() => {
     if (cursoSeleccionado) {
       const fetchData = async () => {
         setIsLoadingAlumnos(true);
+        setAlumnosCursos([]);
         try {
           const response = await fetch(`${URL_BASE}/get/getStudentsByModuleAndTutor/${cursoSeleccionado}/${user.id}`, {
             headers: { Authorization: user?.token },
@@ -315,7 +319,7 @@ export function ListStudents({ value }) {
     return (
       <TabsContent value={value}>
         <Card>
-          <LoaderAE />
+          <LoaderAE texto="Cargando módulos..." />
         </Card>
       </TabsContent>
     );
@@ -356,7 +360,7 @@ export function ListStudents({ value }) {
         {cursoSeleccionado && (
           <CardContent className="space-y-2">
             {isLoadingAlumnos ? (
-              <LoaderAE />
+              <LoaderAE texto="Cargando alumnos..." />
             ) : (
               <>
                 <Input
@@ -388,7 +392,7 @@ export function ListStudents({ value }) {
                       ) : (
                         <TableRow>
                           <TableCell colSpan={columns.length} className="h-24 text-center">
-                            No hay resultados.
+                            No se encontraron alumnos para este módulo.
                           </TableCell>
                         </TableRow>
                       )}

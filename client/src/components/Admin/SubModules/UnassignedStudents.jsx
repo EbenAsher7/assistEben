@@ -186,7 +186,7 @@ const UnassignedStudents = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        {student.prefijoNumero ? `+${student.prefijoNumero} ` : ""}
+                        {student.prefijoNumero ? `${student.prefijoNumero} ` : ""}
                         {student.telefono}
                       </TableCell>
                       <TableCell>{student.pais}</TableCell>
@@ -272,7 +272,7 @@ const UnassignedStudents = () => {
                 </div>
                 <strong>Teléfono:</strong>
                 <span>
-                  {selectedStudentDetails.prefijoNumero ? `+${selectedStudentDetails.prefijoNumero} ` : ""}
+                  {selectedStudentDetails.prefijoNumero ? `${selectedStudentDetails.prefijoNumero} ` : ""}
                   {selectedStudentDetails.telefono}
                 </span>
                 <strong>Email:</strong>

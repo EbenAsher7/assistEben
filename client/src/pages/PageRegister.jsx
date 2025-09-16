@@ -33,8 +33,8 @@ const PageRegister = () => {
 
   return (
     <div className="container mx-auto p-4 w-full sm:max-w-[1200px]">
-      <h1 className="text-4xl font-extrabold text-center">Nuevo Registro</h1>
-      <h2 className="text-lg text-center mb-4">Llena los datos requeridos para continuar con el registro</h2>
+      <h1 className="text-4xl font-extrabold text-center">Nueva Inscripción</h1>
+      <h2 className="text-lg text-center mb-4">Llena los datos requeridos para continuar con la inscripción</h2>
 
       {steps.length > 1 && (
         <div className="flex items-center justify-center p-4">

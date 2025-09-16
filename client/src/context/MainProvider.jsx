@@ -24,10 +24,10 @@ const MainProvider = ({ children }) => {
       }
     } catch (error) {
       setAppSettings({
-        asistencia_activa: true,
+        asistencia_activa: false,
         registro_activo: true,
-        preguntas_activas: true,
-        registro_completo_activo: true,
+        preguntas_activas: false,
+        registro_completo_activo: false,
       });
     }
   }, []);

@@ -111,7 +111,7 @@ const Step1_PersonalData = ({ isLastStep }) => {
 
       toast({
         variant: "success",
-        title: "Registro Exitoso",
+        title: "Inscripción Exitosa",
         description: "Tu solicitud ha sido enviada. Un tutor la revisará pronto.",
         duration: 4000,
       });
@@ -158,7 +158,7 @@ const Step1_PersonalData = ({ isLastStep }) => {
     <>
       {loading && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-          <LoaderAE texto="Finalizando registro..." />
+          <LoaderAE texto="Finalizando inscripción..." />
         </div>
       )}
       <fieldset disabled={loading} className="w-full justify-center flex items-center">
@@ -268,7 +268,7 @@ const Step1_PersonalData = ({ isLastStep }) => {
               </Label>
               <Input
                 id="privilegio"
-                placeholder="Ej: Músico, Diácono, etc."
+                placeholder="Ej: Pastor, Anciano, Diacono u otro."
                 value={privilegioNEW}
                 onChange={(e) => setPrivilegioNEW(e.target.value)}
                 onBlur={handleBlur}

@@ -26,8 +26,8 @@ const PageRegister = () => {
 
   return (
     <div className="container mx-auto p-4 w-full sm:max-w-[1200px] min-w-[400px] sm:w-[600px]">
-      <h1 className="text-4xl font-extrabold mt-8 text-center sm:mt-0">Nuevo Registro</h1>
-      <h2 className="text-lg text-center mb-4">Llena los datos requeridos para continuar con el registro</h2>
+      <h1 className="text-4xl font-extrabold mt-8 text-center sm:mt-0">Nueva Inscripción</h1>
+      <h2 className="text-lg text-center mb-4">Llena los datos requeridos para continuar con la inscripción</h2>
 
       <nav className={`mb-4 ${isDesktop ? "flex items-center justify-center" : "space-y-4"}`}>
         {steps.map((s, index) => (

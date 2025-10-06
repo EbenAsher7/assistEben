@@ -33,7 +33,7 @@ publicRouter.get('/settings', async (req, res) => {
 app.use('/public', publicRouter)
 
 app.get('/helloWorld', (req, res) => {
-  res.json({ mensaje: 'Hola mundo!' })
+  res.json({ status: 'ok', mensaje: 'Hola mundo!' })
 })
 
 app.use('/api', user)

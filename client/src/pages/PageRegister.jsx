@@ -1,27 +1,22 @@
 import LoaderAE from "@/components/LoaderAE";
 import MainContext from "@/context/MainContext";
-import { useEffect, lazy, Suspense, useContext, useState } from "react";
+import { useEffect, lazy, Suspense, useContext } from "react";
 import { translations } from "@/translations/registerTranslations";
+import imgDoctrina from "@/assets/imgdoctrina.jpeg"; // <--- AGREGAR ESTA LÍNEA
 
 const Step1 = lazy(() => import("@/components/Register/Step1_PersonalData"));
 const Step2 = lazy(() => import("@/components/Register/Step2_Module"));
 const Step3 = lazy(() => import("@/components/Register/Step3_Tutor"));
 
 const PageRegister = () => {
-  const { step, resetRegistrationForm, appSettings } = useContext(MainContext);
+  const { step, resetRegistrationForm, appSettings, language, toggleLanguage } =
+    useContext(MainContext);
 
-  const [language, setLanguage] = useState("es");
-  console.log("Language in PageRegister:", language);
-
-  const t = translations[language];
+  const t = translations[language || "es"];
 
   useEffect(() => {
     resetRegistrationForm();
   }, [resetRegistrationForm]);
-
-  const toggleLanguage = () => {
-    setLanguage((prev) => (prev === "es" ? "en" : "es"));
-  };
 
   if (appSettings === null) {
     return (
@@ -43,6 +38,13 @@ const PageRegister = () => {
 
   return (
     <div className="container mx-auto p-4 w-full sm:max-w-[1200px]">
+      <div className="w-full mb-6">
+        <img
+          src={imgDoctrina}
+          alt="Logo Doctrina"
+          className="w-full h-auto object-cover"
+        />
+      </div>
       {/* Botón de traducción */}
       <div className="flex justify-end mb-4">
         <button
@@ -107,7 +109,7 @@ const PageRegister = () => {
           <CurrentStepComponent
             key={language}
             isLastStep={step === steps.length - 1}
-            language={language} // <--- AGREGA ESTA LÍNEA
+            language={language}
           />
         </Suspense>
       </div>

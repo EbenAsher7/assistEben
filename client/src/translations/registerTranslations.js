@@ -1,8 +1,8 @@
 // frontend/src/translations/registerTranslations.js
 export const translations = {
   es: {
-    title: "Nueva Inscripción",
-    subtitle: "Llena los datos requeridos para continuar con la inscripción",
+    title: "INSCRIPCIÓN - Módulo de Escatología",
+    subtitle: "Llena los datos requeridos",
     loading: "Cargando configuración del registro...",
     loadingStep: "Cargando paso...",
     steps: {
@@ -68,9 +68,8 @@ export const translations = {
     },
   },
   en: {
-    title: "New Registration",
-    subtitle:
-      "Fill in the required information to continue with the registration",
+    title: "REGISTRATION - Eschatology Module",
+    subtitle: "Fill in the required information",
     loading: "Loading registration settings...",
     loadingStep: "Loading step...",
     steps: {

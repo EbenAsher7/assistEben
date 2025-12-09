@@ -1,0 +1,138 @@
+// frontend/src/translations/registerTranslations.js
+export const translations = {
+  es: {
+    title: "Nueva Inscripción",
+    subtitle: "Llena los datos requeridos para continuar con la inscripción",
+    loading: "Cargando configuración del registro...",
+    loadingStep: "Cargando paso...",
+    steps: {
+      personalData: "Datos Personales",
+      modules: "Módulos",
+      tutors: "Tutores",
+    },
+    step1: {
+      title: "Ingresa tus datos personales",
+      requiredFields: "* Los campos con asterisco son obligatorios",
+      finalizingRegistration: "Finalizando inscripción...",
+      labels: {
+        nombres: "Nombres",
+        apellidos: "Apellidos",
+        telefono: "Teléfono",
+        correo: "Correo Electrónico",
+        pais: "País",
+        iglesia: "Iglesia donde te congregas",
+        pastor: "Nombre de tu Pastor",
+        privilegio: "Privilegio actual",
+        modalidad: "Modalidad",
+      },
+      placeholders: {
+        nombres: "Tus nombres",
+        apellidos: "Tus apellidos",
+        correo: "tu@correo.com",
+        pais: "Selecciona tu país",
+        paisSearch: "Buscar país...",
+        iglesia: "Nombre de tu iglesia",
+        pastor: "Nombre de tu pastor",
+        privilegio: "Ej: Pastor, Anciano, Diacono u otro.",
+        modalidad: "Selecciona tu modalidad",
+      },
+      errors: {
+        nombres: "El nombre es obligatorio (mín. 6 caracteres).",
+        apellidos: "El apellido es obligatorio (mín. 3 caracteres).",
+        telefono: "El teléfono debe ser un número válido.",
+        prefijo: "Seleccione un prefijo.",
+        correo: "Ingrese un correo electrónico válido.",
+        pais: "El país es obligatorio.",
+        iglesia: "El nombre de la iglesia es obligatorio.",
+        pastor: "El nombre del pastor es obligatorio.",
+        privilegio: "El privilegio es obligatorio.",
+        modalidad: "Seleccione una modalidad.",
+      },
+      buttons: {
+        next: "Siguiente",
+        finish: "Finalizar Registro",
+      },
+      toast: {
+        successTitle: "Inscripción Exitosa",
+        successDescription:
+          "Tu solicitud ha sido enviada. Un tutor la revisará pronto.",
+        errorTitle: "Error",
+        incompleteTitle: "Campos Incompletos",
+        incompleteDescription:
+          "Por favor, complete todos los campos obligatorios marcados en rojo.",
+      },
+      modalidad: {
+        presencial: "Presencial",
+        virtual: "Virtual (ZOOM)",
+      },
+    },
+  },
+  en: {
+    title: "New Registration",
+    subtitle:
+      "Fill in the required information to continue with the registration",
+    loading: "Loading registration settings...",
+    loadingStep: "Loading step...",
+    steps: {
+      personalData: "Personal Data",
+      modules: "Modules",
+      tutors: "Tutors",
+    },
+    step1: {
+      title: "Enter your personal information",
+      requiredFields: "* Fields with asterisk are required",
+      finalizingRegistration: "Finalizing registration...",
+      labels: {
+        nombres: "First Name",
+        apellidos: "Last Name",
+        telefono: "Phone",
+        correo: "Email",
+        pais: "Country",
+        iglesia: "Church where you attend",
+        pastor: "Pastor's Name",
+        privilegio: "Current Privilege",
+        modalidad: "Modality",
+      },
+      placeholders: {
+        nombres: "Your first name",
+        apellidos: "Your last name",
+        correo: "your@email.com",
+        pais: "Select your country",
+        paisSearch: "Search country...",
+        iglesia: "Name of your church",
+        pastor: "Your pastor's name",
+        privilegio: "Ex: Pastor, Elder, Deacon or other.",
+        modalidad: "Select your modality",
+      },
+      errors: {
+        nombres: "First name is required (min. 6 characters).",
+        apellidos: "Last name is required (min. 3 characters).",
+        telefono: "Phone must be a valid number.",
+        prefijo: "Select a prefix.",
+        correo: "Enter a valid email address.",
+        pais: "Country is required.",
+        iglesia: "Church name is required.",
+        pastor: "Pastor's name is required.",
+        privilegio: "Privilege is required.",
+        modalidad: "Select a modality.",
+      },
+      buttons: {
+        next: "Next",
+        finish: "Complete Registration",
+      },
+      toast: {
+        successTitle: "Successful Registration",
+        successDescription:
+          "Your request has been submitted. A tutor will review it soon.",
+        errorTitle: "Error",
+        incompleteTitle: "Incomplete Fields",
+        incompleteDescription:
+          "Please complete all required fields marked in red.",
+      },
+      modalidad: {
+        presencial: "In-Person",
+        virtual: "Virtual (ZOOM)",
+      },
+    },
+  },
+};

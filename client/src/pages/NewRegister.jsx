@@ -26,34 +26,56 @@ const PageRegister = () => {
 
   return (
     <div className="container mx-auto p-4 w-full sm:max-w-[1200px] min-w-[400px] sm:w-[600px]">
-      <h1 className="text-4xl font-extrabold mt-8 text-center sm:mt-0">Nueva Inscripción</h1>
-      <h2 className="text-lg text-center mb-4">Llena los datos requeridos para continuar con la inscripción</h2>
+      <h1 className="text-4xl font-extrabold mt-8 text-center sm:mt-0">
+        Nueva Inscripción
+      </h1>
+      <h2 className="text-lg text-center mb-4">
+        Llena los datos requeridos para continuar con la inscripción
+      </h2>
 
-      <nav className={`mb-4 ${isDesktop ? "flex items-center justify-center" : "space-y-4"}`}>
+      <nav
+        className={`mb-4 ${
+          isDesktop ? "flex items-center justify-center" : "space-y-4"
+        }`}
+      >
         {steps.map((s, index) => (
           <div key={index} className={isDesktop ? "flex items-center" : "mb-4"}>
-            <div className={`${isDesktop ? "flex items-center" : "p-4 border rounded shadow-lg"} transition-all duration-300 ease-in-out`}>
+            <div
+              className={`${
+                isDesktop ? "flex items-center" : "p-4 border rounded shadow-lg"
+              } transition-all duration-300 ease-in-out`}
+            >
               <h3
-                className={`${isDesktop ? "text-base" : "text-2xl font-medium"} ${
-                  index === step ? "text-blue-600 dark:text-blue-400 font-black" : "text-gray-600 dark:text-gray-500 text-lg font-extralight"
+                className={`${
+                  isDesktop ? "text-base" : "text-2xl font-medium"
+                } ${
+                  index === step
+                    ? "text-blue-600 dark:text-blue-400 font-black"
+                    : "text-gray-600 dark:text-gray-500 text-lg font-extralight"
                 }`}
               >
                 {s.label}
               </h3>
               {!isDesktop && index === step && (
                 <div className="mt-4">
-                  <Suspense fallback={<LoaderAE texto="Cargando paso..." />}>{s.component}</Suspense>
+                  <Suspense fallback={<LoaderAE texto="Cargando paso..." />}>
+                    {s.component}
+                  </Suspense>
                 </div>
               )}
             </div>
-            {isDesktop && index < steps.length - 1 && <span className="mx-2 text-gray-400">&gt;</span>}
+            {isDesktop && index < steps.length - 1 && (
+              <span className="mx-2 text-gray-400">&gt;</span>
+            )}
           </div>
         ))}
       </nav>
 
       {isDesktop && (
         <div>
-          <Suspense fallback={<LoaderAE texto="Cargando paso..." />}>{steps[step].component}</Suspense>
+          <Suspense fallback={<LoaderAE texto="Cargando paso..." />}>
+            {steps[step].component}
+          </Suspense>
         </div>
       )}
     </div>

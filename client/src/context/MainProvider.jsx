@@ -13,6 +13,22 @@ const MainProvider = ({ children }) => {
   const [maxAttendanceByDay, setMaxAttendanceByDay] = useState(5);
   const [attendanceHistory, setAttendanceHistory] = useState({});
 
+  // ==================== NUEVO: Estado de idioma ====================
+  const [language, setLanguage] = useState(() => {
+    // Intenta obtener el idioma guardado en localStorage
+    const savedLanguage = localStorage.getItem("appLanguage");
+    return savedLanguage || "es"; // Por defecto español
+  });
+
+  const toggleLanguage = () => {
+    setLanguage((prev) => {
+      const newLanguage = prev === "es" ? "en" : "es";
+      localStorage.setItem("appLanguage", newLanguage); // Guardar en localStorage
+      return newLanguage;
+    });
+  };
+  // ================================================================
+
   const fetchAppSettings = useCallback(async () => {
     try {
       const response = await fetch(`${URL_BASE}/public/settings`);
@@ -78,10 +94,14 @@ const MainProvider = ({ children }) => {
     const user = JSON.parse(localStorage.getItem("user"));
     const isTutor = user && ["Tutor", "Administrador"].includes(user.tipo);
     const today = new Date().toISOString().slice(0, 10);
-    const storedHistory = JSON.parse(localStorage.getItem("attendanceHistory")) || {};
+    const storedHistory =
+      JSON.parse(localStorage.getItem("attendanceHistory")) || {};
 
     if (isTutor) {
-      return !(storedHistory[today] && storedHistory[today].asistencias.some((a) => a.id === alumnoId));
+      return !(
+        storedHistory[today] &&
+        storedHistory[today].asistencias.some((a) => a.id === alumnoId)
+      );
     } else {
       const todayHistory = storedHistory[today] || { asistencias: [] };
       const attendanceCount = todayHistory.asistencias.length;
@@ -158,13 +178,16 @@ const MainProvider = ({ children }) => {
   const fetchModulos = async (tutorID) => {
     if (tutorID) {
       try {
-        const response = await fetch(`${URL_BASE}/api/modulesByTutor/${tutorID}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user?.token,
-          },
-        });
+        const response = await fetch(
+          `${URL_BASE}/api/modulesByTutor/${tutorID}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: user?.token,
+            },
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -220,13 +243,16 @@ const MainProvider = ({ children }) => {
   const fetchModulesAndTutors = async (id_module) => {
     if (user) {
       try {
-        const response = await fetch(`${URL_BASE}/api/modulesAndTutors/${id_module}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user?.token,
-          },
-        });
+        const response = await fetch(
+          `${URL_BASE}/api/modulesAndTutors/${id_module}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: user?.token,
+            },
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -238,7 +264,8 @@ const MainProvider = ({ children }) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
+          description:
+            "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
           duration: 2500,
         });
       }
@@ -276,13 +303,16 @@ const MainProvider = ({ children }) => {
   const deleteTutoresModulos = async (id_moduleTutors) => {
     if (user) {
       try {
-        const response = await fetch(`${URL_BASE}/api/modulesAndTutors/${id_moduleTutors}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: user?.token,
-          },
-        });
+        const response = await fetch(
+          `${URL_BASE}/api/modulesAndTutors/${id_moduleTutors}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: user?.token,
+            },
+          }
+        );
 
         if (response.ok) {
           const data = await response.json();
@@ -294,7 +324,8 @@ const MainProvider = ({ children }) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
+          description:
+            "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
           duration: 2500,
         });
       }
@@ -323,7 +354,8 @@ const MainProvider = ({ children }) => {
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
+          description:
+            "Ocurrió un error al consultar los tutores asignados a los módulos disponibles.",
           duration: 2500,
         });
       }
@@ -448,6 +480,10 @@ const MainProvider = ({ children }) => {
         step,
         navigateStep,
         resetRegistrationForm,
+        // ==================== NUEVO: Agregar al value ====================
+        language,
+        toggleLanguage,
+        // ================================================================
       }}
     >
       {children}

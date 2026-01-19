@@ -51,26 +51,6 @@ const Navbar = memo(() => {
           <img src={LOGODOCTRINA} className="h-10 py-1 ml-2 dark:invert invert-0" alt="Logo Ministerios Ebenezer" />
         </Link>
 
-        {appSettings?.preguntas_activas && !isLogin && (
-          <Link to="/questions" className="font-bold flex flex-row gap-1 py-2 px-4 rounded-md dark:bg-neutral-600 bg-neutral-200">
-            Preguntas
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M0 0h24v24H0z" stroke="none" />
-              <path d="M8 9h8M8 13h6M14 18h-1l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3v4.5M19 22v.01M19 19a2.003 2.003 0 0 0 .914-3.782 1.98 1.98 0 0 0-2.414.483" />
-            </svg>
-          </Link>
-        )}
-
         <button
           onClick={toggleNavbar}
           type="button"
@@ -161,15 +141,39 @@ const Navbar = memo(() => {
                 </li>
               </>
             ) : (
-              <li className="text-black dark:text-white flex justify-center items-center">
-                <Link
-                  to="/login"
-                  className="bg-blue-500 text-white dark:bg-blue-800 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md"
-                  onClick={closeNavbar}
-                >
-                  Iniciar Sesión
-                </Link>
-              </li>
+              <>
+                {appSettings?.registro_activo && (
+                  <li className="text-black dark:text-white flex justify-center items-center">
+                    <Link
+                      to="/newRegister"
+                      className="bg-blue-500 text-white dark:bg-blue-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md"
+                      onClick={closeNavbar}
+                    >
+                      Inscripción
+                    </Link>
+                  </li>
+                )}
+                {appSettings?.preguntas_activas && (
+                  <li className="text-black dark:text-white flex justify-center items-center">
+                    <Link
+                      to="/questions"
+                      className="bg-purple-500 text-white dark:bg-purple-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md"
+                      onClick={closeNavbar}
+                    >
+                      Preguntas
+                    </Link>
+                  </li>
+                )}
+                <li className="text-black dark:text-white flex justify-center items-center">
+                  <Link
+                    to="/login"
+                    className="bg-green-500 text-white dark:bg-green-800 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md"
+                    onClick={closeNavbar}
+                  >
+                    Iniciar Sesión
+                  </Link>
+                </li>
+              </>
             )}
             <li>
               <span className="flex justify-center text-black dark:text-white">

@@ -33,43 +33,54 @@ const Homepage = () => {
 
   const { asistencia_activa, registro_activo } = appSettings;
 
-  if (!asistencia_activa && !registro_activo) {
-    return (
-      <div className="flex w-full h-dvh -mt-20 justify-center items-center text-center p-4">
-        <div>
-          <h1 className="text-2xl font-bold">Por el momento no tienes acceso a esto.</h1>
-          <p className="mt-2">Se habilitará más adelante o consulta con algún tutor asignado.</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (asistencia_activa && !registro_activo) {
-    if (location.pathname === "/newRegister") return <Navigate to="/" replace />;
-    return <AsistenciaView />;
-  }
-
-  if (!asistencia_activa && registro_activo) {
-    if (location.pathname === "/") return <Navigate to="/newRegister" replace />;
+  // Mostrar vista de registro solo cuando estamos en la ruta /newRegister
+  if (location.pathname === "/newRegister") {
+    if (!registro_activo) {
+      return <Navigate to="/" replace />;
+    }
     return <RegistroView />;
   }
 
-  return (
-    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-      <div className="flex justify-center border-b sticky top-[55px] sm:top-[63px] bg-neutral-100 dark:bg-neutral-900 z-40">
-        <TabsList>
-          <TabsTrigger value="asistencia">Asistencia</TabsTrigger>
-          <TabsTrigger value="registro">Registro</TabsTrigger>
-        </TabsList>
-      </div>
-      <TabsContent value="asistencia">
-        <AsistenciaView />
-      </TabsContent>
-      <TabsContent value="registro">
-        <RegistroView />
-      </TabsContent>
-    </Tabs>
-  );
+  // Por defecto, mostrar asistencia en la ruta "/"
+  if (location.pathname === "/") {
+    // Si ambos están activos, mostrar tabs para elegir
+    if (asistencia_activa && registro_activo) {
+      return (
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+          <div className="flex justify-center border-b sticky top-[55px] sm:top-[63px] bg-neutral-100 dark:bg-neutral-900 z-40">
+            <TabsList>
+              <TabsTrigger value="asistencia">Asistencia</TabsTrigger>
+              <TabsTrigger value="registro">Registro</TabsTrigger>
+            </TabsList>
+          </div>
+          <TabsContent value="asistencia">
+            <AsistenciaView />
+          </TabsContent>
+          <TabsContent value="registro">
+            <RegistroView />
+          </TabsContent>
+        </Tabs>
+      );
+    }
+
+    // Si ninguno está activo, mostrar mensaje
+    if (!asistencia_activa && !registro_activo) {
+      return (
+        <div className="flex w-full h-dvh -mt-20 justify-center items-center text-center p-4">
+          <div>
+            <h1 className="text-2xl font-bold">Por el momento no tienes acceso a esto.</h1>
+            <p className="mt-2">Se habilitará más adelante o consulta con algún tutor asignado.</p>
+          </div>
+        </div>
+      );
+    }
+
+    // Siempre mostrar asistencia en "/" por defecto
+    return <AsistenciaView />;
+  }
+
+  // Fallback para cualquier otra ruta
+  return <AsistenciaView />;
 };
 
 const AsistenciaView = () => (

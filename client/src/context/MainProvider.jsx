@@ -400,6 +400,7 @@ const MainProvider = ({ children }) => {
   const [iglesiaNEW, setIglesiaNEW] = useState("");
   const [pastorNEW, setPastorNEW] = useState("");
   const [privilegioNEW, setPrivilegioNEW] = useState("");
+  const [privilegioSubcategoriaNEW, setPrivilegioSubcategoriaNEW] = useState("");
   const [paisNEW, setPaisNEW] = useState("");
   const [modalidadNEW, setModalidadNEW] = useState("");
   const [cursoSeleccionadoNEW, setCursoSeleccionadoNEW] = useState(null);
@@ -420,6 +421,7 @@ const MainProvider = ({ children }) => {
     setIglesiaNEW("");
     setPastorNEW("");
     setPrivilegioNEW("");
+    setPrivilegioSubcategoriaNEW("");
     setPaisNEW("");
     setModalidadNEW("");
     setCursoSeleccionadoNEW(null);
@@ -469,6 +471,8 @@ const MainProvider = ({ children }) => {
         setPastorNEW,
         privilegioNEW,
         setPrivilegioNEW,
+        privilegioSubcategoriaNEW,
+        setPrivilegioSubcategoriaNEW,
         paisNEW,
         setPaisNEW,
         modalidadNEW,

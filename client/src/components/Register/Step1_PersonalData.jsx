@@ -13,6 +13,7 @@ import CRSelect from "../Preguntas/CRSelect";
 import { prefijos } from "@/context/prefijos";
 import { cn } from "@/lib/utils";
 import { translations } from "@/translations/registerTranslations";
+import { checkRegistrationLimit, incrementRegistrationCount } from "@/utils/registrationLimit";
 
 const Step1_PersonalData = ({ isLastStep, language }) => {
   const {
@@ -33,6 +34,8 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
     setPastorNEW,
     privilegioNEW,
     setPrivilegioNEW,
+    privilegioSubcategoriaNEW,
+    setPrivilegioSubcategoriaNEW,
     paisNEW,
     setPaisNEW,
     modalidadNEW,
@@ -71,9 +74,52 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
     { value: "Youtube", label: "Youtube" },
   ];
 
+  const privilegiosOptions = t.privilegios.categorias;
+  const privilegiosSubcategoriasOptions = t.privilegios.subcategorias;
+
+  // Mostrar subcategorías solo si se selecciona "Servidor/Ujier"
+  const showSubcategoria = privilegioNEW === "Servidor/Ujier";
+
   const handleBlur = (e) => {
     const { id } = e.target;
     setTouched((prev) => ({ ...prev, [id]: true }));
+  };
+
+  // Funciones de validación de caracteres
+  const handleNombresChange = (e) => {
+    const value = e.target.value;
+    // Solo permite letras (incluye acentos y ñ) y espacios
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]*$/;
+    if (regex.test(value) || value === "") {
+      setNombresNEW(value);
+    }
+  };
+
+  const handleApellidosChange = (e) => {
+    const value = e.target.value;
+    // Solo permite letras (incluye acentos y ñ) y espacios
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]*$/;
+    if (regex.test(value) || value === "") {
+      setApellidosNEW(value);
+    }
+  };
+
+  const handleIglesiaChange = (e) => {
+    const value = e.target.value;
+    // Permite letras, números, espacios y algunos caracteres especiales comunes
+    const regex = /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑüÜ\s.,\-'"()]*$/;
+    if (regex.test(value) || value === "") {
+      setIglesiaNEW(value);
+    }
+  };
+
+  const handlePastorChange = (e) => {
+    const value = e.target.value;
+    // Permite letras, espacios y punto (para abreviaturas como "Dr.")
+    const regex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s.]*$/;
+    if (regex.test(value) || value === "") {
+      setPastorNEW(value);
+    }
   };
 
   const validateForm = () => {
@@ -88,6 +134,10 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
     if (!iglesiaNEW.trim()) newErrors.iglesia = t.errors.iglesia;
     if (!pastorNEW.trim()) newErrors.pastor = t.errors.pastor;
     if (!privilegioNEW.trim()) newErrors.privilegio = t.errors.privilegio;
+    // Validar subcategoría solo si se seleccionó "Servidor/Ujier"
+    if (privilegioNEW === "Servidor/Ujier" && !privilegioSubcategoriaNEW.trim()) {
+      newErrors.privilegioSubcategoria = t.errors.privilegioSubcategoria;
+    }
     if (!modalidadNEW) newErrors.modalidad = t.errors.modalidad;
     return newErrors;
   };
@@ -105,13 +155,57 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
     iglesiaNEW,
     pastorNEW,
     privilegioNEW,
+    privilegioSubcategoriaNEW,
     modalidadNEW,
     language,
   ]);
 
+  // Limpiar subcategoría cuando se cambia el privilegio
+  useEffect(() => {
+    if (privilegioNEW !== "Servidor/Ujier") {
+      setPrivilegioSubcategoriaNEW("");
+    }
+  }, [privilegioNEW, setPrivilegioSubcategoriaNEW]);
+
+  // Verificar límite de registros al cargar el componente
+  useEffect(() => {
+    const registrationCheck = checkRegistrationLimit();
+
+    // Mostrar advertencia si queda solo 1 registro
+    if (registrationCheck.canRegister && registrationCheck.remainingRegistrations === 1) {
+      toast({
+        variant: "default",
+        title: language === "en" ? "Last Registration" : "Último Registro",
+        description: language === "en"
+          ? "This is your last registration opportunity from this browser."
+          : "Esta es tu última oportunidad de registro desde este navegador.",
+        duration: 5000,
+      });
+    }
+  }, [toast, language]);
+
   const handleFinalSubmit = async () => {
     setLoading(true);
     try {
+      // Verificar límite de registros
+      const registrationCheck = checkRegistrationLimit();
+
+      if (!registrationCheck.canRegister) {
+        toast({
+          variant: "destructive",
+          title: t.toast.registrationLimitTitle,
+          description: t.toast.registrationLimitDescription,
+          duration: 6000,
+        });
+        setLoading(false);
+        return;
+      }
+
+      // Construir el valor final del privilegio
+      const privilegioFinal = privilegioNEW === "Servidor/Ujier" && privilegioSubcategoriaNEW
+        ? `${privilegioNEW} - ${privilegioSubcategoriaNEW}`
+        : privilegioNEW;
+
       const response = await fetch(`${URL_BASE}/api/user/registerAlumno`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -123,7 +217,7 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
           email: correoNEW,
           iglesia: iglesiaNEW,
           pastor: pastorNEW,
-          privilegio: privilegioNEW,
+          privilegio: privilegioFinal,
           pais: paisNEW,
           modalidad: modalidadNEW,
         }),
@@ -133,6 +227,9 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
         const errorData = await response.json();
         throw new Error(errorData.error || t.toast.errorTitle);
       }
+
+      // Incrementar el contador de registros
+      incrementRegistrationCount();
 
       toast({
         variant: "success",
@@ -172,6 +269,7 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
         iglesia: true,
         pastor: true,
         privilegio: true,
+        privilegioSubcategoria: true,
         modalidad: true,
       });
       toast({
@@ -212,7 +310,7 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
                 id="nombres"
                 placeholder={t.placeholders.nombres}
                 value={nombresNEW}
-                onChange={(e) => setNombresNEW(e.target.value)}
+                onChange={handleNombresChange}
                 onBlur={handleBlur}
                 className={cn(
                   touched.nombres && errors.nombres && "border-red-500"
@@ -232,7 +330,7 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
                 id="apellidos"
                 placeholder={t.placeholders.apellidos}
                 value={apellidosNEW}
-                onChange={(e) => setApellidosNEW(e.target.value)}
+                onChange={handleApellidosChange}
                 onBlur={handleBlur}
                 className={cn(
                   touched.apellidos && errors.apellidos && "border-red-500"
@@ -322,7 +420,7 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
                 id="iglesia"
                 placeholder={t.placeholders.iglesia}
                 value={iglesiaNEW}
-                onChange={(e) => setIglesiaNEW(e.target.value)}
+                onChange={handleIglesiaChange}
                 onBlur={handleBlur}
                 className={cn(
                   touched.iglesia && errors.iglesia && "border-red-500"
@@ -342,7 +440,7 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
                 id="pastor"
                 placeholder={t.placeholders.pastor}
                 value={pastorNEW}
-                onChange={(e) => setPastorNEW(e.target.value)}
+                onChange={handlePastorChange}
                 onBlur={handleBlur}
                 className={cn(
                   touched.pastor && errors.pastor && "border-red-500"
@@ -353,28 +451,8 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
               )}
             </div>
 
-            {/* PRIVILEGIO */}
-            <div className="mb-2">
-              <Label htmlFor="privilegio">
-                {t.labels.privilegio} <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="privilegio"
-                placeholder={t.placeholders.privilegio}
-                value={privilegioNEW}
-                onChange={(e) => setPrivilegioNEW(e.target.value)}
-                onBlur={handleBlur}
-                className={cn(
-                  touched.privilegio && errors.privilegio && "border-red-500"
-                )}
-              />
-              {touched.privilegio && errors.privilegio && (
-                <p className="text-red-500 text-xs mt-1">{errors.privilegio}</p>
-              )}
-            </div>
-
             {/* MODALIDAD */}
-            <div className="mb-2 md:col-span-2">
+            <div className="mb-2">
               <div
                 onBlur={() =>
                   setTouched((prev) => ({ ...prev, modalidad: true }))
@@ -393,6 +471,52 @@ const Step1_PersonalData = ({ isLastStep, language }) => {
                 <p className="text-red-500 text-xs mt-1">{errors.modalidad}</p>
               )}
             </div>
+
+            {/* PRIVILEGIO */}
+            <div className="mb-2">
+              <div
+                onBlur={() =>
+                  setTouched((prev) => ({ ...prev, privilegio: true }))
+                }
+              >
+                <CRSelect
+                  title={t.labels.privilegio}
+                  require={true}
+                  data={privilegiosOptions}
+                  value={privilegioNEW}
+                  onChange={setPrivilegioNEW}
+                  placeholder={t.placeholders.privilegio}
+                />
+              </div>
+              {touched.privilegio && errors.privilegio && (
+                <p className="text-red-500 text-xs mt-1">{errors.privilegio}</p>
+              )}
+            </div>
+
+            {/* PRIVILEGIO SUBCATEGORÍA - Solo visible si se selecciona "Servidor/Ujier" */}
+            {showSubcategoria && (
+              <div className="mb-2">
+                <div
+                  onBlur={() =>
+                    setTouched((prev) => ({ ...prev, privilegioSubcategoria: true }))
+                  }
+                >
+                  <CRSelect
+                    title={t.labels.privilegioSubcategoria}
+                    require={true}
+                    data={privilegiosSubcategoriasOptions}
+                    value={privilegioSubcategoriaNEW}
+                    onChange={setPrivilegioSubcategoriaNEW}
+                    placeholder={t.placeholders.privilegioSubcategoria}
+                  />
+                </div>
+                {touched.privilegioSubcategoria && errors.privilegioSubcategoria && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {errors.privilegioSubcategoria}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center mt-8">

@@ -92,6 +92,21 @@ const RegisterAttendance = () => {
           setAlumnoSeleccionado(null);
           navigate("/");
         }, 4500);
+      } else if (response.status === 409) {
+        // Error 409: Ya registró asistencia hoy
+        const errorData = await response.json();
+        toast({
+          variant: "destructive",
+          title: "Ya registraste tu asistencia",
+          description: errorData.error || "Ya has registrado tu asistencia para el día de hoy.",
+          duration: 5000,
+        });
+        // Marcar como ya registrado y redirigir
+        setAlreadyRegistered(true);
+        setTimeout(() => {
+          setAlumnoSeleccionado(null);
+          navigate("/");
+        }, 3000);
       } else {
         throw new Error("Error al registrar asistencia");
       }

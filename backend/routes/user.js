@@ -169,6 +169,18 @@ router.post('/user/registerAttendance', async (req, res) => {
       return res.status(400).json({ error: 'Alumno no existe' })
     }
 
+    // Verificar si ya existe una asistencia para este alumno en esta fecha
+    const existingAttendance = await turso.execute({
+      sql: 'SELECT id FROM Asistencias WHERE alumno_id = ? AND fecha = ?',
+      args: [alumno_id, fecha]
+    })
+
+    if (existingAttendance.rows.length > 0) {
+      return res.status(409).json({
+        error: 'Ya has registrado tu asistencia para el día de hoy.'
+      })
+    }
+
     const resultado = await turso.execute({
       sql: 'INSERT INTO Asistencias (alumno_id, fecha, pregunta, tipo) VALUES (?, ?, ?, ?)',
       args: [alumno_id, fecha, pregunta, tipo]

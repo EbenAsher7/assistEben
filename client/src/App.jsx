@@ -41,14 +41,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-        <Route
-          path="/registerAttendance"
-          element={
-            <ProtectedRoute>
-              <RegisterAttendance />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/registerAttendance" element={<RegisterAttendance />} />
         <Route
           path="/admin"
           element={

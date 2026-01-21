@@ -16,6 +16,7 @@ const RegisterAttendance = () => {
   const [virtualSelected, setVirtualSelected] = useState(false);
   const [confirmClicked, setConfirmClicked] = useState(false);
   const [alreadyRegistered, setAlreadyRegistered] = useState(false);
+  const [registrationError, setRegistrationError] = useState(null); // 'duplicate' o 'limit'
   const [pregunta, setPregunta] = useState("");
   const [isTutor, setIsTutor] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,7 +34,10 @@ const RegisterAttendance = () => {
     setIsTutor(user && ["Tutor", "Administrador"].includes(user.tipo));
 
     const canRegister = checkAttendanceStatus(alumnoSeleccionado.id);
-    setAlreadyRegistered(!canRegister);
+    if (!canRegister) {
+      setAlreadyRegistered(true);
+      setRegistrationError('limit'); // Límite de 5 asistencias por navegador
+    }
   };
 
   const handlePresencialClick = () => {
@@ -93,20 +97,9 @@ const RegisterAttendance = () => {
           navigate("/");
         }, 4500);
       } else if (response.status === 409) {
-        // Error 409: Ya registró asistencia hoy
-        const errorData = await response.json();
-        toast({
-          variant: "destructive",
-          title: "Ya registraste tu asistencia",
-          description: errorData.error || "Ya has registrado tu asistencia para el día de hoy.",
-          duration: 5000,
-        });
-        // Marcar como ya registrado y redirigir
+        // Error 409: Este alumno ya registró su asistencia hoy
         setAlreadyRegistered(true);
-        setTimeout(() => {
-          setAlumnoSeleccionado(null);
-          navigate("/");
-        }, 3000);
+        setRegistrationError('duplicate'); // Asistencia duplicada del mismo alumno
       } else {
         throw new Error("Error al registrar asistencia");
       }
@@ -146,21 +139,35 @@ const RegisterAttendance = () => {
   };
 
   if (alreadyRegistered) {
+    let mensaje = "";
+
     if (isTutor) {
-      return (
-        <div className="flex justify-center items-center h-screen">
-          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">
-            Ya se ha registrado la asistencia de {alumnoSeleccionado.nombres} {alumnoSeleccionado.apellidos} para el día de hoy.
-          </p>
-        </div>
-      );
+      mensaje = `Ya se ha registrado la asistencia de ${alumnoSeleccionado.nombres} ${alumnoSeleccionado.apellidos} para el día de hoy.`;
     } else {
-      return (
-        <div className="flex justify-center items-center h-screen">
-          <p className="text-3xl font-bold text-center text-gray-800 dark:text-white">Ya has registrado un máximo de 5 asistencias el día de hoy.</p>
-        </div>
-      );
+      if (registrationError === 'duplicate') {
+        mensaje = "Ya has registrado tu asistencia para el día de hoy.";
+      } else if (registrationError === 'limit') {
+        mensaje = "Has alcanzado el límite de 5 registros de asistencia desde este dispositivo para el día de hoy.";
+      } else {
+        mensaje = "Ya has registrado tu asistencia para el día de hoy.";
+      }
     }
+
+    return (
+      <div className="flex flex-col justify-center items-center h-screen px-4">
+        <div className="max-w-2xl text-center">
+          <p className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-white">
+            {mensaje}
+          </p>
+          <button
+            className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+            onClick={handleBackClick}
+          >
+            Volver al inicio
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

@@ -52,6 +52,8 @@ export function AttendanceByDay({ value }) {
     }
   }, []);
 
+  const isAdmin = user?.tipo === "Administrador";
+
   const loadData = async () => {
     if (!selectedDate || !selectedModule) {
       toast({
@@ -65,7 +67,12 @@ export function AttendanceByDay({ value }) {
     setLoading(true);
     setDataLoaded(false);
     try {
-      const response = await fetch(`${URL_BASE}/get/getAttendanceByDateAndTutorAndModule/${selectedDate}/${user.id}/${selectedModule}`, {
+      // Si es admin, usar endpoint que trae todas las asistencias del módulo
+      const endpoint = isAdmin
+        ? `${URL_BASE}/get/getAttendanceByDateAndModuleAdmin/${selectedDate}/${selectedModule}`
+        : `${URL_BASE}/get/getAttendanceByDateAndTutorAndModule/${selectedDate}/${user.id}/${selectedModule}`;
+
+      const response = await fetch(endpoint, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -165,6 +172,7 @@ export function AttendanceByDay({ value }) {
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white min-w-[200px] max-w-[300px]">Nombre</th>
+                    {isAdmin && <th className="border border-gray-200 px-4 py-2 text-white dark:text-white min-w-[150px]">Tutor</th>}
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tipo de Asistencia</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white overflow-x-auto min-w-[200px] max-w-[300px]">
@@ -180,6 +188,7 @@ export function AttendanceByDay({ value }) {
                     <tr key={student.AlumnoID}>
                       <td className="border border-gray-200 px-4 py-2">{index + 1}</td>
                       <td className="border border-gray-200 px-4 py-2 min-w-[200px] max-w-[300px]">{student.AlumnoNombres}</td>
+                      {isAdmin && <td className="border border-gray-200 px-4 py-2 min-w-[150px]">{student.TutorNombre}</td>}
                       <td className="border border-gray-200 px-4 py-2 min-w-[100px]">
                         {student.Pregunta?.length > 0 ? (
                           <a
@@ -232,6 +241,7 @@ export function AttendanceByDay({ value }) {
                   <tr>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">#</th>
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Nombre</th>
+                    {isAdmin && <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Tutor</th>}
                     <th className="border border-gray-200 px-4 py-2 text-white dark:text-white">Teléfono</th>
                   </tr>
                 </thead>
@@ -240,6 +250,7 @@ export function AttendanceByDay({ value }) {
                     <tr key={student.AlumnoID}>
                       <td className="border border-gray-200 px-4 py-2">{index + 1}</td>
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoNombres}</td>
+                      {isAdmin && <td className="border border-gray-200 px-4 py-2">{student.TutorNombre}</td>}
                       <td className="border border-gray-200 px-4 py-2">{student.AlumnoTelefono}</td>
                     </tr>
                   ))}

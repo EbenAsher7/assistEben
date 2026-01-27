@@ -65,7 +65,11 @@ const RegisterAttendance = () => {
 
     try {
       const now = new Date();
-      const fechaActual = now.toISOString().split("T")[0];
+      // Usar fecha local en lugar de UTC para evitar desfases de zona horaria
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      const fechaActual = `${year}-${month}-${day}`;
       const response = await fetch(`${URL_BASE}/api/user/registerAttendance`, {
         method: "POST",
         headers: {

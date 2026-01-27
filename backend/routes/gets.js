@@ -405,6 +405,68 @@ router.get(
   }
 )
 
+// Obtener todas las asistencias por fecha y módulo (solo para Administradores)
+router.get(
+  '/getAttendanceByDateAndModuleAdmin/:date/:moduleId',
+  async (req, res) => {
+    try {
+      const { date, moduleId } = req.params
+
+      // Obtener todos los alumnos del módulo con sus asistencias y el nombre del tutor
+      const result = await turso.execute({
+        sql: `
+        SELECT
+          Alumnos.id AS AlumnoID,
+          Alumnos.nombres || ' ' || Alumnos.apellidos AS AlumnoNombres,
+          Alumnos.telefono AS AlumnoTelefono,
+          Asistencias.tipo AS TipoAsistencia,
+          Asistencias.pregunta as Pregunta,
+          Alumnos.email AS AlumnoEmail,
+          Alumnos.prefijoNumero AS AlumnoPrefijoNumero,
+          Tutores.nombres || ' ' || Tutores.apellidos AS TutorNombre
+        FROM Alumnos
+        LEFT JOIN Asistencias ON Alumnos.id = Asistencias.alumno_id AND Asistencias.fecha = ?
+        LEFT JOIN Tutores ON Alumnos.tutor_id = Tutores.id
+        WHERE Alumnos.modulo_id = ? AND Alumnos.activo = 'Activo';
+      `,
+        args: [date, moduleId]
+      })
+
+      const columns = result.columns
+      const rows = result.rows
+
+      const attendedStudents = []
+      const notAttendedStudents = []
+
+      rows.forEach((row) => {
+        const student = {
+          AlumnoID: row[columns.indexOf('AlumnoID')],
+          AlumnoNombres: row[columns.indexOf('AlumnoNombres')],
+          AlumnoTelefono: row[columns.indexOf('AlumnoTelefono')],
+          TipoAsistencia: row[columns.indexOf('TipoAsistencia')],
+          Pregunta: row[columns.indexOf('Pregunta')],
+          AlumnoEmail: row[columns.indexOf('AlumnoEmail')],
+          AlumnoPrefijoNumero: row[columns.indexOf('AlumnoPrefijoNumero')],
+          TutorNombre: row[columns.indexOf('TutorNombre')]
+        }
+        if (student.TipoAsistencia) {
+          attendedStudents.push(student)
+        } else {
+          delete student.TipoAsistencia
+          notAttendedStudents.push(student)
+        }
+      })
+
+      res.status(200).json({
+        attendedStudents,
+        notAttendedStudents
+      })
+    } catch (error) {
+      res.status(500).json({ error: error.message })
+    }
+  }
+)
+
 // obtener la suma de asistencias por tipo en un mes, año, tutor, dmodulo
 router.get(
   '/getAttendanceByMonthAndTutor/:month/:year/:tutorId/:moduloId/:day',

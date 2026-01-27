@@ -153,6 +153,15 @@ const Navbar = memo(() => {
                     </Link>
                   </li>
                 )}
+                <li className="text-black dark:text-white flex justify-center items-center">
+                  <Link
+                    to="/glossary"
+                    className="bg-amber-500 text-white dark:bg-amber-700 w-full sm:w-auto px-4 py-2 flex justify-center rounded-md"
+                    onClick={closeNavbar}
+                  >
+                    Glosario
+                  </Link>
+                </li>
                 {appSettings?.preguntas_activas && (
                   <li className="text-black dark:text-white flex justify-center items-center">
                     <Link

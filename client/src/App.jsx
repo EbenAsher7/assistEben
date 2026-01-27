@@ -12,6 +12,7 @@ import QuestionUser from "./components/Preguntas/QuestionUser";
 import QuestionsAdmin from "./components/Admin/QuestionsAdmin";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import TutorialesPage from "./pages/TutorialesPage";
+import Glossary from "./pages/Glossary";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
         <Route path="/newRegister" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/questions" element={<QuestionUser />} />
+        <Route path="/glossary" element={<Glossary />} />
 
         <Route
           path="/profile"

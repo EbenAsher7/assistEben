@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState, useRef, useMemo } from "react";
-import { flexRender, getCoreRowModel, getFilteredRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { useContext, useEffect, useState, useRef, useMemo, useCallback } from "react";
+import { flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, useReactTable } from "@tanstack/react-table";
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { ArrowUpDown, Pencil } from "lucide-react";
 import { URL_BASE } from "@/config/config";
 import { useToast } from "@/components/ui/use-toast";
@@ -201,6 +202,16 @@ const ListaCompletaAlumnos = () => {
   const { toast } = useToast();
   const { user } = useContext(MainContext);
   const tableRef = useRef(null);
+  const scrollTopRef = useRef(null);
+  const scrollTableRef = useRef(null);
+  const isSyncing = useRef(false);
+
+  const syncScroll = useCallback((source, target) => {
+    if (isSyncing.current) return;
+    isSyncing.current = true;
+    if (target.current) target.current.scrollLeft = source.current.scrollLeft;
+    requestAnimationFrame(() => { isSyncing.current = false; });
+  }, []);
 
   const fetchAllAlumnos = async () => {
     setIsLoading(true);
@@ -289,6 +300,8 @@ const ListaCompletaAlumnos = () => {
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: { pagination: { pageSize: 15 } },
     state: { sorting, columnFilters, globalFilter },
   });
 
@@ -332,8 +345,21 @@ const ListaCompletaAlumnos = () => {
           <Button>Exportar a Excel</Button>
         </DownloadTableExcel>
       </div>
-      <div className="rounded-md border overflow-x-auto">
-        <Table className="text-sm">
+      {/* Barra de scroll superior sincronizada */}
+      <div
+        ref={scrollTopRef}
+        className="overflow-x-auto rounded-t-md border border-b-0"
+        onScroll={() => syncScroll(scrollTopRef, scrollTableRef)}
+      >
+        <div style={{ width: "1200px", height: "1px" }} />
+      </div>
+      {/* Tabla principal */}
+      <div
+        ref={scrollTableRef}
+        className="rounded-b-md border overflow-x-auto"
+        onScroll={() => syncScroll(scrollTableRef, scrollTopRef)}
+      >
+        <Table className="text-sm" style={{ minWidth: "1200px" }}>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
@@ -378,6 +404,40 @@ const ListaCompletaAlumnos = () => {
             )}
           </TableBody>
         </Table>
+      </div>
+      {/* Paginación */}
+      <div className="flex items-center justify-between py-4">
+        <span className="text-sm text-muted-foreground">
+          Página {table.getState().pagination.pageIndex + 1} de {table.getPageCount()} — {table.getFilteredRowModel().rows.length} alumnos
+        </span>
+        <div className="flex items-center gap-2">
+          <Select
+            value={String(table.getState().pagination.pageSize)}
+            onValueChange={(val) => table.setPageSize(Number(val))}
+          >
+            <SelectTrigger className="w-[130px] h-8 text-sm">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10">10 por página</SelectItem>
+              <SelectItem value="15">15 por página</SelectItem>
+              <SelectItem value="25">25 por página</SelectItem>
+              <SelectItem value="50">50 por página</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="outline" size="sm" onClick={() => table.setPageIndex(0)} disabled={!table.getCanPreviousPage()}>
+            <ChevronsLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+            <ChevronLeft className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => table.setPageIndex(table.getPageCount() - 1)} disabled={!table.getCanNextPage()}>
+            <ChevronsRight className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       <div className="hidden">
         <Table ref={tableRef}>

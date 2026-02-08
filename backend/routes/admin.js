@@ -15,7 +15,8 @@ router.get('/settings', async (req, res) => {
     }, {})
     res.status(200).json(settings)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -104,7 +105,8 @@ router.get('/unassigned-students', async (req, res) => {
       totalStudents: total
     })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -123,7 +125,8 @@ router.get('/student/:id', async (req, res) => {
 
     res.status(200).json(result.rows[0])
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -145,7 +148,8 @@ router.get('/listados/tutores', async (req, res) => {
     `)
     res.status(200).json(result.rows)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -156,7 +160,10 @@ router.get('/listados/alumnos', async (req, res) => {
       SELECT
         a.id, a.nombres, a.apellidos, a.fecha_nacimiento,
         a.prefijoNumero || ' ' || a.telefono AS telefono_completo,
+        a.prefijoNumero, a.telefono,
         a.direccion, a.email, a.iglesia, a.pastor, a.privilegio, a.pais, a.modalidad,
+        a.observaciones,
+        a.tutor_id, a.modulo_id,
         a.activo AS estado,
         t.nombres || ' ' || t.apellidos AS tutor_asignado,
         m.nombre AS modulo_asignado
@@ -167,7 +174,8 @@ router.get('/listados/alumnos', async (req, res) => {
     `)
     res.status(200).json(result.rows)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -183,7 +191,8 @@ router.get('/listados/modulos', async (req, res) => {
     `)
     res.status(200).json(result.rows)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -208,7 +217,8 @@ router.get('/modules', async (req, res) => {
 
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -280,7 +290,8 @@ router.get('/allTutorsByModule/:tutorID', async (req, res) => {
 
     res.status(200).json(modulesArray)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -322,7 +333,8 @@ router.get('/alumnosModulo', async (req, res) => {
 
     res.status(200).json(data)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -368,7 +380,8 @@ router.get('/preguntasModulo', async (req, res) => {
 
     res.status(200).json(data)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -413,7 +426,8 @@ router.get('/asistenciasModulo', async (req, res) => {
 
     res.status(200).json(data)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -453,7 +467,8 @@ router.get('/alumnosPendientesModulo', async (req, res) => {
 
     res.status(200).json(data)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -496,7 +511,8 @@ router.get('/preguntasTipoAsistencia', async (req, res) => {
 
     res.status(200).json(data)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -533,7 +549,8 @@ router.get('/preguntasAnonimas/:startDate/:endDate', async (req, res) => {
     })
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 

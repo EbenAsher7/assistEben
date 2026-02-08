@@ -86,7 +86,8 @@ router.post('/user/login', async (req, res) => {
       }
     })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -148,7 +149,8 @@ router.post('/user/searchStudent', async (req, res) => {
 
     res.status(200).json(students)
   } catch (error) {
-    return res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    return res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -194,7 +196,8 @@ router.post('/user/registerAttendance', async (req, res) => {
 
     res.json({ Success: 'Asistencia registrada correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -217,7 +220,8 @@ router.get('/user/modules', async (req, res) => {
 
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -257,7 +261,8 @@ router.get('/user/tutors/:moduleId', async (req, res) => {
 
     res.status(200).json(tutors)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -356,7 +361,8 @@ router.post('/user/registerAlumno', async (req, res) => {
 
     res.json({ success: 'Alumno registrado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -391,7 +397,8 @@ router.post('/user/preguntas/nueva', async (req, res) => {
 
     res.json({ success: 'Pregunta registrada correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 

@@ -21,7 +21,8 @@ router.get('/modules', async (req, res) => {
 
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -43,7 +44,8 @@ router.get('/modulesDeleted', async (req, res) => {
 
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -78,7 +80,8 @@ router.get('/modulesByTutor/:tutorID', async (req, res) => {
 
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -102,7 +105,8 @@ router.get('/Allmodules', async (req, res) => {
 
     res.status(200).json(modules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -147,7 +151,8 @@ router.get('/tutors', async (req, res) => {
 
     res.status(200).json(tutors)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -172,7 +177,8 @@ router.get('/tutorsDeleted', async (req, res) => {
 
     res.status(200).json(tutors)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -188,7 +194,8 @@ router.delete('/modulesAndTutors/:id', async (req, res) => {
       .status(200)
       .json({ message: 'Asignacion de modulos eliminados correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -204,7 +211,8 @@ router.post('/modulesAndTutors', async (req, res) => {
       .status(201)
       .json({ message: 'Asignacion de modulos creada correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -230,7 +238,8 @@ router.get('/modulesAndTutors/:id', async (req, res) => {
 
     res.status(200).json(tutorsModules)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -251,7 +260,8 @@ router.get('/students', async (req, res) => {
 
     res.status(200).json(students)
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 

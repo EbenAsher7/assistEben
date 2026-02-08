@@ -1,5 +1,6 @@
 import express from 'express'
 import { turso } from '../database/connection.js'
+import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 dotenv.config()
 /* eslint-disable camelcase */
@@ -19,7 +20,14 @@ router.put('/updateStudent/:AlumnoID', async (req, res) => {
       direccion,
       tutor_id,
       modulo_id,
-      AlumnoActivo
+      AlumnoActivo,
+      email,
+      pais,
+      modalidad,
+      iglesia,
+      pastor,
+      privilegio,
+      prefijoNumero
     } = req.body
 
     // verificar que el AlumnoID esté presente
@@ -85,6 +93,34 @@ router.put('/updateStudent/:AlumnoID', async (req, res) => {
       updateFields.push('observaciones = ?')
       updateValues.push(AlumnoObservaciones)
     }
+    if (email !== undefined) {
+      updateFields.push('email = ?')
+      updateValues.push(email)
+    }
+    if (pais) {
+      updateFields.push('pais = ?')
+      updateValues.push(pais)
+    }
+    if (modalidad) {
+      updateFields.push('modalidad = ?')
+      updateValues.push(modalidad)
+    }
+    if (iglesia !== undefined) {
+      updateFields.push('iglesia = ?')
+      updateValues.push(iglesia)
+    }
+    if (pastor !== undefined) {
+      updateFields.push('pastor = ?')
+      updateValues.push(pastor)
+    }
+    if (privilegio !== undefined) {
+      updateFields.push('privilegio = ?')
+      updateValues.push(privilegio)
+    }
+    if (prefijoNumero) {
+      updateFields.push('prefijoNumero = ?')
+      updateValues.push(prefijoNumero)
+    }
 
     // Si no se proporcionó ningún campo a actualizar
     if (updateFields.length === 0) {
@@ -114,7 +150,8 @@ router.put('/updateStudent/:AlumnoID', async (req, res) => {
     const action = AlumnoActivo === 'Inactivo' ? 'desactivado' : 'actualizado'
     res.status(200).json({ Success: `Alumno ${action} correctamente` })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -169,7 +206,8 @@ router.put('/updateStudentPendant/:AlumnoID', async (req, res) => {
 
     res.status(200).json({ Success: 'Alumno actualizado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -229,8 +267,10 @@ router.put('/updateTutor/:TutorID', async (req, res) => {
       updateValues.push(username)
     }
     if (password) {
+      const saltRounds = parseInt(process.env.SALT_ROUNDS) || 10
+      const hashedPassword = await bcrypt.hash(password, saltRounds)
       updateFields.push('password = ?')
-      updateValues.push(password)
+      updateValues.push(hashedPassword)
     }
     if (tipo) {
       updateFields.push('tipo = ?')
@@ -272,7 +312,8 @@ router.put('/updateTutor/:TutorID', async (req, res) => {
 
     res.status(200).json({ Success: 'Tutor actualizado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -365,7 +406,8 @@ router.put('/updateCurso/:CursoID', async (req, res) => {
 
     res.status(200).json({ Success: 'Curso actualizado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 

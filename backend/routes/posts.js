@@ -82,7 +82,8 @@ router.post('/addTutor', async (req, res) => {
       Success: 'Tutor agregado correctamente'
     })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -137,7 +138,8 @@ router.post('/changePassword', async (req, res) => {
 
     res.json({ Success: 'Contraseña cambiada correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -173,7 +175,8 @@ router.post('/disableTutor', async (req, res) => {
 
     res.json({ Success: 'Usuario desactivado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -286,7 +289,8 @@ router.post('/addStudent', async (req, res) => {
 
     res.status(200).json({ Success: 'Alumno agregado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -322,7 +326,8 @@ router.post('/disableStudent', async (req, res) => {
 
     res.json({ Success: 'Alumno desactivado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -358,7 +363,8 @@ router.post('/acceptStudent', async (req, res) => {
 
     res.json({ Success: 'Alumno activado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -397,7 +403,8 @@ router.post('/changeTutorData', async (req, res) => {
 
     res.json({ Success: 'Datos del tutor cambiados correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -457,7 +464,8 @@ router.post('/changeStudentData', async (req, res) => {
 
     res.json({ Success: 'Datos del alumno cambiados correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
@@ -510,7 +518,8 @@ router.post('/addModulo', async (req, res) => {
 
     res.status(200).json({ Success: 'Módulo agregado correctamente' })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Error en la operación:', error.message)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
